@@ -1,7 +1,32 @@
 # Tooling
 
 This document contains resources to help you in both the tooling and
-development of the **visualize-it** project.
+development of the **svelte-native-forms** project.
+
+## Two Projects in One
+
+This project is a bit unusual in that it represents **"two projects in
+one"**!
+
+1. The **outer project** _(this one)_ serves two purposes: 
+   **a:** the **interactive demo app** and
+   **b:** the **formal documentation**
+   _(both of which are published on [GitHub Pages])_.
+
+   The tooling for this project is **seeded from [sveltejs/template]**
+   _(the project template for Svelte apps)_.
+
+2. The **inner project** _(found in the `snf/` directory)_ is the **utility
+   library** _(published on [npm])_.
+
+   The tooling for this project is **seeded from
+   [sveltejs/component-template]** _(the base for building shareable
+   Svelte components)_.
+
+The reason for this **"two projects in one"** approach is: first the
+**integration aspect** _(obviously)_, but **more importantly** to take
+advantage of the boiler plate tooling templates _(pretty much
+unmodified)_!
 
 
 # At a Glance
@@ -11,8 +36,7 @@ development of the **visualize-it** project.
 - [Project Resources]
 - [Project Setup]
   - [Setup GitHub Project]
-  - [Setup Svelte Tooling]
-  - [Setup UI Kit (SMUI)]
+  - [Setup Svelte App Tooling]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -35,7 +59,7 @@ app:devServe ... launch dev server, with continuous build (watching for code cha
                        1. invokes the rollup bundler in a "watch" state (to: public/build)
                        2. implicitly invokes "npm start" to launch the server
 
-docs:serve ..... AI: launch documentation server, continuously watching for docs changes
+docs:serve ..... AI: ?? launch documentation server, continuously watching for docs changes
 
 start .......... start a static file server from the contents of public/
                  http://localhost:5000/
@@ -47,26 +71,26 @@ start .......... start a static file server from the contents of public/
 
 TESTING
 =======
-test ........... run test suite, one time
-test:watch ..... run test suite, continuously watching for module changes
+test ........... AI: ?? run test suite, one time
+test:watch ..... AI: ?? run test suite, continuously watching for module changes
 
 
 CODE QUALITY
 ============
-app:lint ....... AI: verify code quality, linting BOTH production and test code
+app:lint ....... AI: ?? verify code quality, linting BOTH production and test code
                  NOTE: Real-time linting is ALSO available in the VSCode editor.
 
-app:check ...... AI: convenience script to:
+app:check ...... AI: ?? convenience script to:
                  - verify code quality (lint)
                  - show outdated installed packages
                  - run tests (against our master src)
 
-pkgReview ...... AI: show outdated installed packages
+pkgReview ...... AI: ?? show outdated installed packages
 
 
 DEPLOYMENT       NOTE: we DEPLOY the application
 ==========
-app:deploy ..... AI: deploy latest application to https://visualize-it.js.org/app/
+app:deploy ..... AI: ?? deploy latest application to https://svelte-native-forms.js.org/app/
                  NOTE: This script FIRST builds the app from scratch
                        ... via preapp:deploy
 
@@ -74,26 +98,26 @@ app:prodBuild .. build production bundle (to: public/build)
                  NOTE: This is implicitly invoked from app:deploy
 
 
-app:clean ...... AI: clean all machine-generated app/build directories
+app:clean ...... AI: ?? clean all machine-generated app/build directories
 
 
 PUBLISH          NOTE: we PUBLISH the documentation
 =======
-docs:publish ... AI: publish the latest documentation to https://visualize-it.js.org/docs/
+docs:publish ... AI: ?? publish the latest documentation to https://svelte-native-forms.js.org/docs/
                  NOTE: this script FIRST builds the docs from scratch
                        ... via predocs:publish
 
                  >>> OPTIONALLY:
-docs:build   ... AI: you can manually build the docs (into the _book/ dir)
+docs:build   ... AI: ?? you can manually build the docs (into the _book/ dir)
                  HOWEVER it is not typically necessary 
                  BECAUSE this build is executed as the first step in docs:publish
 
-docs:clean   ... AI: clean all machine-generated docs directories
+docs:clean   ... AI: ?? clean all machine-generated docs directories
 
 
 MISC
 ====
-clean .......... AI: cleans ALL machine-generated directories
+clean .......... AI: ?? cleans ALL machine-generated directories
 ```
 
 
@@ -104,7 +128,7 @@ clean .......... AI: cleans ALL machine-generated directories
 # Dependencies
 
 This section provides some insight regarding the various dependencies
-found in **visualize-it**.
+found in **svelte-native-forms**.
 
 The dependency list can become quite large for a mature project.  In
 looking at `package.json`, the inevitable questions are:
@@ -119,16 +143,30 @@ looking at `package.json`, the inevitable questions are:
   dependencies are `devDependencies`, due to the fact that all run-time
   resources are bundled together by the Svelte compiler.
 
-The following table itemizes the **visualize-it** dependencies,
+The following table itemizes the **svelte-native-forms** dependencies,
 referencing when/where they were introduced/configured.
+
+
+Dependency                        | Type        | Usage                   | Refer To
+--------------------------------- | ----------- | ----------------------- | ----------------
+`@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
+`rollup-plugin-css-only`          | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`rollup-plugin-svelte`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`rollup-plugin-terser`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
+`sirv-cli`                        | **TOOLING** | A static file server    | [Setup Svelte App Tooling]
+`svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte App Tooling]
+
+
+**OLD TEMPLATE:** ?? synced above (remove when complete)
 
 Dependency                        | Type        | Usage                   | Refer To
 --------------------------------- | ----------- | ----------------------- | ----------------
 `@babel/core`                     | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
 `@babel/preset-env`               | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
 <del>`@rollup/plugin-alias`</del> | **TOOLING** | Absolute Imports        | [Setup Absolute Imports]
-`@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte Tooling]
-`@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte Tooling]
 `babel-jest`                      | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
 `crc`                             | **APP**     | CRC Hashing Utility     | app code: `src/util/crc.js`
 `enumify`                         | **APP**     | Enumeration Utility     | app code: `src/...`
@@ -139,17 +177,11 @@ Dependency                        | Type        | Usage                   | Refe
 `lodash.isobject`                 | **APP**     | Validation              | app code: `src/util/typeCheck.js`
 `lodash.isplainobject`            | **APP**     | Validation              | app code: `src/util/typeCheck.js`
 `lodash.isstring`                 | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte Tooling]
-`rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte Tooling]
 `rollup-plugin-node-builtins`     | **TOOLING** | Build some npm packages | [Setup Node Builtins]
 `rollup-plugin-node-globals`      | **TOOLING** | Build some npm packages | [Setup Node Builtins]
-`rollup-plugin-postcss`           | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)]
-`rollup-plugin-svelte`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte Tooling]
-`rollup-plugin-terser`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte Tooling]
-`sass`                            | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)]
-`sirv-cli`                        | **TOOLING** | A static file server    | [Setup Svelte Tooling]
-`svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte Tooling]
-`svelte-material-ui`              | **APP**<br>**TOOLING** | UI Kit       | app code: `src/...`<br>[Setup UI Kit (SMUI)]
+`rollup-plugin-postcss`           | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)] ?? TRASH
+`sass`                            | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)] ?? TRASH
+`svelte-material-ui`              | **APP**<br>**TOOLING** | UI Kit       | app code: `src/...`<br>[Setup UI Kit (SMUI)] ?? TRASH
 
 
 
@@ -160,29 +192,31 @@ Wondering what some of the top-level file resources are?  Here is a
 summary:
 
 ```
-visualize-it/
+svelte-native-forms/
   .git/ ................ our local git repo
   .gitignore ........... git repo exclusions (typically machine generated)
-  _docs/ ............... machine generated docs [see: "AI"]
-  babel.config.js ...... babel configuration used by jest  [see: "Setup Jest Unit Testing")
-  docs/ ................ master source of our on-line docs [see: "AI"]
-  jest.config.js ....... jest unit testing configuration [see: "Setup Jest Unit Testing")
   LICENSE.md ........... our MIT License
   node_modules/ ........ install location of dependent packages (maintained by npm)
   package.json ......... project meta data with dependencies
   package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-  public/ .............. the Svelte app deployment root (with generated build/) [see: "Setup Svelte Tooling"]
+  public/ .............. the Svelte app deployment root (with generated build/) see: "Setup Svelte App Tooling"
   README.md ............ basic project docs
-  rollup.config.js ..... the rollup bundler configuration (used by Svelte) [see: "Setup Svelte Tooling"]
+  rollup.config.js ..... the rollup bundler configuration (used by Svelte) see: "Setup Svelte App Tooling"
   src/ ................. the app source code
   TOOLING.md ........... this document :-)
+
+  ?? L8TR: (as needed)
+  _docs/ ............... machine generated docs see: "AI"
+  babel.config.js ...... babel configuration used by jest see: "Setup Jest Unit Testing"
+  docs/ ................ master source of our on-line docs see: "AI"
+  jest.config.js ....... jest unit testing configuration see: "Setup Jest Unit Testing"
 ```
 
 
 <!--- *** SECTION *************************************************************** --->
 # Project Setup
 
-This section chronicles the original setup of the **visualize-it**
+This section chronicles the original setup of the **svelte-native-forms**
 project.
 
 If you are forking this project, this detail is _unnecessary_, because
@@ -197,8 +231,7 @@ were carried out, however in some cases the order can be changed.
 
 **Sub Sections**:
   - [Setup GitHub Project]
-  - [Setup Svelte Tooling]
-  - [Setup UI Kit (SMUI)]
+  - [Setup Svelte App Tooling]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -219,7 +252,7 @@ At the end of this process you should have:
 - A local git repository (for your development)
 - Impacted Files:
   ```
-    visualize-it/
+    svelte-native-forms/
       .git/ ................ our local git repo
       .gitignore ........... git repo exclusions (typically machine generated)
       README.md ............ basic project docs
@@ -239,13 +272,13 @@ _My personal notes are "hidden" (in comment form) in this doc ..._
            c:/data/tech/dev/GitHub.txt
 
 > ********************************************************************************
-- create github repository: visualize-it
+- create github repository: svelte-native-forms
   * New Project:
     - Create a Repository on GitHub (i.e. a project)
       * from github page (https://github.com/KevinAst)
       * click + (by user name)
       * New Repository
-      * repository name: visualize-it
+      * repository name: svelte-native-forms
       * description:     Your view into External Systems
       * Initialize this repository with a README
       * Add MIT License
@@ -261,9 +294,9 @@ _My personal notes are "hidden" (in comment form) in this doc ..._
                - skip this step if you’re importing an existing repository
       * now available on my local computer
         - local file system:
-          c:/dev/visualize-it> 
+          c:/dev/svelte-native-forms> 
         - Github repository:
-          https://github.com/KevinAst/visualize-it.git
+          https://github.com/KevinAst/svelte-native-forms.git
       * adjust following files:
         > AUTOMATICALLY DONE:
           .git/
@@ -273,7 +306,7 @@ _My personal notes are "hidden" (in comment form) in this doc ..._
         ... readme/license updates
       * verify README content on GitHub
       * add following topics (to github pages)
-        ... astx geeku visualize-it
+        ... astx geeku svelte-native-forms
         ... NOT: pwa
 
  > ********************************************************************************
@@ -284,7 +317,7 @@ KJB Notes --->
 
 
 <!--- *** SUB-SECTION *************************************************************** --->
-# Setup Svelte Tooling
+# Setup Svelte App Tooling
 
 This task assumes you are "starting from scratch", setting up the
 Svelte tooling _(the compiler, etc.)_, with the basic application code
@@ -299,6 +332,7 @@ At the end of this process you should have:
   @rollup/plugin-commonjs
   @rollup/plugin-node-resolve
   rollup
+  rollup-plugin-css-only
   rollup-plugin-livereload
   rollup-plugin-svelte
   rollup-plugin-terser
@@ -308,12 +342,12 @@ At the end of this process you should have:
 
 - Impacted Files:
   ```
-  visualize-it/
+  svelte-native-forms/
     node_modules/ ........ install location of dependent packages (maintained by npm)
     package.json ......... project meta data with dependencies
     package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-    public/ .............. the Svelte app deployment root (with generated build/) [see: "Setup Svelte Tooling"]
-    rollup.config.js ..... the rollup bundler configuration (used by Svelte) [see: "Setup Svelte Tooling"]
+    public/ .............. the Svelte app deployment root (with generated build/) [see: "Setup Svelte App Tooling"]
+    rollup.config.js ..... the rollup bundler configuration (used by Svelte) [see: "Setup Svelte App Tooling"]
     src/ ................. the app source code (the basic template starting point)
   ```
 
@@ -333,8 +367,8 @@ using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that co
 ```
 - Summary Instructions:
   $ cd c:/dev
-  $ npx degit sveltejs/template visualize-it
-  $ cd visualize-it
+  $ npx degit sveltejs/template svelte-native-forms
+  $ cd svelte-native-forms
   $ npm install
   $ npm run dev
 
@@ -373,12 +407,12 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 - create a new project
   $ cd c:/dev
   # copy template to your project root
-  $ npx degit sveltejs/template visualize-it
+  $ npx degit sveltejs/template svelte-native-forms
 
 - setup the new project
-  $ cd visualize-it
+  $ cd svelte-native-forms
   * edit package.json
-    "name": "visualize-it",
+    "name": "svelte-native-forms",
     "version": "0.1.0",
   $ npm install
     added 74 packages from 130 contributors and audited 104 packages in 4.591s
@@ -388,21 +422,21 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 
 - configure static resources
   * public/index.html
-    - change Title: visualize-it
+    - change Title: svelte-native-forms
     - change resource resolution FROM absolute TO relative, making it deployable in a relative directory
-  * change the public/favicon.png to be visualize-it specific
-    - define the various visualize-it icons
+  * change the public/favicon.png to be svelte-native-forms specific
+    - define the various svelte-native-forms icons
       public/
-        visualize-it.png            ... our favicon
-        visualize-it-logo.png       ... our logo
-        visualize-it-logo-eyes.jpg  ... prying eyes
+        svelte-native-forms.png            ... our favicon
+        svelte-native-forms-logo.png       ... our logo
+        svelte-native-forms-logo-eyes.jpg  ... prying eyes
     - update index.html
-      * reference visualize-it.png
+      * reference svelte-native-forms.png
     - delete template favicon.png
 
 - configure VSCode
   * setup VSCode workspace file (and edit):
-    c:/dev/visualize-it.code-workspace 
+    c:/dev/svelte-native-forms.code-workspace 
   * launch this workspace
   * ONE TIME: NOW load the VSCode "svelte" extension
 
@@ -434,128 +468,10 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 KJB Notes --->
 
 
-
-
-<!--- *** SUB-SECTION *************************************************************** --->
-# Setup UI Kit (SMUI)
-
-**visualize-it** uses the [**Svelte Material UI Kit
-(SMUI)**](https://sveltematerialui.com/) for it's UI.
-
-**Links**:
-- [web (demos)](https://sveltematerialui.com/)
-- [npm](https://www.npmjs.com/package/svelte-material-ui) _(324 weekly downloads (in beta), 3,600 watches)_
-- [repo](https://github.com/hperrin/svelte-material-ui)
-- [Component Docs](https://github.com/hperrin/svelte-material-ui#components)
-  are in the form in individual READMEs _(mostly just a short desc)_
-  - here is the [component sample code](https://github.com/hperrin/svelte-material-ui/tree/master/site/src/routes/demo)
-    _for the demos link (above)_
-  - implementations for components that need to be _"Svelte-ified"_
-  - otherwise, simply use the MDC package directly _(pre-installed with SMUI)_
-
-At the end of this process you should have:
-
-- The ability to use the SMUI components.
-
-  ```
-  <script>
-    import Drawer from '@smui/drawer';
-    ...
-  </script>
-
-  ... 
-
-  <Drawer ... />
-  ```
-
-- Impacted Dependencies:
-  ```
-  rollup-plugin-postcss
-  sass
-  svelte-material-ui
-  ```
-
-- Impacted Files:
-  ```
-  visualize-it/
-    rollup.config.js .............. modified to include SMUI configuration
-    public/index.html ............. modified to include MDC fonts
-    src/theme/_smui-theme.scss .... defining SMUI's app theme
-  ```
-
-**Installation Details**:
-
-[Official Instructions here](https://github.com/hperrin/svelte-material-ui#installation) _(rather vague)_
-
-- Install UI Kit:
-  
-  **NOTE**: I installed the entire lib, even though they recommend
-            installing individual components ... _remember the build
-            process should only include the components that are used
-            in your code_!
-
-  ```
-  $ npm install --save-dev svelte-material-ui
-    + svelte-material-ui@1.0.0-beta.21
-      added 76 packages from 6 contributors and audited 2879 packages in 16.067s
-
-    - NOTE: installed in same location as individual installs: 
-            node_modules/@smui
-  ```
-
-- Configure `rollup.config.js` _(in support of SMUI)_
-
-  The instructions are rather vague.  I ended up mimicking the contents of
-  [`rollup.config.js` found in the demo site](https://github.com/hperrin/svelte-material-ui/blob/master/site/rollup.config.js).
-
-  * edit `rollup.config.js`
-    For details, see embedded comments:
-    ```
-    Sass Processor (used by Svelte Material UI (SMUI))
-    ```
-
-  * install Sass Processor
-
-    ```
-    $ npm install --save-dev sass
-      + sass@1.26.3
-        added 1 package from 1 contributor and audited 1134 packages in 2.463s
-    ```
-
-  * install the rollup postcss plugin
-
-    ```
-    $ npm install --save-dev rollup-plugin-postcss
-      + rollup-plugin-postcss@2.8.2
-        added 220 packages from 139 contributors and audited 1073 packages in 15.053s
-    ```
-
-- Define the SMUI Theme resource: `src/theme/_smui-theme.scss`
-  * This is where you set the MDC theme variables. 
-  * If it's empty, it will use the default theme values from MDC. 
-  * See the [theme file in the demo site](https://github.com/hperrin/svelte-material-ui/blob/master/site/src/theme/_smui-theme.scss)
-    for an example that uses Svelte colors.
-  * Add `@import '@material/typography/mdc-typography';` to pull in the MDC Typography CSS classes
-
-    **usage:**
-    ```html
-    <p class="mdc-typography--subtitle2">Hello</p>
-    ```
-
-- Define the MDC fonts (Material Icon, Roboto, and Roboto Mono fonts):
-
-  ```
-  public/index.html
-  =================
-  <!-- KJB: Material UI fonts (used by Svelte Material UI (SMUI))  -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono">
-  ```
-
-
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Absolute Imports
+
+TODO: ?? update this when we start using it
 
 **NOTE**: Due to a bug in the [alias rollup
 plugin](https://www.npmjs.com/package/@rollup/plugin-alias), resulting
@@ -612,7 +528,7 @@ At the end of this process you should have:
 
 - Impacted Files:
   ```
-  visualize-it/
+  svelte-native-forms/
     rollup.config.js ... modified to include alias configuration (Absolute Imports)
   ```
 
@@ -654,6 +570,8 @@ At the end of this process you should have:
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Node Builtins
 
+TODO: ?? WHAT?
+
 Some npm packages utilize node builtins.  This requires some
 additional rollup configuration!
 
@@ -668,7 +586,7 @@ error from the svelte build process:
 Creating a browser bundle that depends on 'buffer'.
 You might need to include https://www.npmjs.com/package/rollup-plugin-node-builtins       
 (!) Plugin node-resolve: preferring built-in module 'buffer' over local alternative at 
-    'C:\dev\visualize-it\node_modules\buffer\index.js', pass 'preferBuiltins: false'
+    'C:\dev\svelte-native-forms\node_modules\buffer\index.js', pass 'preferBuiltins: false'
     to disable this behavior or 'preferBuiltins: true' to disable this warning
 (!) Unresolved dependencies
 https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
@@ -711,7 +629,7 @@ At the end of this process you should have:
 
 - Impacted Files:
   ```
-  visualize-it/
+  svelte-native-forms/
     rollup.config.js ... modified to include Node Builtin configuration
   ```
 
@@ -756,7 +674,9 @@ At the end of this process you should have:
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Jest Unit Testing
 
-**visualize-it** uses [Jest](https://jestjs.io/en/) as it's unit
+TODO: ?? update when in-use
+
+**svelte-native-forms** uses [Jest](https://jestjs.io/en/) as it's unit
 testing framework.  Svelte is **not** pre-configured with any testing
 solution, so you must configure this yourself.
 
@@ -782,7 +702,7 @@ At the end of this process you should have:
 
 - Impacted Files:
   ```
-  visualize-it/
+  svelte-native-forms/
     babel.config.js ...... babel configuration used by jest  [see: "Setup Jest Unit Testing")
     jest.config.js ....... jest unit testing configuration [see: "Setup Jest Unit Testing")
   ```
@@ -792,7 +712,7 @@ At the end of this process you should have:
 **NOTE**: Jest requires babel, which not available in Svelte
           out-of-the-box, so you must install it manually.
 
-**SideBar**: **visualize-it** does **not** systematically test the GUI
+**SideBar**: **svelte-native-forms** does **not** systematically test the GUI
              itself, only business logic in JavaScript modules.  As a result, any
              UI related dependency found in the linked instructions were omitted.
 
@@ -861,16 +781,16 @@ At the end of this process you should have:
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Documentation Tooling
 
-AI: details to follow
+TODO: ?? details to follow
 
 
 
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Deployment
 
-**visualize-it** is deployed on github pages (both the web-app and our documentation).
+**svelte-native-forms** is deployed on github pages (both the web-app and our documentation).
 
-AI: refine this when I actually do it (in visualize-it)
+TODO: ?? refine this when I actually do it (in svelte-native-forms)
 
 At the end of this process you should have:
 
@@ -898,8 +818,8 @@ At the end of this process you should have:
 
       * setup js.org sub-domain web alias (takes time to resolve)
         - for detailed steps see: "setup js.org" below 
-        - FROM: https://kevinast.github.io/visualize-it
-          TO:   https://visualize-it.js.org
+        - FROM: https://kevinast.github.io/svelte-native-forms
+          TO:   https://svelte-native-forms.js.org
         - you can actually do this at ANY TIME (first or last)
           BECAUSE: there is NO build dependency on the deployment domain
           EVERYTHING IS USING RELATIVE RESOURCES!!!
@@ -912,16 +832,16 @@ At the end of this process you should have:
         /              ... root
           CNAME        ... the gh-pages custom domain
           index.html   ... a redirector to our docs
-                           ex: FROM: https://visualize-it.js.org/
-                               TO:   https://visualize-it.js.org/docs
+                           ex: FROM: https://svelte-native-forms.js.org/
+                               TO:   https://svelte-native-forms.js.org/docs
 
           docs/        ... app documentation
             bla            FROM: {project}/_docs ... machine generated from {project}/docs (via gitbook)
-            bla            ex:   https://visualize-it.js.org/docs
+            bla            ex:   https://svelte-native-forms.js.org/docs
 
           app/         ... app deployment
             bla            FROM: {project}/build ... machine generated from {project}/ (via create-react-app)
-            bla            ex:   https://visualize-it.js.org/app
+            bla            ex:   https://svelte-native-forms.js.org/app
 
 
       > GENERAL -and- DOCS-RELATED
@@ -938,7 +858,7 @@ At the end of this process you should have:
             _docs/
               CNAME
               =====
-              visualize-it.js.org
+              svelte-native-forms.js.org
 
               index.html  ... redirector to docs
               ==========
@@ -950,13 +870,13 @@ At the end of this process you should have:
                   <script>
                     window.location.href = "./docs"
                   </script>
-                  <title>visualize-it docs redirect</title>
+                  <title>svelte-native-forms docs redirect</title>
                 </head>
                 <body>
-                  <h1>visualize-it docs redirect</h1>
+                  <h1>svelte-native-forms docs redirect</h1>
                   <p>
                     If you are not redirected automatically, follow this link to the
-                    <a href="./docs">visualize-it docs</a>
+                    <a href="./docs">svelte-native-forms docs</a>
                   </p>
                 </body>
               </html>
@@ -968,7 +888,7 @@ At the end of this process you should have:
           $ npx gh-pages --dist _docs
 
         - WORKS: test redirection to docs
-          https://visualize-it.js.org/
+          https://svelte-native-forms.js.org/
 
         - you can now discard {project}/_docs
           ... should never change
@@ -1025,7 +945,7 @@ DO THIS       - AND making all our run-time resource retrievals RELATIVE (no sta
                 ... this is the resources found in {project}/public
                 ... ex: 
                         * KonvaSandboxScreen.js
-                          <img src="visualize-it-logo.png" width="300" alt="Logo" className={classes.entry} /> ... NOT: /visualize-it-logo.png
+                          <img src="svelte-native-forms-logo.png" width="300" alt="Logo" className={classes.entry} /> ... NOT: /svelte-native-forms-logo.png
                         * initializeFirebase.js
                           const resp = await fetch('fbac'); ... NOT: '/fbac'
           
@@ -1050,7 +970,7 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                 ... http://localhost:3000/
             - in prod
               $ npm run app:deploy
-                ... https://visualize-it.js.org/app/
+                ... https://svelte-native-forms.js.org/app/
 
       > GENERAL
       * check in / sync
@@ -1093,20 +1013,20 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
             <html lang="en">
               <head>
                 <meta charset="utf-8" />
-                <title>visualize-it</title>
+                <title>svelte-native-forms</title>
               </head>
               <body>
-                <h1>visualize-it</h1>
+                <h1>svelte-native-forms</h1>
             
                 <p>
-                  <b>visualize-it</b> promotes an interactive graphical
+                  <b>svelte-native-forms</b> promotes an interactive graphical
                   visualization of an external system!
                 </p>
-                  <img src="./visualize-it-logo.png"  width="250" alt="Logo"/>
+                  <img src="./svelte-native-forms-logo.png"  width="250" alt="Logo"/>
                 <p>
                   This is your view into External Systems!
                 </p>
-                  <img src="./visualize-it-logo-eyes.jpg" width="500" alt="Logo Eyes"/>
+                  <img src="./svelte-native-forms-logo-eyes.jpg" width="500" alt="Logo Eyes"/>
             
                 <p>
                   This is currently work-in-progress and will be used to
@@ -1114,7 +1034,7 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                 </p>
             
                 <p>
-                  Please take a look at the initial <a href="https://github.com/KevinAst/visualize-it/blob/initial-tooling/docs/visualize-it.md">Design Docs</a>.
+                  Please take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/initial-tooling/docs/svelte-native-forms.md">Design Docs</a>.
                 </p>
             
               </body>
@@ -1124,18 +1044,18 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
             $ npx gh-pages --dist _docs
 
           * test site
-            ... https://KevinAst.github.io/visualize-it
+            ... https://KevinAst.github.io/svelte-native-forms
 
-        - setup the js.org sub-domain alias: https://visualize-it.js.org/
+        - setup the js.org sub-domain alias: https://svelte-native-forms.js.org/
           ... see: c:/data/tech/dev/GitHub.txt (configure the js.org subdomain) ... prob a bit stale
           * KEY:  js.org offers sub-domain that points to GitHub Pages
-          * NICE: https://visualize-it.js.org/
-                  https://kevinast.github.io/visualize-it
+          * NICE: https://svelte-native-forms.js.org/
+                  https://kevinast.github.io/svelte-native-forms
 
           * setup CNAME file at root and deploy to gh-pages
               CNAME
               =====
-              visualize-it.js.org
+              svelte-native-forms.js.org
 
              - issue a PR that adds my sub-domain to js.org
                * all done from the web
@@ -1150,16 +1070,16 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                  ... https://github.com/KevinAst/js.org    <<< FYI: used to be dns.js.org
                    * via the web, edit the cnames_active.js file
                    * add your entry:
-                         "visualize-it": "kevinast.github.io/visualize-it",
+                         "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
                    * commit:
-                     ... adding visualize-it sub-domain
+                     ... adding svelte-native-forms sub-domain
                    * issue New Pull Request
                    * back in the dns.js.org, monitor your Pull Request
                      ... https://github.com/js-org/js.org/pulls
                          https://github.com/js-org/js.org/pull/3516
                      ... should take effect within 24 hrs
                      - confirm: web site NO LONGER SERVES till they enact this
-                       https://kevinast.github.io/visualize-it/
+                       https://kevinast.github.io/svelte-native-forms/
                      - wait for sub-domain to go live
                        * GEEZE: they rejected this because it doesn't have reasonable content
                          ... https://github.com/js-org/js.org/wiki/No-Content
@@ -1176,7 +1096,7 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                            . Kevin
                        * ONCE MERGED 
                        * WORKS: should be able to now see the url:
-                         ... https://visualize-it.js.org/
+                         ... https://svelte-native-forms.js.org/
 
 KJB Notes --->
 
@@ -1191,10 +1111,14 @@ KJB Notes --->
 [Project Resources]:              #project-resources
 [Project Setup]:                  #project-setup
   [Setup GitHub Project]:         #setup-github-project
-  [Setup Svelte Tooling]:         #setup-svelte-tooling
-  [Setup UI Kit (SMUI)]:          #setup-ui-kit-smui
+  [Setup Svelte App Tooling]:     #setup-svelte-app-tooling
   [Setup Absolute Imports]:       #setup-absolute-imports
   [Setup Node Builtins]:          #setup-node-builtins
   [Setup Jest Unit Testing]:      #setup-jest-unit-testing
   [Setup Documentation Tooling]:  #setup-documentation-tooling
   [Setup Deployment]:             #setup-deployment
+
+[GitHub Pages]:                   https://pages.github.com/
+[npm]:                            https://www.npmjs.com/
+[sveltejs/template]:              https://github.com/sveltejs/template
+[sveltejs/component-template]:    https://github.com/sveltejs/component-template
