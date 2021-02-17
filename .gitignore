@@ -2,3 +2,7 @@
 /public/build/
 
 .DS_Store
+
+# machine generated docs (from GitBook)
+/_book/
+/_docs/

@@ -90,7 +90,7 @@ pkgReview ...... AI: ?? show outdated installed packages
 
 DEPLOYMENT       NOTE: we DEPLOY the application
 ==========
-app:deploy ..... AI: ?? deploy latest application to https://svelte-native-forms.js.org/app/
+app:deploy ..... deploy latest application to https://svelte-native-forms.js.org/app/
                  NOTE: This script FIRST builds the app from scratch
                        ... via preapp:deploy
 
@@ -152,6 +152,7 @@ Dependency                        | Type        | Usage                   | Refe
 `@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
+`gh-pages`                        | **TOOLING** | Deployment              | [Setup Deployment]
 `rollup-plugin-css-only`          | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-svelte`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
@@ -788,13 +789,124 @@ TODO: ?? details to follow
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Deployment
 
-**svelte-native-forms** is deployed on github pages (both the web-app and our documentation).
-
-TODO: ?? refine this when I actually do it (in svelte-native-forms)
+**svelte-native-forms** is deployed on [GitHub Pages] (both the demo
+web-app and our documentation).
 
 At the end of this process you should have:
 
-- AI: itemize this when I actually do it
+- A github pages `js.org` sub-domain: 
+  * FROM: https://kevinast.github.io/svelte-native-forms/
+  * TO:   https://svelte-native-forms.js.org/
+
+- AI: ?? The ability to deploy the formal docs (to github pages)
+
+- The ability to deploy the demo app (to github pages)
+  ```
+  $ npm run app:deploy
+  ```
+
+- Impacted Dependencies:
+  ```
+  gh-pages
+  ```
+
+- Impacted Scripts:
+  ```
+  app:deploy
+  docs:publish ?? AI
+  ```
+
+
+**Install gh-pages**
+
+All deployment scripts use the `gh-pages` utility, that simplifies publishing resources
+to [GitHub Pages].  Install as follows:
+
+```
+$ npm install --save-dev gh-pages
+```
+
+
+**Establish `js.org` sub-domain**
+
+Both our app and docs are deployed to [GitHub Pages].  To accommodate a
+more professional URL, [js.org] supports a sub-domain, so that our
+site is transformed:
+
+- **from this**: https://kevinast.github.io/svelte-native-forms/
+- **to this**:   https://svelte-native-forms.js.org/
+
+Simply follow the instructions on [js.org].  Here is my summary _(more
+notes hidden here in comment form)_:
+
+```
+ - create a temporary dir to deploy content to the gh-pages branch.
+   * EX: _docs/
+   * NOTE: can deploy to gh-pages branch at any time with:
+           $ npx gh-pages --dist _docs
+
+ - create a temporary index.html page at gh-pages root:
+   * NOTE: this must convey enough content to be accepted as a legit npm package
+
+ - create a CNAME file at gh-pages root:
+   * CNAME
+     =====
+     svelte-native-forms.js.org
+   * NOTE: Once this is done, you will not be able to browse your gh-pages
+           till js.org processes PR (below)
+
+ - issue a js.org PR to introduce our sub-domain
+   * new entry in: cnames_active.js
+     ... "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
+   * monitor PR acceptance (will take 24 hrs)
+
+ - once complete the sub-domain should be active
+   * NOTE: the original gh-pages link to the new sub-domain
+```
+
+**Relative App Resources**
+
+Because our app is deployed to a sub-directory of github pages, all
+startup html resource references should be relative.  Simply change
+`public/index.html` as follows:
+
+```diff
+public/index.html
+=================
+-   <link rel='icon' type='/image/png' href='/favicon.png'>
++   <link rel='icon' type='/image/png' href='favicon.png'>
+
+-   <link rel='stylesheet' href='/global.css'>
++   <link rel='stylesheet' href='global.css'>
+
+-   <link rel='stylesheet' href='/build/bundle.css'>
++   <link rel='stylesheet' href='build/bundle.css'>
+
+-   <script defer src='/build/bundle.js'></script>
++   <script defer src='build/bundle.js'></script>
+```
+
+**Add `app:deploy` Script**
+
+Add the following scripts to `package.json`:
+
+```
+package.json
+============
+{
+  ...
+  "scripts": {
+    "preapp:deploy": "npm run app:prodBuild",
+    "app:deploy": "gh-pages --dist public --dest app",
+    ... snip snip
+  }  
+}
+```
+
+
+**Add `docs:publish` Script** ?? AI
+
+
 
 <!--- Comment out KJB Notes
 
@@ -811,7 +923,7 @@ At the end of this process you should have:
 - AI: retrofit this
 
       ********************************
-      * SUMMARIZE DEPLOYMENT PROCESS * ... stale master in: CreateReactApp.txt
+      * SUMMARIZE DEPLOYMENT PROCESS *
       ********************************
 
       > KEY: We are deploying BOTH docs and app on the same site
@@ -904,8 +1016,8 @@ At the end of this process you should have:
         - TERMINOLOGY:
           "terminology:COMMENT":   "app is DEPLOYED, and docs are PUBLISHED",
         - DEPLOY APP (NOTE: see CRA for setup required to deploy to a sub-directory ... there is a bit of config)
-          "preapp:deploy":         "npm run app:build",
-KEY       "app:deploy":            "gh-pages --dist build --dest app"
+          "preapp:deploy": "npm run app:prodBuild",
+          "app:deploy": "gh-pages --dist public --dest app",
         - PUBLISH DOCS
           "l8tr:docs:prepare:do:once":  "gitbook install",
           "l8tr:docs:build:COMMENT":    "NOTE: for gitbook build/serve, following diagnostics are useful: --log=debug --debug",
@@ -931,7 +1043,7 @@ KEY       "docs:publish":          "gh-pages --dist _docs --dest docs",
           - KEY: important concept: we are deploying our app in a sub-directory of our server
                  ... this is a bit different than we have done before
                  ... sidebar: and we are deploying our docs in a different sub-directory
-          - CRA has a new option that makes it EASY to deploy apps in a sub-directory of our server
+          - CRA (Create React App) has a new option that makes it EASY to deploy apps in a sub-directory of our server
             * we can simply plop our app into ANY dir
             * KEY: for us, this is a viable option BECAUSE we are NOT using the:
                    - HTML5 pushState history API
@@ -1000,15 +1112,25 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
 
         - prime the pump by putting a dummy page in the root:
 
-          * crete _docs directory where our machine generated gitbook will eventually be places
+          * create _docs directory where our machine generated gitbook will eventually be placed
             - .gitignore it
               # machine generated docs (from GitBook)
               /_book/
               /_docs/
 
           * add following temporary html file to this _docs 
-            _docs/index.html <<< NOTE: has to be "reasonable content"
-            ================ <<< NOTE: we can just deploy our app for this too (now that it can be plopped anywhere)
+            - NOTE: has to be "reasonable content"
+                    - per their README, their focus is on granting subdomain requests to
+                      projects with a clear relation to the JavaScript ecosystem and
+                      community (NOT personal pages, blogs, etc.).
+                    - Projects such as NPM packages, libraries, tools that have a clear
+                      direct relation to JavaScript, will be accepted when requesting a
+                      JS.ORG subdomain.
+                    - KJB: My experience is that by a) placing limited content in, and b) rerencing other project docs and your README
+                           IT WILL BE ACCEPTED
+
+            _docs/index.html
+            ================
             <!DOCTYPE html>
             <html lang="en">
               <head>
@@ -1018,23 +1140,32 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
               <body>
                 <h1>svelte-native-forms</h1>
             
+                <p><i>... minimalist form validation with powerful results</i></p>
                 <p>
-                  <b>svelte-native-forms</b> promotes an interactive graphical
-                  visualization of an external system!
-                </p>
-                  <img src="./svelte-native-forms-logo.png"  width="250" alt="Logo"/>
-                <p>
-                  This is your view into External Systems!
-                </p>
-                  <img src="./svelte-native-forms-logo-eyes.jpg" width="500" alt="Logo Eyes"/>
-            
-                <p>
-                  This is currently work-in-progress and will be used to
-                  cross-communicate to co-workers on the project.
+                  Validating forms has notoriously been a painful development
+                  experience. Implementing client side validation in a user friendly way
+                  is a tedious and arduous process • you want to validate fields only at
+                  the appropriate time (when the user has had the chance to enter the
+                  data) • you want to present validation errors in a pleasing way • you
+                  may need to apply custom validation (specific to your application
+                  domain) • etc.
                 </p>
             
                 <p>
-                  Please take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/initial-tooling/docs/svelte-native-forms.md">Design Docs</a>.
+                  Even with the introduction of HTML5's Form Validation, it is still
+                  overly complex, and doesn't address many common scenarios (mentioned
+                  above). Without the proper approach, form validation can be one of the
+                  most difficult tasks in web development.
+                </p>
+            
+                <p>
+                  This sub-domain is currently work-in-progress and will
+                  eventually hold BOTH the formal documentation and the deployed app
+                  <i>(similar to other projects under my control: e.g. <a href="http://feature-u.js.org/">http://feature-u.js.org/</a>)</i>
+                </p>
+            
+                <p>
+                  For now you may wish to take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/main/README.md">Design Docs</a>.
                 </p>
             
               </body>
@@ -1071,30 +1202,21 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                    * via the web, edit the cnames_active.js file
                    * add your entry:
                          "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
-                   * commit:
-                     ... adding svelte-native-forms sub-domain
+                   * check in commit:
+                     >>> KEY: use this description (they will change it to this if you don't):
+                     ... NOT: adding svelte-native-forms sub-domain
+                     ... YES: svelte-native-forms.js
                    * issue New Pull Request
                    * back in the dns.js.org, monitor your Pull Request
                      ... https://github.com/js-org/js.org/pulls
-                         https://github.com/js-org/js.org/pull/3516
+                         https://github.com/js-org/js.org/pull/5555
                      ... should take effect within 24 hrs
                      - confirm: web site NO LONGER SERVES till they enact this
                        https://kevinast.github.io/svelte-native-forms/
-                     - wait for sub-domain to go live
-                       * GEEZE: they rejected this because it doesn't have reasonable content
-                         ... https://github.com/js-org/js.org/wiki/No-Content
-                         - add my README page
-                         - publish
-                           $ npx gh-pages --dist _docs
-                         - add note to pull request
-                           . I have added some minimal content to the page :-)
-                           . Please note that this is an active project, where the page will be used to both:
-                              - deploy a single-page-app
-                              - and define documentation 
-                             in order to collaborate to other team members.
-                           . Thank you for your service.
-                           . Kevin
-                       * ONCE MERGED 
+                     - wait for sub-domain to go live (24 hrs)
+                       * FIRST they will approve it
+                       * THEN they will apply the domain
+                       * ONCE ACCEPTED & MERGED 
                        * WORKS: should be able to now see the url:
                          ... https://svelte-native-forms.js.org/
 
@@ -1119,6 +1241,7 @@ KJB Notes --->
   [Setup Deployment]:             #setup-deployment
 
 [GitHub Pages]:                   https://pages.github.com/
+[js.org]:                         https://js.org/
 [npm]:                            https://www.npmjs.com/
 [sveltejs/template]:              https://github.com/sveltejs/template
 [sveltejs/component-template]:    https://github.com/sveltejs/component-template

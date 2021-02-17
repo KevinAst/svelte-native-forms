@@ -1,22 +1,37 @@
 {
-  "name": "svelte-app",
-  "version": "1.0.0",
+  "name": "svelte-native-forms",
+  "version": "0.1.0",
+  "description": "minimalist form validation with powerful results",
+  "homepage": "https://svelte-native-forms.js.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KevinAst/svelte-native-forms.git"
+  },
+  "keywords": [
+    "svelte-native-forms",
+    "svelte",
+    "utility",
+    "geeku",
+    "astx"
+  ],
+  "license": "MIT",
   "scripts": {
-    "app:prodBuild": "rollup -c",
+    "app:deploy": "gh-pages --dist public --dest app",
     "app:devServe": "rollup -c -w",
+    "app:prodBuild": "rollup -c",
+    "preapp:deploy": "npm run app:prodBuild",
     "start": "sirv public"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
+    "gh-pages": "^3.1.0",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.0",
+    "sirv-cli": "^1.0.0",
     "svelte": "^3.0.0"
-  },
-  "dependencies": {
-    "sirv-cli": "^1.0.0"
   }
 }
