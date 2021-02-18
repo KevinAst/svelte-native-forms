@@ -203,7 +203,7 @@ svelte-native-forms/
   node_modules/ ........ install location of dependent packages (maintained by npm)
   package.json ......... project meta data with dependencies
   package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-  public/ .............. the Svelte app deployment root (with generated build/) see: "Setup Svelte App Tooling"
+  public/ .............. the app deployment root (with generated build/) see: "Setup Svelte App Tooling"
   README.md ............ basic project docs
   rollup.config.js ..... the rollup bundler configuration (used by Svelte) see: "Setup Svelte App Tooling"
   src/ ................. the app source code
@@ -212,6 +212,7 @@ svelte-native-forms/
     App.svelte ......... our top-most App component (launched from Main.svelte)
     snip snip .......... many more!
   tailwind.config.js ... the tailwind css configuration file
+  tailwindUITemplates/ . tailwind UI templates (sandbox) see: temp routes in src/Main.svelte
   TOOLING.md ........... this document :-)
 
   ?? L8TR: (as needed)
