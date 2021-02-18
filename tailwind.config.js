@@ -20,7 +20,15 @@ export default {
   purge: {
     content: [
       "./src/**/*.svelte",
-      // may also want to include base index.html
+
+      // KJB: also include base index.html (for any tailwind directives found there)
+      "./public/index.html",
+
+      // KJB: following is ONLY needed if you deploy tailwindUITemplates in production
+      //      - this is NOT normal
+      //      - unlike dev, in production builds - there IS a purge process
+      //        ... so it MUST see this code
+      //? "./tailwindUITemplates/**/*.svelte",
     ], 
     enabled: production // disable purge in dev
   },
