@@ -8,7 +8,7 @@
  * **Advanced**: check.prefix(msgPrefix): hof-check
  *               - hof-check: a higher-order check function
  *               - same API as check(), but prefixes ALL messages
- *               - NOTE: msgPrefix is acumulative when invoked
+ *               - NOTE: msgPrefix is accumulative when invoked
  *                       on: hof-check.prefix() ... KOOL!
  *
  * @param {truthy} condition - a "truthy" condition which

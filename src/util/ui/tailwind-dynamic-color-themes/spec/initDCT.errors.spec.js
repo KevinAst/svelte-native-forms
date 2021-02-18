@@ -149,7 +149,7 @@ describe('initDCT() ERRORS', () => {
       //        references a single tailwind color (black/white), but the schema requires a multi-color shaded context color
     });
 
-    test('themes realColor references mulit-shaded tailwind color (without a dash) but requires single-color', () => {
+    test('themes realColor references multi-shaded tailwind color (without a dash) but requires single-color', () => {
       expect( () => initDCT(['primary'], {myTheme: {contextColors: {primary: 'red'}}}) )
         .toThrow(/theme:.*myTheme.*contextColor:.*primary.*realColor:.*red.*invalid realColor:.*references multiple tailwind shaded colors.*schema requires a single-color/);
       // THROW: initDCT() parameter violation: theme: 'myTheme' contextColor: 'primary' realColor: 'red' invalid realColor: 

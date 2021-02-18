@@ -691,7 +691,7 @@ _While this is an internal implementation detail_, the simple answer is:
   tailwind.config.js
   ==================
     ... snip snip
-    colors: { // ... OUPUT from: dct.colorConfig()
+    colors: { // ... OUTPUT from: dct.colorConfig()
       primary:  "var(--dct-primary)",
       ... snip snip
     }
