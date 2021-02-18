@@ -90,6 +90,7 @@ Make sense? ... _that was **Easy Peasy!**_
   - [Color Systems]
   - [A Note on App State]
   - [A Note on DCT Reactivity]
+  - [A Note on ES Modules in Tailwind Configuration]
   - [How do it know?]
 - [API]
   - [`initDCT(schema, themes, \[initialThemeName\], \[initialInvertShade\]): DCT`]
@@ -239,21 +240,20 @@ is easy to use, and _simplifies a number of burdensome details_.
    **tailwind.config.js**
    ```js
    import DCT from './src/colorTheme';
-   
    export default {
-   
      ... snip snip
-   
      // define our abstract Context Colors
      theme: {
        extend: {
          colors: DCT.colorConfig(),
        },
      },
-   
      ... snip snip
    };
    ```
+
+   **NOTE:** Having trouble with this snippet, due to **ES Modules**?
+   Please refer to [A Note on ES Modules in Tailwind Configuration].
    
 5. **Finally**: You are free to use your **Context Colors** in your markup.
    
@@ -318,6 +318,7 @@ The following sections discuss the basic concepts of **DCT**:
 - [Color Systems]
 - [A Note on App State]
 - [A Note on DCT Reactivity]
+- [A Note on ES Modules in Tailwind Configuration]
 - [How do it know?]
 
 
@@ -669,6 +670,50 @@ TODO: - We can easily provide reactivity by simply emitting a custom
 ```
 
 </ul>
+
+
+<!--- *** Section ************************************************************************* ---> 
+## A Note on ES Modules in Tailwind Configuration
+
+<ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
+
+The [`DCT.colorConfig()`] function conveys the **Context Colors** to
+tailwind by referencing it directly in the `tailwind.config.js`.  This
+is a nice feature because it provides a **"single source of truth"**.
+
+There is an **issue** however, in that by accessing the `DCT` object
+in `tailwind.config.js`, we are importing application code _(in the
+configuration)_.  Typically our application code contains **ES
+Modules**.  Currently, tailwind does NOT support ES Modules in it's
+configuration.
+
+You can work around this by resolving the `tailwind.config.js` in your
+controlling configuration _(e.g. the configuration file for webpack or
+rollup)_ ... as follows:
+
+```js
+rollup.config.js
+================
+import tailwindcss    from 'tailwindcss';          // NEW: in support of ES Modules
+import tailwindConfig from './tailwind.config.js'; //      (found in tailwind.config.js)
+... snip snip
+export default {
+  ... snip snip
+  plugins: [
+    svelte({
+      ... snip snip
+      preprocess: sveltePreprocess({
+        ... snip snip
+        postcss: {
+          plugins: [
+            ... snip snip
+         // require("tailwindcss"),      // ... NEW: normal usage
+            tailwindcss(tailwindConfig), // ... NEW: in support of ES Modules (in tailwind.config.js)
+```
+
+</ul>
+
+
 
 <!--- *** Section ************************************************************************* ---> 
 ## How do it know?
@@ -1043,16 +1088,20 @@ referenced in the `tailwind.config.js` color section.
 ```js
 tailwind.config.js
 ==================
+import DCT from './src/colorTheme';
 export default {
   ... snip snip
   theme: {
     ... snip snip
     extend: {
-      colors: dct.colorConfig(), // define the context colors in-use
+      colors: DCT.colorConfig(), // define the context colors in-use
     },
   },
 };
 ```
+
+**NOTE:** Having trouble with this snippet, due to **ES Modules**?
+Please refer to [A Note on ES Modules in Tailwind Configuration].
 
 </ul>
 
@@ -1323,6 +1372,8 @@ Schema: [['primary'], ['secondary'], 'error'];
 
   [A Note on DCT Reactivity]:            #a-note-on-dct-reactivity
   [DCT Reactivity]:                      #a-note-on-dct-reactivity
+
+  [A Note on ES Modules in Tailwind Configuration]:  #a-note-on-es-modules-in-tailwind-configuration
 
   [How do it know?]:                     #how-do-it-know
 

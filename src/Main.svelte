@@ -1,15 +1,15 @@
 <script>
-//? import                     './ui/colorTheme'; // initialize our color themes EARLY in our app's life-cycle
+ import                     './ui/colorTheme'; // initialize our color themes EARLY in our app's life-cycle
  import App            from './App.svelte';
-//? import NavBarTemplate from '../tailwindUITemplates/NavBar/NavBar.svelte';
+ import NavBarTemplate from '../tailwindUITemplates/NavBar/NavBar.svelte';
 </script>
 
-<!-- launch our production App -->
+<!-- launch our production App
 <App/>
-
-<!-- temporary route to our tailwind UI template sandbox components
-<NavBarTemplate/>
 -->
+
+<!-- temporary route to our tailwind UI template sandbox components -->
+<NavBarTemplate/>
 
 <!-- setup Tailwind CSS (NOTE: do NOT believe lang="postcss" is needed) -->
 <style global lang="postcss">

@@ -1,32 +1,9 @@
-// NOTE: This module uses ES Modules in order to include resources
-//       from our `src/` app tree.  
-//
-//       - This is needed to pull in our context color definitions
-//         (used in our color themes).
-//
-//       - Currently, tailwind does NOT support ES Modules (in it's
-//         configuration file).  Therefore, to accomplish this,
-//         our `rollup.config.js` resolves this configuration file,
-//         and passes it directly to the tailwindcss plugin function:
-//           rollup.config.js
-//           ================
-//           import tailwindcss    from 'tailwindcss';
-//           import tailwindConfig from './tailwind.config.js';
-//           ... snip snip
-//           export default {
-//             ... snip snip
-//             plugins: [
-//               svelte({
-//                 ... snip snip
-//                 preprocess: sveltePreprocess({
-//                   ... snip snip
-//                   postcss: {
-//                     plugins: [
-//                       ... snip snip
-//                    // require("tailwindcss"),      // ... KJB: normal usage
-//                       tailwindcss(tailwindConfig), // ... KJB: in support of ES Modules (in tailwind.config.js)
-
-// ??? import DCT from './src/ui/colorTheme';
+// NOTE: The following import is in our application source (which contains ES Modules)!
+//       - Because tailwind does NOT support ES Modules, we resolve THIS
+//         configuration file directly in rollup.config.js.
+//       - This is fully described in:
+//         TOOLING.md#setup-tailwind-dynamic-color-themes
+import DCT from './src/ui/colorTheme';
 
 const production = !process.env.ROLLUP_WATCH; // or some other env var like NODE_ENV KJB: same as in rollup.config.js
 
@@ -48,10 +25,10 @@ export default {
     enabled: production // disable purge in dev
   },
 
-//? // KJB: define our abstract Context Colors
-//? theme: {
-//?   extend: {
-//?     colors: DCT.colorConfig(),
-//?   },
-//? },
+  // KJB: define our abstract Context Colors
+  theme: {
+    extend: {
+      colors: DCT.colorConfig(),
+    },
+  },
 };

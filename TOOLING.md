@@ -38,6 +38,7 @@ unmodified)_!
   - [Setup GitHub Project]
   - [Setup Svelte App Tooling]
   - [Setup Tailwind CSS]
+  - [Setup tailwind-dynamic-color-themes]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -162,6 +163,7 @@ Dependency                        | Type        | Usage                   | Refe
 `svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte App Tooling]
 `svelte-preprocess`               | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
 `tailwindcss`                     | **TOOLING**<br>**APP**   | Tailwind CSS Build<br>and application code  | [Setup Tailwind CSS]<br>and app code: `src/...`
+`tailwind-dynamic-color-themes`   | **TOOLING**<br>**APP**   | a faux dependency (sourced here but a potential npm lib)  | [Setup tailwind-dynamic-color-themes] and app code: `src/...`
 
 
 **OLD TEMPLATE:** ?? synced above (remove when complete)
@@ -243,6 +245,7 @@ were carried out, however in some cases the order can be changed.
   - [Setup GitHub Project]
   - [Setup Svelte App Tooling]
   - [Setup Tailwind CSS]
+  - [Setup tailwind-dynamic-color-themes]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -734,6 +737,84 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 --->
 
 
+
+
+<!--- *** SUB-SECTION *************************************************************** --->
+# Setup tailwind-dynamic-color-themes
+
+Our application color themes are provided through the
+**tailwind-dynamic-color-themes** utility.  This is currently a faux
+dependency _(i.e. simulated)_, because it is **sourced here**.
+However it has the potential of being published as a full fledged npm
+library.  Please refer to the [tailwind-dynamic-color-themes
+README](./src/util/ui/tailwind-dynamic-color-themes/README.md) for
+full details.
+
+As a general rule, it is configured by following the "Getting Started"
+README instructions.
+
+- The key aspect is we create an application module _(see
+  `src/ui/colorTheme.js`)_ that promotes the `DCT` object, from which
+  the remainder of the API is gleaned.
+
+- From a **tooling perspective**, we must inform tailwind of our
+  **Context Colors**, by referencing this `DCT` object in
+  `tailwind.config.js`, through the following snippet:
+
+  ```js
+  tailwind.config.js
+  ==================
+  import DCT from './src/ui/colorTheme';
+
+  export default {
+
+    ... snip snip
+
+    // define our abstract Context Colors
+    theme: {
+      extend: {
+        colors: DCT.colorConfig(),
+      },
+    },
+
+    ... snip snip
+  };
+  ```
+
+  **ISSUE:**
+
+  There is an **issue** here in that we are importing application code
+  in this configuration file, which means it must support **ES
+  Modules**.
+
+  Currently, tailwind does NOT support ES Modules in it's
+  configuration file.
+
+  **FIX:**
+
+  To work around this, our `rollup.config.js` resolves this
+  configuration file, and passes it directly to the tailwindcss
+  plugin function:
+
+  ```js
+  rollup.config.js
+  ================
+  import tailwindcss    from 'tailwindcss';          // NEW: in support of ES Modules
+  import tailwindConfig from './tailwind.config.js'; //      (found in tailwind.config.js)
+  ... snip snip
+  export default {
+    ... snip snip
+    plugins: [
+      svelte({
+        ... snip snip
+        preprocess: sveltePreprocess({
+          ... snip snip
+          postcss: {
+            plugins: [
+              ... snip snip
+           // require("tailwindcss"),      // ... NEW: normal usage
+              tailwindcss(tailwindConfig), // ... NEW: in support of ES Modules (in tailwind.config.js)
+  ```
 
 
 
@@ -1503,6 +1584,7 @@ KJB Notes --->
   [Setup GitHub Project]:         #setup-github-project
   [Setup Svelte App Tooling]:     #setup-svelte-app-tooling
   [Setup Tailwind CSS]:           #setup-tailwind-css
+  [Setup tailwind-dynamic-color-themes]: #setup-tailwind-dynamic-color-themes
   [Setup Absolute Imports]:       #setup-absolute-imports
   [Setup Node Builtins]:          #setup-node-builtins
   [Setup Jest Unit Testing]:      #setup-jest-unit-testing
