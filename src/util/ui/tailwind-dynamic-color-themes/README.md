@@ -225,7 +225,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    
    **main.js**
    ```
-   import './ui/colorTheme'; // initialize our color themes EARLY in our app's life-cycle
+   import './layout/colorTheme'; // initialize our color themes EARLY in our app's life-cycle
    ... snip snip
    ```
    
@@ -239,7 +239,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    
    **tailwind.config.js**
    ```js
-   import DCT from './src/colorTheme';
+   import DCT from './src/layout/colorTheme';
    export default {
      ... snip snip
      // define our abstract Context Colors
@@ -1088,7 +1088,7 @@ referenced in the `tailwind.config.js` color section.
 ```js
 tailwind.config.js
 ==================
-import DCT from './src/colorTheme';
+import DCT from './src/layout/colorTheme';
 export default {
   ... snip snip
   theme: {

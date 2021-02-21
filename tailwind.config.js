@@ -3,7 +3,7 @@
 //         configuration file directly in rollup.config.js.
 //       - This is fully described in:
 //         TOOLING.md#setup-tailwind-dynamic-color-themes
-import DCT from './src/ui/colorTheme';
+import DCT from './src/layout/colorTheme';
 
 const production = !process.env.ROLLUP_WATCH; // or some other env var like NODE_ENV KJB: same as in rollup.config.js
 

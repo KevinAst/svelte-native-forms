@@ -754,7 +754,7 @@ As a general rule, it is configured by following the "Getting Started"
 README instructions.
 
 - The key aspect is we create an application module _(see
-  `src/ui/colorTheme.js`)_ that promotes the `DCT` object, from which
+  `src/layout/colorTheme.js`)_ that promotes the `DCT` object, from which
   the remainder of the API is gleaned.
 
 - From a **tooling perspective**, we must inform tailwind of our
@@ -764,7 +764,7 @@ README instructions.
   ```js
   tailwind.config.js
   ==================
-  import DCT from './src/ui/colorTheme';
+  import DCT from './src/layout/colorTheme';
 
   export default {
 
