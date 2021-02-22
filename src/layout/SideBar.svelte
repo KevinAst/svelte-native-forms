@@ -12,6 +12,18 @@
  //       width:  int,     // actual SideBar width (user can change)
  //                        // ... needed to offset <AppContainer> for OPEN <SideBar>
  //     }
+
+ // NOTE: Currently ALL default semantics are defined in this module
+ //       - this is FINE if <SideBar> is considered part of our app
+ //       - AI: If if however we want to make <SideBar> a reusable component, this is a Code Smell :-(
+
+ // AI: CONSIDER if we want <SideBar> to be a reusable component
+ //     - determine HOW content is supplied
+ //       OP0: component parameters (such as header content, etc.)
+ //       OP1: svelte slots
+ //       OP2: registration API (useful for dynamic run-time resources - as in visualize-it)
+ //       OP3: combination of OP1/OP2
+
  import {writable} from 'svelte/store';
 
  // promote our sideBar PUBLIC API through this "module scoped" custom store
