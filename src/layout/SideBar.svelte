@@ -93,11 +93,11 @@
 </script>
 
 <!-- SIMULATE: SideBar Flex container WITH full height of screen, and resize control --> 
-<div class="absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left bg-red-200"
+<div class="absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left bg-pink-200"
      bind:this={sideBarElm}>
 
   <!-- SIMULATE SideBar Header (fixed height coorelates with height in <NavBar>) -->
-  <div class="flex-none h-12 bg-green-50">
+  <div class="flex-none h-12 bg-pink-100">
     SIMULATE SideBar Header
   </div>
 

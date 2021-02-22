@@ -29,7 +29,7 @@
 
 <!-- our <AppContainer> --> 
 <!-- outer div needed to anchor full width/height of screen -->
-<div class="w-screen h-screen bg-red-50">
+<div class="w-screen h-screen bg-pink-200">
   <!-- inner div provides flex container WITH full height of container, and dynamic adjustments for <SideBar> -->
   <div class="h-full flex flex-col transition-margin-left"
        bind:this={appContainerElm}>
@@ -37,7 +37,7 @@
     <NavBar/>
 
     <!-- place <TabBar> here (if needed)
-    <div class="flex-none bg-yellow-50">
+    <div class="flex-none bg-pink-400">
       SIMULATE TabBar
     </div>
     -->
