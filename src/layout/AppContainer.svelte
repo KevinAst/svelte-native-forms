@@ -1,6 +1,6 @@
 <script>
  // <AppContainer>
- //   - Full Application Container (everything EXCEPT <SideBar>)
+ //   - Full Application Container (WITH <SideBar>)
  //   - fills entire width/height of browser window
  //   - flex container (flex-direction: col) of following:
  //     * <NavBar>  ... Navigation Bar
@@ -9,8 +9,11 @@
  //   - adjusts left position to account for <SideBar>
  //     * via inline style.marginLeft
  //     * interacts directly with <SideBar> for this interaction
- import {sideBar} from './SideBar.svelte';
+
+ import SideBar,
+        {sideBar} from './SideBar.svelte';
  import NavBar    from './NavBar.svelte';
+ import AppMain   from './AppMain.svelte';
 
  let appContainerElm;
 
@@ -21,7 +24,10 @@
  }
 </script>
 
-<!-- SIMULATE: AppContainer Flex WITH left adjustment of <SideBar> --> 
+<!-- our <SideBar> --> 
+<SideBar/>
+
+<!-- our <AppContainer> --> 
 <!-- outer div needed to anchor full width/height of screen -->
 <div class="w-screen h-screen bg-red-50">
   <!-- inner div provides flex container WITH full height of container, and dynamic adjustments for <SideBar> -->
@@ -30,30 +36,13 @@
 
     <NavBar/>
 
-    <!-- SIMULATE TabBar -->
+    <!-- place <TabBar> here (if needed)
     <div class="flex-none bg-yellow-50">
       SIMULATE TabBar
     </div>
+    -->
 
-    <!-- SIMULATE AppMain WITH it's independent scroll bars -->
-    <div class="flex-1 overflow-x-auto overflow-y-auto bg-blue-50">
-      <p>AppMain: First entry</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <div style="width: 800px; height: 200px;" class="block bg-blue-100">
-        Test a wide and tall item
-      </div>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>Now is the time for every good man to come to the aid of their country</p>
-      <p>AppMain: Last entry</p>
-    </div>
+    <AppMain/>
 
   </div>
 </div>
