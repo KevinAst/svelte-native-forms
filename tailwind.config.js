@@ -39,4 +39,7 @@ export default {
       colors: DCT.colorConfig(),
     },
   },
+
+  // KJB: allow tailwind css classes to override others (ex: material-icons)
+  important: true,
 };
