@@ -415,7 +415,8 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
   function getActiveThemeName() {
     // this is too easy ...
-    return _activeThemeName;
+    // ... conditional resolves app-initialization window.onload race condition
+    return _activeThemeName===undefined ? initialThemeName : _activeThemeName;
   }
 
 
@@ -425,7 +426,8 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
   function getActiveInvertShade() {
     // need I say more ...
-    return _activeInvertShade;
+    // ... conditional resolves app-initialization window.onload race condition
+    return _activeInvertShade===undefined ? initialInvertShade : _activeInvertShade;
   }
 
 
