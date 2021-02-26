@@ -11,6 +11,8 @@ const schema = [
 
   'onLight',
   'onDark',
+
+  'neutralBackground',
 ];
 
 const themes = {
@@ -27,6 +29,8 @@ const themes = {
       
       'onLight':        'black',
       'onDark':         'white',
+
+      'neutralBackground': `trueGray-200`, // LIKE
     }
   },
   'Amber':     themeGenerator('amber',     'indigo'),
@@ -57,6 +61,9 @@ function themeGenerator(primary, secondary) {
       
       'onLight':        'black',
       'onDark':         'white',
+
+//    'neutralBackground': `${primary}-100`, // LIKE, but may be too much of same color
+      'neutralBackground': `trueGray-200`,   // LIKE
     }
   };
 }

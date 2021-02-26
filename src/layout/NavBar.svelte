@@ -52,12 +52,6 @@
                        OTHER              px-3 py-2 rounded-md text-sm font-medium">
             Projects
           </span>
-          <span class="NON-SELECTED-COLOR text-onLight
-                       HOVER              hover:bg-primary hover:text-onDark
-                       CURSOR          select-none cursor-pointer
-                       OTHER              px-3 py-2 rounded-md text-sm font-medium">
-            Calendar
-          </span>
         </div>
       </div>
 
