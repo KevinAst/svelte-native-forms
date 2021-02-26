@@ -9,7 +9,6 @@
  //   - adjusts left position to account for <SideBar>
  //     * via inline style.marginLeft
  //     * interacts directly with <SideBar> for this interaction
-
  import SideBar,
         {sideBar} from './SideBar.svelte';
  import NavBar    from './NavBar.svelte';

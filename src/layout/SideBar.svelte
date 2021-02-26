@@ -49,8 +49,10 @@
  //   - SideBar Menu Container (i.e. LeftNav)
  //   - a "singleton" component ... only one instance is allowed
  //   - fills entire height of browser window
+ //     * header is fixed (at top)
+ //     * content is independently scrollable
  //   - flex container (flex-direction: col) of following:
- //     * <SideBarItem>  ... multiple items
+ //     * <SideBarItem> ... multiple items
  //   - adjusts left position for visibility (open/close)
  //     * via inline style.left
  //   - SideBar width is adjustable (BY user via drag operation)
@@ -100,21 +102,19 @@
             DIVIDER border-primary border-r-4"
      bind:this={sideBarElm}>
 
-  <!-- SideBar Header (fixed height coorelates with height in <NavBar>)
-     - ?? sync height to NavBar
-     -->
-  <div class="LAYOUT flex-none h-12 
+  <!-- SideBar Header (fixed height h-14 coorelates with height in <NavBar>) -->
+  <div class="LAYOUT flex-none h-14
               MISC   px-4 bg-primaryLight border-primary border-b-4">
 
-    <span class="text-onLight
-                 h-10 flex items-center px-2 py-2 text-base font-medium italic">
+    <div class="text-onLight
+                flex items-center px-2 py-2 text-base font-medium italic">
       Demo Selection ...
-    </span>
+    </div>
   </div>
 
   <!-- SideBarItems WITH it's independent scroll bars -->
   <nav class="LAYOUT flex-1 overflow-y-auto
-              MIST   p-2 space-y-1"
+              MISC   p-2 space-y-1"
        aria-label="Sidebar">
 
     <!-- Selected Sample -->
