@@ -55,6 +55,7 @@
  //     * via inline style.left
  //   - SideBar width is adjustable (BY user via drag operation)
  import {onMount}  from 'svelte';
+ import Icon       from '../util/ui/Icon.svelte';
 
  let sideBarElm;
 
@@ -92,44 +93,121 @@
  });
 </script>
 
-<!-- SIMULATE: SideBar Flex container WITH full height of screen, and resize control --> 
-<div class="absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left bg-pink-200"
+<!-- SideBar Flex container WITH full height of screen, and resize control --> 
+<div class="LAYOUT  absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left 
+            CURSOR  select-none cursor-pointer
+            MISC    pb-2 bg-primaryLight overflow-y-auto
+            DIVIDER border-primary border-r-4"
      bind:this={sideBarElm}>
 
-  <!-- SIMULATE SideBar Header (fixed height coorelates with height in <NavBar>) -->
-  <div class="flex-none h-12 bg-pink-100">
-    SIMULATE SideBar Header
+  <!-- SideBar Header (fixed height coorelates with height in <NavBar>)
+     - ?? sync height to NavBar
+     -->
+  <div class="LAYOUT flex-none h-12 
+              MISC   px-4 bg-primaryLight border-primary border-b-4">
+
+    <span class="text-onLight
+                 h-10 flex items-center px-2 py-2 text-base font-medium italic">
+      Demo Selection ...
+    </span>
   </div>
 
-  <!-- SIMULATE SideBarItems WITH it's independent scroll bars -->
-  <div class="flex-1 overflow-y-auto">
+  <!-- SideBarItems WITH it's independent scroll bars -->
+  <nav class="LAYOUT flex-1 overflow-y-auto
+              MIST   p-2 space-y-1"
+       aria-label="Sidebar">
 
-    <!-- SIMULATE SideBarItem -->
-    <div>Item 1</div>
-    <div>Item 2</div>
-    <div>Item 3</div>
-    <div>Item 4</div>
-    <div>Item 5</div>
-    <div>Item 6</div>
-    <div>Item 7</div>
-    <div>Item 8</div>
-    <div>Item 9<br/>... what happens if this is really big</div>
-    <div>Item 10</div>
-    <div>Item 11</div>
-    <div>Item 12</div>
-    <div>Item 13</div>
-    <div>Item 14</div>
-    <div>Item 15</div>
-    <div>Item 16</div>
-    <div>Item 17</div>
-    <div>Item 18</div>
-    <div>Item 19</div>
-    <div>Item 20</div>
-  </div>
+    <!-- Selected Sample -->
+    <span class="SELECTED-COLOR  bg-primary text-onDark
+                 SELECTED-BORDER border-secondary border-l-8
+                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+      <!-- Selected Icon -->
+      <Icon name="home"
+            class="mr-3
+                   SELECTED-COLOR text-primaryLight"/>
+      SEL: Dashboard
+      <!-- Selected Notice -->
+      <span class="SELECTED-COLOR bg-primaryLight text-onLight
+                   ml-auto inline-block py-0.5 px-3 text-xs font-medium rounded-full">
+        2
+      </span>
+    </span>
+
+    <!-- Non-Selected Sample -->
+    <span class="NON-SELECTED-COLOR text-onLight
+                 NON-SELECTED-BORDER  border-transparent border-l-8
+                 HOVER hover:bg-primary hover:text-onDark
+                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+      <!-- Non-Selected Icon -->
+      <Icon name="people"
+            class="mr-3 
+                   PRIMARY-COLOR text-primary
+                   HOVER-COLOR   group-hover:text-primaryLight"/>
+      NON-SEL: Team
+      <!-- Non-Selected Notice -->
+      <span class="PRIMARY-COLOR             bg-primaryDark              text-onDark
+                   HOVER-COLOR   group-hover:bg-primaryLight group-hover:text-onLight
+                   ml-auto inline-block py-0.5 px-3 text-xs font-medium rounded-full">
+        3
+      </span>
+    </span>
+
+    <!-- With expandable sections -->
+    <span class="NON-SELECTED-COLOR text-onLight
+                 NON-SELECTED-BORDER  border-transparent border-l-8
+                 HOVER hover:bg-primary hover:text-onDark
+                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+      <Icon name="folder"
+            class="mr-3 
+                   PRIMARY-COLOR text-primary
+                   HOVER-COLOR   group-hover:text-primaryLight"/>
+      Projects
+      <!-- KJB: ml-auto moves to right (auto receives it's share of unused space) -->
+      <!--      JUST LIKE: mx-auto would center in remaining space -->
+      <Icon name="expand_more"
+            class="ml-auto 
+                   PRIMARY-COLOR text-primary
+                   HOVER-COLOR   group-hover:text-primaryLight"/>
+    </span>
+
+    <!-- Expandable link section, ?? show/hide based on state -->
+    <div class="space-y-1">
+
+      <span class="NON-SELECTED-COLOR text-onLight
+                   NON-SELECTED-BORDER  border-transparent border-l-8
+                   HOVER hover:bg-primary hover:text-onDark
+                   OTHER group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+        Overview
+      </span>
+
+      <span class="text-onLight
+                   border-transparent border-l-8
+                   hover:bg-primary hover:text-onDark
+                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+        Members
+      </span>
+
+      <span class="text-onLight
+                   border-transparent border-l-8
+                   hover:bg-primary hover:text-onDark
+                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+        Calendar
+      </span>
+
+      <span class="text-onLight
+                   border-transparent border-l-8
+                   hover:bg-primary hover:text-onDark
+                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+        Settings
+      </span>
+    </div>
+
+  </nav>
 </div>
 
+
 <style>
- /* carve out our own style (rather than customize tailwind for left ONLY property) */
+ /* carve out our own transition style (rather than customize tailwind for left ONLY property) */
  /* NOTE: tailwind usage of `transition-all duration-500` THWARTS resizing by user dragging (unsure why) */
  .transition-left {
    transition: left 0.5s; /* NOTE: duration should match animation in <AppContainer> */
