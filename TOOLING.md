@@ -214,7 +214,6 @@ svelte-native-forms/
     App.svelte ......... our top-most App component (launched from Main.svelte)
     snip snip .......... many more!
   tailwind.config.js ... the tailwind css configuration file
-  tailwindUITemplates/ . tailwind UI templates (sandbox) see: temp routes in src/Main.svelte
   TOOLING.md ........... this document :-)
 
   ?? L8TR: (as needed)
