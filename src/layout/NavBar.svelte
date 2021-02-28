@@ -17,10 +17,17 @@
  });
 </script>
 
-<!-- NavBar (height coorelates with height in <SideBar> header) -->
+<!-- NavBar
+     - height correlates with height in <SideBar> header (when single line)
+       ... accomplished here with py (below)
+     - the flex-wrap (below) prevents NavBar from exceeding browser window width
+       ... preventing browser-based scroll bars
+       ... we want all scrolling to occur within sub-panels
+           ALLOWING our NavBar to always be visible at the top of our app
+ -->
 <nav class="flex-none bg-primaryLight">
   <div class="max-w-7xl mx-auto px-3">
-    <div class="flex justify-between h-14">
+    <div class="flex flex-wrap justify-between py-2.5">
 
       <!-- Left Section of NavBar -->
       <div class="flex">
@@ -53,7 +60,7 @@
             Projects
           </span>
         </div>
-      </div>
+      </div>  <!-- end of ... Left Section of NavBar -->
 
       <!-- Right Section of NavBar -->
       <div class="flex items-center">
@@ -116,9 +123,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> <!-- end of ... Right Section of NavBar -->
+
     </div>
   </div>
-
 </nav>
 
