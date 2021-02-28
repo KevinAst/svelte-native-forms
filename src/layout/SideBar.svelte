@@ -97,7 +97,6 @@
 
 <!-- SideBar Flex container WITH full height of screen, and resize control --> 
 <div class="LAYOUT  absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left 
-            CURSOR  select-none cursor-pointer
             MISC    pb-2 bg-primaryLight overflow-y-auto
             DIVIDER border-primary border-r-2"
      bind:this={sideBarElm}>
@@ -106,7 +105,8 @@
   <div class="LAYOUT flex-none h-14
               MISC   px-4 bg-primaryLight"> <!-- BORDER border-primary border-b-2 -->
     <div class="text-onLight
-                flex items-center px-2 py-3 text-base font-medium italic">
+                flex items-center px-2 py-3 text-base font-medium italic
+                CURSOR  select-none">
       Select a Demo ...
     </div>
   </div>
@@ -119,6 +119,7 @@
     <!-- Selected Sample -->
     <span class="SELECTED-COLOR  bg-primary text-onDark
                  SELECTED-BORDER border-secondary border-l-8
+                 CURSOR  select-none cursor-pointer
                  OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
       <!-- Selected Icon -->
       <Icon name="home"
@@ -136,6 +137,7 @@
     <span class="NON-SELECTED-COLOR text-onLight
                  NON-SELECTED-BORDER  border-transparent border-l-8
                  HOVER hover:bg-primary hover:text-onDark
+                 CURSOR  select-none cursor-pointer
                  OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
       <!-- Non-Selected Icon -->
       <Icon name="people"
@@ -155,6 +157,7 @@
     <span class="NON-SELECTED-COLOR text-onLight
                  NON-SELECTED-BORDER  border-transparent border-l-8
                  HOVER hover:bg-primary hover:text-onDark
+                 CURSOR  select-none cursor-pointer
                  OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
       <Icon name="folder"
             class="mr-3 
@@ -175,6 +178,7 @@
       <span class="NON-SELECTED-COLOR text-onLight
                    NON-SELECTED-BORDER  border-transparent border-l-8
                    HOVER hover:bg-primary hover:text-onDark
+                   CURSOR  select-none cursor-pointer
                    OTHER group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
         Overview
       </span>
@@ -182,6 +186,7 @@
       <span class="text-onLight
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
+                   CURSOR  select-none cursor-pointer
                    group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
         Members
       </span>
@@ -189,6 +194,7 @@
       <span class="text-onLight
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
+                   CURSOR  select-none cursor-pointer
                    group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
         Calendar
       </span>
@@ -196,6 +202,7 @@
       <span class="text-onLight
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
+                   CURSOR  select-none cursor-pointer
                    group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
         Settings
       </span>
