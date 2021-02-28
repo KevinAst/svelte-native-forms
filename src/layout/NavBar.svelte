@@ -25,7 +25,8 @@
        ... we want all scrolling to occur within sub-panels
            ALLOWING our NavBar to always be visible at the top of our app
  -->
-<nav class="flex-none bg-primaryLight">
+<nav class="flex-none bg-primaryLight 
+            BORDER border-primary border-b-2">
   <div class="flex flex-wrap justify-between px-3 py-2.5">
 
     <!-- Left Section of NavBar -->
