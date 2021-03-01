@@ -1,5 +1,6 @@
 import {initDCT} from '../util/ui/tailwind-dynamic-color-themes/index'; // AI: for some reason, when imported from tailwind.config.js, NodeJS does NOT know how to resolve this WITHOUT index
 
+// our color schema ...
 const schema = [
   'primaryLight',
   'primary',
@@ -9,8 +10,8 @@ const schema = [
   'secondary',
   'secondaryDark',
 
-  'onLight', // typically black
-  'onDark',  // typically white
+  'onLight',       // typically black
+  'onDark',        // typically white
 
   'accentBorder',  // typically a gray tone (e.g. 'coolGray-600')
                    // ... used for borders in SideBar/NavBar/Menu/Dialog/etc.
@@ -22,58 +23,54 @@ const schema = [
                    //         providing NOT too much of same color
 ];
 
+// helper that generates the bulk of our contextColors ...
+function gen(primary, secondary) {
+  return {
+    'primaryLight':   `${primary}-300`,
+    'primary':        `${primary}-500`,
+    'primaryDark':    `${primary}-900`,
+
+    'secondaryLight': `${secondary}-300`,
+    'secondary':      `${secondary}-500`,
+    'secondaryDark':  `${secondary}-900`,
+
+    'onLight':        'black',
+    'onDark':         'white',
+
+    'accentBorder':   'coolGray-600',
+
+    'backdrop':       `${primary}-100`, // or: 'coolGray-200'
+  };
+}
+
+// our color themes ...
 const themes = {
-  'Cool Gray': themeGenerator('coolGray',  'orange'),
+  'Cool Gray':   { contextColors: gen('coolGray', 'orange'), },
   'Black/White': {
     contextColors: {
-      'primaryLight':   `white`,
-      'primary':        `gray-500`,
-      'primaryDark':    `black`,
-      
-      'secondaryLight': `red-300`,
-      'secondary':      `red-500`,
-      'secondaryDark':  `red-900`,
-      
-      'onLight':        'black',
-      'onDark':         'white',
-
-      'accentBorder':   'coolGray-600',
-
+      ...gen('coolGray', 'red'), // ... base colors
+      'primaryLight':   'white', // ... overrides:
+      'primaryDark':    'black',
       'backdrop':       'white',
     }
   },
-  'Amber':     themeGenerator('amber',     'indigo'),
-  'Emerald':   themeGenerator('emerald',   'red'),
-  'Teal':      themeGenerator('teal',      'rose'),
-  'Blue':      themeGenerator('lightBlue', 'orange'),
-  'Cyan':      themeGenerator('cyan',      'orange'),
-  'Red':       themeGenerator('red',       'green'),
-  'Pink':      themeGenerator('pink',      'lime'),
+  'Amber':   { contextColors: gen('amber',     'indigo'), },
+  'Emerald': { contextColors: gen('emerald',   'red'),    },
+  'Teal':    { contextColors: gen('teal',      'rose'),   },
+  'Blue':    { contextColors: gen('lightBlue', 'orange'), },
+  'Cyan':    { contextColors: gen('cyan',      'orange'), },
+  'Red':     { contextColors: gen('red',       'green'),  },
+  'Rose':    { contextColors: gen('rose',      'green'),  },
+  'Pink':    { contextColors: gen('pink',      'lime'),   },
 };
+
+
+//***
+//*** Initialize tailwind-dynamic-color-themes -and- promote the DCT object to our app
+//***
 
 const initialThemeName   = 'Cool Gray'; // AI: ENHANCE TO pull from local storage
 const initialInvertShade = true;        //     ditto
 
 const DCT = initDCT(schema, themes, initialThemeName, initialInvertShade);
 export default DCT;
-
-function themeGenerator(primary, secondary) {
-  return {
-    contextColors: {
-      'primaryLight':   `${primary}-300`,
-      'primary':        `${primary}-500`,
-      'primaryDark':    `${primary}-900`,
-      
-      'secondaryLight': `${secondary}-300`,
-      'secondary':      `${secondary}-500`,
-      'secondaryDark':  `${secondary}-900`,
-      
-      'onLight':        'black',
-      'onDark':         'white',
-
-      'accentBorder':   'coolGray-600',
-
-      'backdrop': `${primary}-100`, // or: 'coolGray-200'
-    }
-  };
-}
