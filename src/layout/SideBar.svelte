@@ -98,12 +98,12 @@
 <!-- SideBar Flex container WITH full height of screen, and resize control --> 
 <div class="LAYOUT  absolute h-screen flex flex-col resize-x overflow-x-hidden transition-left 
             MISC    pb-2 bg-primaryLight overflow-y-auto
-            DIVIDER border-primary border-r-2"
+            DIVIDER border-accentBorder border-r-2"
      bind:this={sideBarElm}>
 
   <!-- SideBar Header (fixed height h-14 coorelates with height in <NavBar>) -->
   <div class="LAYOUT flex-none h-14
-              MISC   px-4 bg-primaryLight"> <!-- BORDER border-primary border-b-2 -->
+              MISC   px-4 bg-primaryLight"> <!-- BORDER border-accentBorder border-b-2 -->
     <div class="text-onLight
                 flex items-center px-2 py-3 text-base font-medium italic
                 CURSOR  select-none">

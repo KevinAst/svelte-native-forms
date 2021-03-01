@@ -28,7 +28,7 @@
 
 <!-- our <AppContainer> --> 
 <!-- outer div needed to anchor full width/height of screen -->
-<div class="w-screen h-screen bg-neutralBackground">
+<div class="w-screen h-screen bg-backdrop">
   <!-- inner div provides flex container WITH full height of container, and dynamic adjustments for <SideBar> -->
   <div class="h-full flex flex-col transition-margin-left"
        bind:this={appContainerElm}>

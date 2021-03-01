@@ -9,10 +9,17 @@ const schema = [
   'secondary',
   'secondaryDark',
 
-  'onLight',
-  'onDark',
+  'onLight', // typically black
+  'onDark',  // typically white
 
-  'neutralBackground',
+  'accentBorder',  // typically a gray tone (e.g. 'coolGray-600')
+                   // ... used for borders in SideBar/NavBar/Menu/Dialog/etc.
+
+  'backdrop',      // universal background 
+                   // ... can be a gray tone       (e.g. 'coolGray-200')
+                   // ... or lighter primary shade (e.g. `${primary}-100`)
+                   //     ... lighter that 'primaryLight'
+                   //         providing NOT too much of same color
 ];
 
 const themes = {
@@ -30,7 +37,9 @@ const themes = {
       'onLight':        'black',
       'onDark':         'white',
 
-      'neutralBackground': `trueGray-200`, // LIKE
+      'accentBorder':   'coolGray-600',
+
+      'backdrop':       'white',
     }
   },
   'Amber':     themeGenerator('amber',     'indigo'),
@@ -62,8 +71,9 @@ function themeGenerator(primary, secondary) {
       'onLight':        'black',
       'onDark':         'white',
 
-//    'neutralBackground': `${primary}-100`, // LIKE, but may be too much of same color
-      'neutralBackground': `trueGray-200`,   // LIKE
+      'accentBorder':   'coolGray-600',
+
+      'backdrop': `${primary}-100`, // or: 'coolGray-200'
     }
   };
 }

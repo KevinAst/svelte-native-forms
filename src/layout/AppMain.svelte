@@ -1,5 +1,5 @@
 <!-- SIMULATE AppMain WITH it's independent scroll bars -->
-<div class="flex-1 overflow-x-auto overflow-y-auto p-3 bg-neutralBackground text-onLight">
+<div class="flex-1 overflow-x-auto overflow-y-auto p-3 bg-backdrop text-onLight">
 
   <p>AppMain: First entry</p>
 

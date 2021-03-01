@@ -26,7 +26,7 @@
            ALLOWING our NavBar to always be visible at the top of our app
  -->
 <nav class="flex-none bg-primaryLight 
-            BORDER border-primary border-b-2">
+            DIVIDER border-accentBorder border-b-2">
   <div class="flex flex-wrap justify-between px-3 py-2.5">
 
     <!-- Left Section of NavBar -->
@@ -55,7 +55,7 @@
         </span>
         <span class="NON-SELECTED-COLOR text-onLight
                      HOVER              hover:bg-primary hover:text-onDark
-                     CURSOR          select-none cursor-pointer
+                     CURSOR             select-none cursor-pointer
                      OTHER              px-3 py-2 rounded-md text-sm font-medium">
           Projects
         </span>
@@ -112,14 +112,14 @@
              -->
           <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1
                       bg-primaryLight
-                      ring-2 ring-primary ring-opacity-5
+                      ring-2 ring-accentBorder ring-opacity-5
                       CONTENT-RELATED text-sm font-bold select-none cursor-pointer"
                role="menu"
                aria-orientation="vertical"
                aria-labelledby="user-menu">
-            <span class="block px-4 py-2 text-primaryDark hover:bg-primary" role="menuitem">Your Profile</span>
-            <span class="block px-4 py-2 text-primaryDark hover:bg-primary" role="menuitem">Settings</span>
-            <span class="block px-4 py-2 text-primaryDark hover:bg-primary" role="menuitem">Sign Out</span>
+            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Your Profile</span>
+            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Settings</span>
+            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Sign Out</span>
           </div>
         </div>
       </div>
