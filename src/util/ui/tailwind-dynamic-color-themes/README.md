@@ -5,16 +5,14 @@ _... powerful tailwind color themes **(selectable at run-time)**_
 **NOTE:** TODO: This readme is a placeholder, should I decide to publish
 this utility :-)
 
-Developing **dynamic color themes** _(that are dynamically selectable
-at run-time)_ has always been **a tedious and arduous process**.
-Ideally, we would like to include **Dark Modes** to this requirements
-list.  While **tailwind** provides a powerful foundation to work from,
-it has no real support for the dynamics that are needed for this task.
-Without the proper approach, **dynamic color themes** can be a most
-difficult task.
+Developing **dynamic color themes** _that are dynamically selectable
+at run-time_ is **a tedious and arduous process**.  Ideally **Dark
+Mode** would also be included in our requirements list!  While
+**tailwind** provides a powerful foundation to work from, it has no
+real support for the dynamics that are needed for this task.
 
 If you are a **tailwind** user _that needs **dynamic color themes**_,
-this utility may just be for you!
+this utility may be just what you are looking for!
 
 
 <!--- *** Section ************************************************************************* ---> 
@@ -40,25 +38,27 @@ Using **DCT** ...
 
 - Your colors can be defined either through the **tailwind**'s
   standard color pallet, or your own custom colors _(or a combination
-  of both)_.  However, when using the standard color pallet, you can
-  make use of **tailwind**'s color shading _(e.g. `primary-200`,
-  `info-700`, etc.)_, and fully utilize color opacity.
+  of both)_.
 
-- Along with color shading, you can even **invert the shades** at
-  run-time _(light-to-dark, and dark-to-light)_, **in effect doubling
-  the number of color themes available**, and potentially supporting
-  an **automatic dark mode theme** _(depending on your color scheme)_.
+- It's common to use [Color Shading] to accentuate various
+  aspects of your UI.  In **DCT** you can define your own shade
+  nomenclature _(e.g. `primaryLight`, `primaryDark`)_, or piggy back
+  off of **tailwind**'s numeric shade scale _(e.g. `primary-50`,
+  `primary-100`, `primary-200`, etc.)_.
 
-  TODO: create and reference a "concepts section" on **Shade Inversion**.
+- REFACTOR: Speaking of color shades, **DCT** even allows you to
+  [invert your color shades] at run-time _(light-to-dark, and
+  dark-to-light)_, **in effect doubling the number of color themes
+  available**, and potentially supporting an **automatic dark mode
+  theme** _(depending on how your colors are implemented)_.
   
-- Of course, you can explicitly define your own **dark themes** _(with
-  minimal effort)_.  It's merely a new theme!  Unlike **tailwind**'s
-  new **Dark Mode** feature, using **DCT** to define your **dark
-  themes** requires **NO CHANGES** to your markup _(the **tailwind**
-  solution requires you to tediously add the `dark` variant throughout
-  your markup)_.
-
-  TODO: create and reference a "concepts section" on **Dark Mode**.
+- Of course, you can explicitly define your own [Dark Mode] with
+  minimal effort _(if [Shade Inversion] doesn't produce the desired
+  effect)_ ... it's merely a new theme!  Unlike **tailwind**'s new
+  **Dark Mode** feature, using **DCT** to define your **dark themes**
+  requires **NO CHANGES** to your markup _(the **tailwind** solution
+  requires you to tediously add the `dark` variant throughout your
+  markup)_.
 
 - Because **tailwind** needs to know about your Context Colors,
   **DCT** provides a utility that auto-generates the required color
@@ -87,6 +87,8 @@ Make sense? ... _that was **Easy Peasy!**_
   - [Themes (Real Colors)]
   - [Pulling it all together]
   - [Context Color Shades]
+  - [Shade Inversion]
+  - [Dark Mode]
   - [Color Systems]
   - [A Note on App State]
   - [A Note on DCT Reactivity]
@@ -147,33 +149,52 @@ is easy to use, and _simplifies a number of burdensome details_.
    You use **Context Colors** in your markup.  They are abstract
    _(e.g. `primary`/`secondary`)_ in the sense that they have meaning
    in the context of your application.  The **Context Colors** you use
-   is completely up to you.  There are a number of philosophies,
-   _mentioned in the [Color Systems] section_.
+   is completely up to you.  There are a number of philosophies to
+   consider in this process, which are discussed in [Context Colors],
+   [Color Shading], [Shade Inversion], [Dark Mode], and [Color
+   Systems].
    
-   This will result in your **DCT** [`Schema`].  In this example, we will
-   use the following **Context Colors**/**Schema**:
+   The end result of this step will be your **DCT** [`Schema`].  For
+   sake of example, let's say we will be using the following **Context
+   Colors** _(remember this definition can be whatever you desire)_:
    
    **Our Schema:**
    ```js
-   const schema = ['primary', 'onPrimary', 'secondary', 'onSecondary'];
+   const schema = ['primaryLight',   'primary',   'primaryDark',
+                   'secondaryLight', 'secondary', 'secondaryDark',
+                   'onLight',
+                   'onDark',
+                   'accentBorder',
+                   'backdrop',
+                  ];
    ```
 
 2. **Next**: We need to apply [Real Colors] to the process.  
    
    This is accomplished through [`Themes`].  You will typically define
    multiple themes _(that are changeable at run-time)_, but starting
-   out we can get by with one.  Without this initial theme, our system
-   would have **no color** at all.
+   out we can get by with one.  At lease one theme is required, else
+   our system would have **no color** at all.
    
    **Our Initial Theme:**
    ```js
    const themes = {
-     gray: {
+     'Cool Gray': {
        contextColors: {
-         primary:     'coolGray-400',
-         onPrimary:   'coolGray-900',
-         secondary:   'coolGray-600',
-         onSecondary: 'coolGray-100',
+         'primaryLight':   'coolGray-300',
+         'primary':        'coolGray-500',
+         'primaryDark':    'coolGray-900',
+         
+         'secondaryLight': 'orange-300',
+         'secondary':      'orange-500',
+         'secondaryDark':  'orange-900',
+         
+         'onLight':        'black',
+         'onDark':         'white',
+         
+         'accentBorder':   'coolGray-600',
+         
+         'backdrop':       'coolGray-100',
        },
      },
    };
@@ -196,15 +217,31 @@ is easy to use, and _simplifies a number of burdensome details_.
    ```js
    import {initDCT} from 'tailwind-dynamic-color-themes';
    
-   const schema = ['primary', 'onPrimary', 'secondary', 'onSecondary'];
+   const schema = ['primaryLight',   'primary',   'primaryDark',
+                   'secondaryLight', 'secondary', 'secondaryDark',
+                   'onLight',
+                   'onDark',
+                   'accentBorder',
+                   'backdrop',
+                  ];
    
    const themes = {
-     gray: {
+     'Cool Gray': {
        contextColors: {
-         primary:     'coolGray-400',
-         onPrimary:   'coolGray-900',
-         secondary:   'coolGray-600',
-         onSecondary: 'coolGray-100',
+         'primaryLight':   'coolGray-300',
+         'primary':        'coolGray-500',
+         'primaryDark':    'coolGray-900',
+         
+         'secondaryLight': 'orange-300',
+         'secondary':      'orange-500',
+         'secondaryDark':  'orange-900',
+         
+         'onLight':        'black',
+         'onDark':         'white',
+         
+         'accentBorder':   'coolGray-600',
+         
+         'backdrop':       'coolGray-100',
        },
      },
    };
@@ -258,25 +295,24 @@ is easy to use, and _simplifies a number of burdensome details_.
 5. **Finally**: You are free to use your **Context Colors** in your markup.
    
    Your **Context Colors** can be used in all the standard **tailwind**
-   color directives _(ex: `text-primary`, `bg-onSecondary`, etc.)_.
+   color directives _(ex: `bg-primaryDark`, `text-onDark`, etc.)_.
    
    At this point, you will want to fully flesh out your system,
    insuring that only your abstract **Context Colors** are used.
 
-6. **Bonus**: Invert your shades
+6. **Bonus**: [Shade Inversion]
 
-   **DCT** offers a unique feature that allows you to invert the shades
-   of your theme at run-time _(light-to-dark, and dark-to-light)_.
-   This has the effect of **doubling the number of color themes
-   available**, and potentially supporting an **automatic dark mode
-   theme** _(depending on your color scheme)_.
+   **DCT** offers a unique feature that allows you to invert the
+   shades of your theme at run-time _(light-to-dark, and
+   dark-to-light)_.  This has the effect of **doubling the number of
+   color themes available**, and potentially supporting an **automatic
+   dark mode theme** _(depending on how your colors are implemented)_.
 
-   If you have used shades in your color definition, _(either directly
-   through shaded context colors, or indirectly through shaded real
-   colors)_ you can play with this option.
-
-   Simply **add a UI control** _(somewhere in your app)_ that invokes the 
-   `DCT.toggleInvertShade()` function.
+   If your themes are seeded with **tailwind** colors, you can play
+   with this option _(only **tailwind** colors support **shade
+   inversion** - custom colors simply no-op)_.  Simply **add a UI
+   control** _(somewhere in your app)_ that invokes the
+   [`DCT.toggleInvertShade()`] function.
 
 7. **Later**: You will want to define multiple color themes.
    
@@ -315,6 +351,8 @@ The following sections discuss the basic concepts of **DCT**:
 - [Themes (Real Colors)]
 - [Pulling it all together]
 - [Context Color Shades]
+- [Shade Inversion]
+- [Dark Mode]
 - [Color Systems]
 - [A Note on App State]
 - [A Note on DCT Reactivity]
@@ -394,7 +432,7 @@ In **DCT** **Real Colors** are supplied through **tailwind**'s
 [standard color
 pallet](https://tailwindcss.com/docs/customizing-colors#color-palette-reference).
 This includes a total of 220 colors _(22 base colors, each with 10
-shades)_ ... pretty impressive!
+shades)_.
 
 If that is not enough, you can also specify **Real Colors** through
 CSS compatible color definitions _(ex: `'#8050c8'`)_.  This however is
@@ -410,18 +448,19 @@ opacity _(see [`Themes`] for more detail)_.
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 Your [Context Colors] _(i.e. [`Schema`])_ and [Real Colors]
-_(i.e. [`Themes`])_ are very closely related within your application.
-Each theme maps the context colors to real colors.
+_(i.e. [`Themes`])_ are closely related within your application.  Each
+theme maps real colors to your context colors.
 
 The fusion of this relationship is accomplished through the
-[`initDCT()`] function _(which accepts both `schema` and `themes`
-parameters)_.  
+[`initDCT()`] function, which accepts both `schema` and `themes`
+parameters, providing a central place where these two aspects
+can be affirmed and validated.
 
 Interestingly enough, this is the only public function promoted by
-**DCT**.  With that said, it returns a [`DCT`] object which in turn
-promotes the remaining API.  The reason for this is to fuse the
-relationship between the `schema` and `themes`.  The `DCT` object
-contains functions to:
+**DCT**.  It however returns a [`DCT`] object which in turn promotes
+the remaining API.  The reason for this is to fuse the relationship
+between the `schema` and `themes`.  The `DCT` object contains
+functions to:
 
 - change the active theme at run-time ... see:
   [`DCT.activateNextTheme()`]
@@ -443,87 +482,148 @@ contains functions to:
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-**DCT** supports both shaded and non-shaded colors.  Within the
-definition of your [Context Colors], you must specify whether each
-individual context color represents multiple colors _(through
-shading)_ or a single color ... _see [`Schema`] for details_.
+Color shades are typically an important part of your color definition,
+helping to distinguish various aspects of your UI.  As an example, you
+may need three distinct shades for your primary context color:
+`primaryLight`, `primary`, and `primaryDark`.
 
-- When context colors are shaded, it represents multiple colors
-  _(through shading)_, so you may use **tailwind**s standard numeric
-  shade qualifiers in your markup (e.g. `primary-100`).
+In **DCT** you have a choice when defining your context color shades:
 
-  **NOTE:** You may also drop the shade suffix (i.e. `primary`),
-  _which defaults to the `500` shade_.
+- you can define your own shade nomenclature _(e.g. `primaryLight`,
+  `primary`, `primaryDark`)_
 
-- When your context color is non-shaded, it represents a single color,
-  so you **may not** use the shading qualifiers.  In this case you are
-  defining a more specific usage pattern, hence your context is more
-  explicit _(e.g. `primary`)_.
+- or you can use **tailwind**'s numeric shade scale
+  _(e.g. `primary-50`, `primary-100`, `primary-200`, etc.)_
 
-### To shade or not to shade:
+The former provides a more distinct set of color shades, and is
+accomplished through a [`Schema`] definition of a single context
+color.  In turn, your [`Theme`] can seed this with either a
+**tailwind** color shade _(e.g. `'gray-100'`)_, or a custom color
+_(e.g. `'#E4E4E7'`)_.
 
-Depending on your needs, shaded colors may work well.
+The latter provides more automated shades, and is accomplished through
+a [`Schema`] definition of a multi-shaded context color.  In this case
+your [`Theme`] **must** seed this with a **tailwind** color that is
+_shadable_ _(e.g. `'gray'`)_.
 
-However there are **many cases where shaded context colors are
-inappropriate**.  The issue arises when you duplicate certain
-heuristics _(in your markup)_ in a very obscure way.  As an example,
-a `base-800` may represent a "primary" section, while a `base-600`
-represents a "secondary" section.  While this certainly works, it's
-somewhat cryptic and not readily apparent.  More importantly, you
-cannot change this heuristic without changing all of the markup in
-your entire application.
+As it turns out, the set of context colors you use may represent a
+mixture of both approaches.
 
-In this case it is **more explicit to define two single context
-colors** _(i.e. `primary`/`secondary`)_ that are non-shaded.  This
-eliminates the shortcoming mentioned above, and makes your markup self
-documenting.  The best part is you haven't lost anything in terms of
-your shading.  You can still apply the same shades to these non-shaded
-context colors, because they are aliased to a specific **tailwind**
-real color shade _(at run-time through your [`Theme`])_ ... for
-example: `primary` is `indigo-800`, and `secondary` is `indigo-600`.
+**Note on [Shade Inversion]**: 
 
-Regardless of whether you use shaded or non-shaded context colors, you
-can still apply the `invertShade` option _(when you set the active
-theme at runtime)_.  This is because of the same reason that we just
-discussed: even non-shaded context colors are defined from a specific
-**tailwind** real color shade, so it too can be inverted.
+<ul>
 
-**Best Practice:** As a general rule, non-shaded context colors are
-preferred in most cases.  This is especially true for **major**
-contextual themes _(e.g. `primary`/`secondary`)_.  Optionally, you may
-consider shaded context colors for **minor** contextual themes
-_(e.g. `error`/`warning`)_.
+Regardless of which option you use, you may still invert the shades of
+either approach, providing the [`Theme`] is seeding this with
+**tailwind** colors.  In other words, custom colors cannot be shade
+inverted.
 
+</ul>
 
-### Clarify color shade confusion:
+**Best Practice**: Use single context colors with your own shade
+nomenclature
 
-In **DCT**, there is a potential source of confusion when talking
-about **Color Shades** ... and that is whether we are referring to
-shades in **Context Colors** _(the abstract colors referenced in our
-markup)_ or shades in **Real Colors** _(the tailwind colors that map
-real colors to the context)_.
+<ul>
 
-- When discussing shades for context colors, it refers to whether the
-  context color represents a single color, or multiple colors (through
-  shading).
+By using your own shade nomenclature, it:
 
-- However, in both shaded and non-shaded context colors, real color
-  shades are used to map color to the context.
+- represents a more distinct set of shades _that is easier to
+  remember and adhere to_
 
-  - the only way to define shaded context colors is to reference a
-    standard tailwind color (which is itself shaded)
-
-  - however even a non-shaded context color is mapped to a real color
-    through a tailwind color shade
-
-This is a subtle yet important distinction.  Beyond the subtle
-nuances, the concrete aspect of this discussion is that you can invert
-shades on even non-shaded context colors, because the real colors are
-supplied through tailwind shaded colors. ?? this is a DUPLICATE of the last para in the last section
+- provides the ability to more finely tune the color shades in-use
+  _(by your [`Theme`])_ for different base colors
+  _(for example, your `'Emerald'` theme may require a slightly darker
+  `primaryLight` than other themes)_
 
 </ul>
 
 
+**Best Practice**: Avoid using **tailwind**'s numeric shade scales to
+distinguish context color boundaries.
+
+<ul>
+
+You may be tempted to define a single context color _(say `base`)_
+using **tailwind's** multi-shaded numeric scale _(`base-100`, etc.)_,
+and then distinguish multiple context color boundaries with this one
+definition _(example: `base-100` is **primary** and `base-700` is
+**secondary**)_.
+
+This may sound like a good idea initially, however it is simply too
+confusing.  A heuristic like this hides the underlying real intent,
+and is hard to remember.
+
+It also doesn't allow color distinctions between your context
+boundaries ... rather your context distinctions are restricted to
+shades of the same color.
+
+Most importantly, you cannot change this heuristic without changing
+all of the markup in your entire application.
+
+</ul>
+
+
+
+<!--- *** Section ************************************************************************* ---> 
+## Shade Inversion
+
+<ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
+
+A unique feature of **DCT** is the ability to invert your color shades
+at run-time.
+
+When you do this your light shades become dark and your dark shades
+become light.  This has the effect of doubling the number of available
+color themes.
+
+You can choose to use this feature or simply let sleeping dogs lie
+_(i.e. leave it alone)_.
+
+Shade inversion is accomplished at run-time, when the active theme is
+specified _(either through [`DCT.activateTheme()`] or
+[`DCT.toggleInvertShade()`])_.
+
+The interesting aspect of this feature is it has the potential of
+supporting an **automated dark mode**, depending on how your color
+philosophy is implemented.
+
+**Please Note** that only **tailwind** colors support **shade inversion**.  Custom
+colors will simply no-op on **shade inversion** requests.
+
+</ul>
+
+
+
+<!--- *** Section ************************************************************************* ---> 
+## Dark Mode
+
+<ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
+
+As we have discussed, it is possible to automatically glean a **Dark
+Mode** by using **DCT**'s [Shade Inversion] feature.  It really
+depends on how your color scheme is implemented.
+
+If your color philosophy produces dark modes by simply inverting the
+color shades, you are [in like flynn]!  Simply alias the **DCT**
+inversion state to a dark mode and you are done!
+
+As a fallback, if this doesn't work _(for whatever reason)_, don't
+fret ... dark modes are easily achieved!
+
+Dark modes are extremely simple to implement in **DCT**!  You simply
+define a theme that adjusts your colors to a dark color strategy.
+It's really no different than defining themes with distinct base
+colors.
+
+Unlike **tailwind**'s **Dark Mode** feature, in **DCT** there are
+**NO** changes to your markup, because you have abstracted this away
+by using [Context Colors].
+
+This is in stark contrast to **tailwind**'s **Dark Mode** feature,
+which requires you to tediously add the `dark` variant throughout your
+markup!
+
+</ul>
 
 
 <!--- *** Section ************************************************************************* ---> 
@@ -1137,43 +1237,53 @@ In it's simplest form, a `Schema` is merely an array of context color
 names.
 
 ```js
-['primary', 'secondary']
+['primaryLight', 'primary', 'primaryDark', 'secondary', 'onLight', 'onDark']
 ```
 
-The example (above) specifies two non-shaded single-color context colors that can
-be used in your application.  As a result, markup references cannot
-specify a shade (e.g. `bg-primary-100` **is invalid**) _because the
-shades do not exist_, rather only the base color is valid
-(e.g. `bg-primary`).
+This example specifies six single context colors that can be used in
+your application.  
 
-If you wish to support multi-color shaded context colors, simply wrap the schema's
-color string in an "inner" array (a single element array):
+- As a result, your markup may reference colors such as:
+  `bg-primaryDark`, `text-onDark`, etc.
 
-```js
-['primary', 'secondary', ['error']]
-```
+- **NOTE:** your [`Theme`] may seed these colors with either a
+  **tailwind** color shade _(e.g. `'gray-100'`)_, or a custom color
+  _(e.g. `'#E4E4E7'`)_.
 
-The example (above) defines three context colors.  The first two are
-non-shaded single-color, but the third (`error`) is shaded
-multi-color.  As a result, your markup can specify either shaded or
-non-shaded `error` directives _(e.g. both `text-error` and
-`text-error-400` are valid)_.  **NOTE:** _the default of a shaded
-context color is the `500` shade_.
 
-**NOTE:** Don't confuse the concept of shaded/non-shaded **context
-colors** with the **real colors** that are applied by the active
-[`Theme`] at run-time.  Regardless of whether you use shaded or
-non-shaded **context colors**, you may still be able to apply the
-`invertShade` option _(when you set the active theme at run-time)_.
-This is because even non-shaded **context colors** can be defined from
-a specific **tailwind** color shade _(so it too can be inverted)_.
+> **tailwind's numeric shade scale**:
+> 
+> If you wish to use **tailwind**'s numeric shade scale in your context
+> color, simply wrap the schema's color string in an "inner" array (a
+> single element array):
+> 
+> ```js
+> ['primaryLight', 'primary', 'primaryDark', 'secondary', 'onLight', 'onDark', ['error']]
+> ```
+> 
+> This example adds an `error` context color which automatically uses
+> the **tailwind** numeric shade scale.
+> 
+> - As a result your markup can specify _(for example)_ `bg-error` or
+>   `bg-error-400` _(**NOTE:** the `error` color reference defaults to the `500`
+>   shade)_.
+> 
+> - **NOTE:** your [`Theme`] must **must** seed this `error` color with a
+>   **tailwind** color that is _shadable_ _(e.g. `'red'`)_.
 
-**Best Practice:** As a general rule, non-shaded context colors are
-preferred in most cases.  This is especially true for **major**
-contextual themes _(e.g. `primary`/`secondary`)_.  Optionally, you may
-consider shaded context colors for **minor** contextual themes
-_(e.g. `error`/`warning`)_.  For more information see: [To shade or
-not to shade]
+**Note on Shade Inversion**: 
+
+<ul>
+
+Regardless of whether you use **tailwind**'s numeric shade scale _or
+not_, you may still invert the shades of either approach, providing
+the [`Theme`] is seeding this with **tailwind** colors.  In other
+words, custom colors cannot be shade inverted.
+
+</ul>
+
+For more information and **Best Practices**, please refer to the
+discussions on [Context Colors] and [Context Color Shades].
 
 </ul>
 
@@ -1196,23 +1306,31 @@ colors specified in the app's [`Schema`].  It defines one or more
 
 ```js
 // using the following Schema:
-Schema: [['primary'], ['secondary'], 'error'];
+Schema: ['primaryLight', 'primary', 'primaryDark', 'secondary', 'onLight', 'onDark', ['error']]
 
 Themes: {
-  emerald: {
+  'Emerald': {
     `clientProps`: `clientValues`,
     contextColors: {
-      primary:   'emerald',
-      secondary: 'coolGray',
-      error:     'red.500',
+      'primaryLight': 'emerald-300',
+      'primary':      'emerald-500',
+      'primaryDark':  'emerald-900',
+      'secondary':    'red-500',
+      'onLight':      'black',
+      'onDark':       'white',
+      'error':        'red',
     },
   },
-  amber: {
+  'Amber': {
     `clientProps`: `clientValues`,
     contextColors: {
-      primary:   'amber',
-      secondary: 'coolGray',
-      error:     'red.500',
+      'primaryLight': 'amber-300',
+      'primary':      'amber-500',
+      'primaryDark':  'amber-900',
+      'secondary':    'indigo-500',
+      'onLight':      'black',
+      'onDark':       'white',
+      'error':        'red',
     },
   },
   ... more - snip snip
@@ -1220,7 +1338,8 @@ Themes: {
 ```
 
 - Each "named" theme is defined through a sub-structure, keyed by the
-  `themeName` which is referenced in [`DCT.activateTheme()`].
+  `themeName` which is referenced in [`DCT.activateTheme()`].  The
+  example above has two `themeNames`: `Emerald` and `Amber`.
 
 - The sub-structure contains the following fields:
 
@@ -1230,26 +1349,26 @@ Themes: {
 
   * Each theme **must define** the `contextColors` property, which is
     a structure that maps all the [Context Colors] _(of the
-    [`Schema`])_ to a `realColor`.
+    [`Schema`])_ to `realColors`.
 
     - ALL [Context Colors] _(defined in the [`Schema`])_ **must be
       supplied**.
 
     - The `realColor` can be on of the following:
 
-      * A **tailwind** color name (defined in the `'tailwindcss/colors'`
-        import).  This represents a given color with **all it's shades**.
-        This is the **only option** for schema-defined **shaded context colors**
-        (because **tailwind** is the only supported source for
-        **shaded colors**).
+      * A **tailwind** color name (found in the `'tailwindcss/colors'`
+        import).  This represents a given color with **all it's
+        numeric shades**.  This is the **only option** for
+        schema-defined **shaded context colors** (because **tailwind**
+        is the only supported source for **shaded colors**).
 
-        EX: `'indigo'`
+        EX: `'red'`
 
       * A **tailwind** color name suffixed with a shade.  This
         represents a single color, and can be used for a
         schema-defined **non-shaded context color**.
 
-        EX: `'indigo-700'`
+        EX: `'emerald-900'`
 
       * A custom color as represented by a CSS compatible color
         definition _(hex colors, rgb() refs, etc.)_.  This represents
@@ -1270,7 +1389,7 @@ Themes: {
 
         ```
         Error: initDCT() parameter violation: 
-               theme: 'My Best Theme' contextColor: 'onPrimary' realColor: 'red' 
+               theme: 'My Best Theme' contextColor: 'primaryDark' realColor: 'red' 
                invalid realColor: 
                  references multiple tailwind shaded colors (without a dash -),
                  but the schema requires a single-color non-shaded context color (with a dash)
@@ -1361,8 +1480,15 @@ Schema: [['primary'], ['secondary'], 'error'];
   [Pulling it all together]:             #pulling-it-all-together
 
   [Context Color Shades]:                #context-color-shades
+  [Color Shading]:                       #context-color-shades
   [To shade or not to shade]:            #to-shade-or-not-to-shade
   [Clarify color shade confusion]:       #clarify-color-shade-confusion
+
+  [Shade Inversion]:                     #shade-inversion
+  [invert your color shades]:            #shade-inversion
+
+  [Dark Mode]:                           #dark-mode
+  [Dark Theme]:                          #dark-mode
 
   [Color Systems]:                       #color-systems
   [Color System]:                        #color-systems
@@ -1427,3 +1553,5 @@ Schema: [['primary'], ['secondary'], 'error'];
 [IBM]:                            https://www.ibm.com/design/language/color/
 [Open Color]:                     https://yeun.github.io/open-color/
 [Material IO Color Config Tool]:  https://material.io/resources/color
+
+[in like flynn]:                  https://en.wikipedia.org/wiki/In_like_Flynn
