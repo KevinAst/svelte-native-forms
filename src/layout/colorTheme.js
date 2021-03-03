@@ -55,13 +55,13 @@ const themes = {
     }
   },
   'Amber':   { contextColors: gen('amber',     'indigo'), },
-  'Emerald': { contextColors: gen('emerald',   'red'),    },
+//'Emerald': { contextColors: gen('emerald',   'red'),    },
   'Teal':    { contextColors: gen('teal',      'rose'),   },
-  'Blue':    { contextColors: gen('lightBlue', 'orange'), },
+//'Blue':    { contextColors: gen('lightBlue', 'orange'), },
   'Cyan':    { contextColors: gen('cyan',      'orange'), },
-  'Red':     { contextColors: gen('red',       'green'),  },
-  'Rose':    { contextColors: gen('rose',      'green'),  },
-  'Pink':    { contextColors: gen('pink',      'lime'),   },
+//'Red':     { contextColors: gen('red',       'green'),  },
+//'Rose':    { contextColors: gen('rose',      'green'),  },
+//'Pink':    { contextColors: gen('pink',      'lime'),   },
 };
 
 
