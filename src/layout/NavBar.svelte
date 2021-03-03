@@ -4,17 +4,10 @@
  //   - a "singleton" component ... only one instance is allowed
  //   - height coorelates with height in <SideBar> header
  //     * is instiated at top of page (see: <AppContainer>)
- import {onMount} from 'svelte';
- import {sideBar} from './SideBar.svelte';
- import Icon      from '../util/ui/Icon.svelte';
- import DCT       from './colorTheme';
-
- let theme;
- let inversion;
- onMount( () => {
-   theme     = DCT.getActiveThemeName();
-   inversion = DCT.getActiveInvertShade();
- });
+ import {sideBar}              from './SideBar.svelte';
+ import ThemeSelector          from './ThemeSelector.svelte';
+ import ThemeInversionSelector from './ThemeInversionSelector.svelte';
+ import Icon                   from '../util/ui/Icon.svelte';
 </script>
 
 <!-- NavBar
@@ -66,45 +59,9 @@
     <div class="flex items-center">
       <div class="ml-4 flex-shrink-0 flex items-center">
 
-        <!-- ThemeSelector ??  -->
-        <span class="text-onLight
-                     HOVER   hover:bg-primary hover:text-onDark
-                     CURSOR  select-none cursor-pointer
-                     OTHER   mr-1 px-3 py-2 rounded-md text-sm font-medium"
-              title="Adjust Theme Color">
-          <Icon name="arrow_back_ios"
-                title="Prior Theme"
-                size="100%"
-                class="hover:text-primaryDark"
-                on:click={() => theme = DCT.activateNextTheme()}/>
-          {theme}
-          <Icon name="arrow_forward_ios"
-                title="Next Theme"
-                size="100%"
-                class="hover:text-primaryDark"
-                on:click={() => theme = DCT.activateNextTheme()}/>
-        </span>
+        <ThemeSelector/>
 
-        <!-- ThemeInverterSelector ?? -->
-        <div class="text-onLight
-                    CURSOR  select-none cursor-pointer
-                    OTHER   mr-1 px-3 py-2 rounded-md text-sm font-medium"
-              title="Toggle Dark/Light"
-              on:click={() => inversion = DCT.toggleInvertShade()}>
-          <!--  toggle indicator -->
-          <span class="bg-primaryLight
-                       relative inline-flex flex-shrink-0
-                       h-3 w-7 border-2 border-transparent rounded-full cursor-pointer
-                       transition-colors ease-in-out duration-200
-                       outline-none ring-2 ring-offset-2 ring-secondary">
-            <span class="{inversion ? 'translate-x-4' : 'translate-x-0'}
-                         pointer-events-none
-                         inline-block h-2 w-2
-                         rounded-full bg-secondary shadow transform ring-0
-                         transition ease-in-out duration-200"/>
-          </span>
-          &nbsp; Dark
-        </div>
+        <ThemeInversionSelector/>
 
         <Icon name="notifications"
               class="PRIMARY-COLOR text-primary
