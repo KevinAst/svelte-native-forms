@@ -388,6 +388,23 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
 
   //***
+  //*** + activatePriorTheme(): activeThemeName
+  //***
+
+  function activatePriorTheme() {
+    const activeThemeIndx = _themesArr.findIndex( (theme) => theme.themeName === _activeThemeName );
+
+    // advance to the prior theme (wrapping at start)
+    const priorThemeIndx = activeThemeIndx===0 ? _themesArr.length-1 : activeThemeIndx-1;
+    const priorThemeName = _themesArr[priorThemeIndx].themeName;
+    activateTheme({themeName: priorThemeName});
+
+    // beam me up Scotty :-)
+    return _activeThemeName; // ... our state has now been updated (via activateTheme())
+  }
+
+
+  //***
   //*** + toggleInvertShade(): activeInvertShade
   //***
 
@@ -471,6 +488,7 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
   return {
     activateTheme,
     activateNextTheme,
+    activatePriorTheme,
     toggleInvertShade,
     getThemes,
     getActiveThemeName,

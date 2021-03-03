@@ -100,6 +100,7 @@ Make sense? ... _that was **Easy Peasy!**_
     - change the active theme:
       - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
       - [`activateNextTheme(): activeThemeName`]
+      - [`activatePriorTheme(): activeThemeName`]
       - [`toggleInvertShade(): activeInvertShade`]
     - support of theme selection UI control:
       - [`getThemes(): Theme\[\]`]
@@ -330,6 +331,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    **Example** _(in [Svelte])_:
    ```html
    <button on:click={DCT.activateNextTheme}>Next Theme</button>
+   <button on:click={DCT.activatePriorTheme}>Prior Theme</button>
    <button on:click={DCT.toggleInvertShade}>Toggle Shade</button>
    ```
 
@@ -463,10 +465,16 @@ between the `schema` and `themes`.  The `DCT` object contains
 functions to:
 
 - change the active theme at run-time ... see:
-  [`DCT.activateNextTheme()`]
+  [`DCT.activateTheme()`], 
+  [`DCT.activateNextTheme()`],
+  [`DCT.activatePriorTheme()`],
+  [`DCT.toggleInvertShade()`]
 
 - miscellaneous API in support of the app's theme selection UI
-  control
+  control ... see:
+  [`DCT.getThemes()`],
+  [`DCT.getActiveThemeName()`],
+  [`DCT.getActiveInvertShade()`]
 
 - auto configure the **tailwind** context colors in
   `tailwind.config.js` _(part of the build process)_ ... see:
@@ -871,6 +879,7 @@ object _(returned from [`initDCT()`])_.
   - change the active theme:
     - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
     - [`activateNextTheme(): activeThemeName`]
+    - [`activatePriorTheme(): activeThemeName`]
     - [`toggleInvertShade(): activeInvertShade`]
   - support of theme selection UI control:
     - [`getThemes(): Theme\[\]`]
@@ -901,10 +910,16 @@ This is done so as to fuse the relationship between the `schema` and
 `themes`.  The `DCT` object contains functions to:
 
 - change the active theme at run-time ... see:
-  [`DCT.activateNextTheme()`]
+  [`DCT.activateTheme()`], 
+  [`DCT.activateNextTheme()`],
+  [`DCT.activatePriorTheme()`],
+  [`DCT.toggleInvertShade()`]
 
 - miscellaneous API in support of the app's theme selection UI
-  control
+  control ... see:
+  [`DCT.getThemes()`],
+  [`DCT.getActiveThemeName()`],
+  [`DCT.getActiveInvertShade()`]
 
 - auto configure the **tailwind** context colors in
   `tailwind.config.js` _(part of the build process)_ ... see:
@@ -965,6 +980,7 @@ following API:
 - change the active theme at run-time:
   - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
   - [`activateNextTheme(): activeThemeName`]
+  - [`activatePriorTheme(): activeThemeName`]
   - [`toggleInvertShade(): activeInvertShade`]
 - miscellaneous API in support of the app's theme selection UI
   control
@@ -1043,6 +1059,34 @@ sophisticated UI control for theme selection.
 
 ```js
 + activateNextTheme(): activeThemeName
+```
+
+**Parameters:** NONE
+
+**Return:** activeThemeName - the newly activated themeName
+
+</ul>
+
+
+
+<!--- *** Section ************************************************************************* ---> 
+## `DCT.activatePriorTheme()`
+
+<ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
+
+`activatePriorTheme()` advances the current theme to the prior one "in
+line" _(wrapping at the start)_.  These heuristics are defined by the
+**DCT** object, with the same "theme order" as defined in it's
+[`Themes`] reference.
+
+This utility is typically used as a dev tool, however it can be used
+in production _(if you wish)_.  Normally your app promotes a more
+sophisticated UI control for theme selection.
+
+**API:**
+
+```js
++ activatePriorTheme(): activeThemeName
 ```
 
 **Parameters:** NONE
@@ -1520,6 +1564,9 @@ Schema: [['primary'], ['secondary'], 'error'];
 
   [`DCT.activateNextTheme()`]:           #dctactivatenexttheme
   [`activateNextTheme(): activeThemeName`]: #dctactivatenexttheme
+
+  [`DCT.activatePriorTheme()`]:           #dctactivatepriortheme
+  [`activatePriorTheme(): activeThemeName`]: #dctactivatepriortheme
 
   [`DCT.toggleInvertShade()`]:           #dcttoggleinvertshade
   [`toggleInvertShade(): activeInvertShade`]: #dcttoggleinvertshade

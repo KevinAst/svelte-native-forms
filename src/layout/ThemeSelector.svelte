@@ -21,7 +21,7 @@
         title="Prior Theme"
         size="100%"
         class="hover:text-primaryDark"
-        on:click={() => theme = DCT.activateNextTheme()}/>
+        on:click={() => theme = DCT.activatePriorTheme()}/>
 
   {theme}
 
