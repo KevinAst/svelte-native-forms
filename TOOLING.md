@@ -37,6 +37,8 @@ unmodified)_!
 - [Project Setup]
   - [Setup GitHub Project]
   - [Setup Svelte App Tooling]
+  - [Setup Tailwind CSS]
+  - [Setup tailwind-dynamic-color-themes]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -90,7 +92,7 @@ pkgReview ...... AI: ?? show outdated installed packages
 
 DEPLOYMENT       NOTE: we DEPLOY the application
 ==========
-app:deploy ..... AI: ?? deploy latest application to https://svelte-native-forms.js.org/app/
+app:deploy ..... deploy latest application to https://svelte-native-forms.js.org/app/
                  NOTE: This script FIRST builds the app from scratch
                        ... via preapp:deploy
 
@@ -146,18 +148,22 @@ looking at `package.json`, the inevitable questions are:
 The following table itemizes the **svelte-native-forms** dependencies,
 referencing when/where they were introduced/configured.
 
-
 Dependency                        | Type        | Usage                   | Refer To
 --------------------------------- | ----------- | ----------------------- | ----------------
 `@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
+`autoprefixer`                    | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
+`gh-pages`                        | **TOOLING** | Deployment              | [Setup Deployment]
 `rollup-plugin-css-only`          | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-svelte`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-terser`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `sirv-cli`                        | **TOOLING** | A static file server    | [Setup Svelte App Tooling]
 `svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte App Tooling]
+`svelte-preprocess`               | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
+`tailwindcss`                     | **TOOLING**<br>**APP**   | Tailwind CSS Build<br>and application code  | [Setup Tailwind CSS]<br>and app code: `src/...`
+`tailwind-dynamic-color-themes`   | **TOOLING**<br>**APP**   | a faux dependency (sourced here but a potential npm lib)  | [Setup tailwind-dynamic-color-themes] and app code: `src/...`
 
 
 **OLD TEMPLATE:** ?? synced above (remove when complete)
@@ -199,10 +205,15 @@ svelte-native-forms/
   node_modules/ ........ install location of dependent packages (maintained by npm)
   package.json ......... project meta data with dependencies
   package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-  public/ .............. the Svelte app deployment root (with generated build/) see: "Setup Svelte App Tooling"
+  public/ .............. the app deployment root (with generated build/) see: "Setup Svelte App Tooling"
   README.md ............ basic project docs
   rollup.config.js ..... the rollup bundler configuration (used by Svelte) see: "Setup Svelte App Tooling"
   src/ ................. the app source code
+    main.js ............ mainline entry point (redirect to Main.svelte)
+    Main.svelte ........ general place to do setup/config (including Tailwind)
+    App.svelte ......... our top-most App component (launched from Main.svelte)
+    snip snip .......... many more!
+  tailwind.config.js ... the tailwind css configuration file
   TOOLING.md ........... this document :-)
 
   ?? L8TR: (as needed)
@@ -232,6 +243,8 @@ were carried out, however in some cases the order can be changed.
 **Sub Sections**:
   - [Setup GitHub Project]
   - [Setup Svelte App Tooling]
+  - [Setup Tailwind CSS]
+  - [Setup tailwind-dynamic-color-themes]
   - [Setup Absolute Imports]
   - [Setup Node Builtins]
   - [Setup Jest Unit Testing]
@@ -466,6 +479,342 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
   $ npm run start
 ```
 KJB Notes --->
+
+
+
+<!--- *** SUB-SECTION *************************************************************** --->
+# Setup Tailwind CSS
+
+The **svelte-native-forms** demo app styles it's components based on
+[Tailwind CSS].
+
+This utility requires a build process that:
+
+  1. Enables tailwind in general _(the `@tailwind` directives found in
+     `src/Main.svelte`)_.
+
+  2. Enable tailwind advanced directives _(`@apply`, `@layer`, etc.)_.
+
+  3. Purging unneeded styles _(for production builds)_. The number of
+     tailwind css classes are massive (over 1.5 meg).  A "production"
+     build can prune this large resource to only what is used by a
+     given application.  This is employed for "production" builds
+     only, because it would be too time consuming to apply this for
+     every development change.
+
+Enabling and configuring the tailwind-portion of the build can be a
+bit confusing, due to the large number of frameworks.  These
+instructions are specific to [Svelte].
+
+At the end of this process you should have:
+
+- [Tailwind CSS] fully integrated in our [Svelte] app
+
+- Impacted Dependencies:
+  ```
+  svelte-preprocess - A Svelte preprocessor with sensible defaults and support for: 
+                      PostCSS, SCSS, Less, Stylus, CoffeeScript, TypeScript, Pug and much more.
+                      ... Svelte's own parser understands only JavaScript, CSS and its HTML-like
+                          syntax. To make it possible to write components in other languages,
+                          such as TypeScript or SCSS, Svelte provides the preprocess API, which
+                          allows to easily transform the content of your markup and your
+                          style/script tags.
+
+  tailwindcss       - A PostCSS plugin for tailwind
+                      ... A utility-first CSS framework for rapidly building custom user interfaces.
+                      ... this is what we are here for
+  
+  autoprefixer      - A PostCSS plugin to parse CSS and add vendor prefixes to CSS rules using values
+                      from "Can I Use"
+                      ... like: -webkit- (Chrome, Android, iOS, Safari),
+                                -moz- (FireFox),
+                                -ms- (IE),
+                                -o- (Opera)
+  
+  NOT CURRENTLY INSTALLED/USED: ---------------------------------------------------------------
+  
+  postcss-nesting   - A PostCSS Nesting plugin, letting you nest style rules inside each other, 
+                      following the CSS Nesting specification. ... KJB: hmmmm
+                        /* THIS: */
+                        a, b {
+                          color: red;
+                         
+                          & c, & d {
+                            color: white;
+                          }
+                        }
+                        /* BECOMES: */
+                        a, b {
+                          color: red;
+                        }
+                        a c, a d, b c, b d {
+                          color: white;
+                        }
+  
+  @tailwindcss/ui   - OPTIONAL tailwind ui plugin <<< NO README ... 50K downloads / week
+                      * KJB: I think this is a package of tailwind defs for pre-packaged components
+                             MAY BE a PURCHASED PRODUCT (found a site for that)
+                             ... https://tailwindui.com/
+  ```
+
+- Impacted Files:
+  ```
+  svelte-native-forms/
+    tailwind.config.js ... the tailwind configuration file
+    rollup.config.js ..... modified in support of tailwind
+    src/
+      main.js ............ mainline entry point (redirect to Main.svelte)
+      Main.svelte ........ general place to do setup/config (including Tailwind)
+      App.svelte ......... our top-most App component (launched from Main.svelte)
+  ```
+
+**Instructions**:
+
+- [Official Install Docs](https://tailwindcss.com/docs/installation) ... _not svelte specific_
+- [How to Set Up Svelte with Tailwind CSS](https://dev.to/swyx/how-to-set-up-svelte-with-tailwind-css-4fg5) ... _what I followed_
+- [Svelte & Tailwind Css, minimal install](https://dev.to/paul42/svelte-tailwind-css-minimal-install-ia2) ... _hmmm_
+
+
+**Installation Summary**:
+
+- NOTE: Tailwind build process requires Node.js 12.13.0 or higher.
+
+- install dependencies:
+  ```
+  $ npm install --save-dev svelte-preprocess tailwindcss autoprefixer
+    + autoprefixer@10.2.4
+    + tailwindcss@2.0.3
+    + svelte-preprocess@4.6.9
+  ```
+- add `tailwind.config.js` at root:
+  ```js
+  tailwind.config.js
+  ==================
+                                                // KJB: same as in rollup.config.js
+  const production = !process.env.ROLLUP_WATCH; // or some other env var like NODE_ENV
+  export default {
+    future: { // for tailwind 2.0 compatibility
+      purgeLayersByDefault: true, 
+      removeDeprecatedGapUtilities: true,
+    },
+    plugins: [
+      // for tailwind UI users only
+      // require('@tailwindcss/ui'), KJB: not using @tailwindcss/ui (can't find info on this)
+      // other plugins here
+    ],
+    purge: {
+      content: [
+        "./src/**/*.svelte",
+        // may also want to include base index.html
+      ], 
+      enabled: production // disable purge in dev
+    },
+  };
+  ```
+
+- setup rollup.config.js WITH svelte-preprocess MANAGING tailwindcss and autoprefixer
+  ```diff
+  rollup.config.js
+  ================
+    ...
+  + import sveltePreprocess from 'svelte-preprocess'; // KJB: supporting tailwindCSS
+    ...
+    plugins: [
+      svelte({
+        ...
+  +     // KJB: supporting tailwindCSS
+  +     preprocess: sveltePreprocess({
+  +       // https://github.com/kaisermann/svelte-preprocess/#user-content-options
+  +       sourceMap: !production,
+  +       postcss: {
+  +         plugins: [
+  +           require("tailwindcss"), 
+  +           require("autoprefixer"),
+  +         //require("postcss-nesting"),
+  +         ],
+  +       },
+  +     }),
+        ...
+      }),
+    ],
+    ...
+  ```
+
+- configure Tailwind in our Svelte App
+
+  ```js
+  src/main.js <<< have it direct to Main.svelte
+  ===========
+  import Main from './Main.svelte';
+  
+  const main = new Main({
+    target: document.body,
+  });
+  
+  export default main;
+  ```
+
+  ```html
+  src/Main.svelte <<< general place to do setup/config (including Tailwind)
+  ===============
+  <script>
+   import App from './App.svelte'
+  </script>
+  
+  <!-- launch our App -->
+  <App/>
+  
+  <!-- setup Tailwind CSS (NOTE: do NOT believe lang="postcss" is needed) -->
+  <style global lang="postcss">
+  
+   /* only apply purgecss on utilities, per Tailwind docs */
+   /* purgecss start ignore */
+   @tailwind base;
+   @tailwind components;
+   /* purgecss end ignore */
+  
+   @tailwind utilities;
+  </style>
+  ```
+
+  ```html
+  src/App.js <<< our top-level App component
+  ==========
+  app specific (whatever is needed for our app)
+  ```
+
+- Disable the global.css _(from the svelte template)_ so as to NOT
+  interfere with tailwind css.  Simply remove it from `index.html`.
+  ```diff
+  public/index.html
+  =================
+  - <link rel='stylesheet' href='global.css'>
+  ```
+
+- **TEST:**
+  ```html
+  <p class="bg-red-500">Styled with tailwind ... should be red!</p>
+  ```
+
+- **NOTE:** when changing `Main.svelte` the build is **slow**
+  _(upwards of 20 sec)_ ... **because** of the processing of the
+  `@tailwind` directives.  This overhead is also incurred at the build
+  startup.  **Fortunately**, this file rarely changes.
+
+
+- **NOTE:** A prior rendition of these instructions involved
+  additional npm scripts to run postcss-cli, but Chris Dhanaraj
+  realized that this was NOT needed, since Svelte already had a way
+  to inject CSS and svelte-preprocess that runs on every Svelte
+  file.
+
+- **UNRESOLVED:**
+  FOR PURGING: Svelte has a `class:` binding syntax that isn't supported by
+  Tailwind out of the box. There is an open discussion for this.
+
+  - [Open Discussion](https://github.com/tailwindlabs/tailwindcss/discussions/1731)
+    Currently Tailwind’s default purge doesn’t match Svelte’s class: directive.
+    <div class:bg-red-500={true} />
+    SO: bg-red-500 will be removed in prod:
+
+_My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
+
+<!--- Comment out KJB Notes
+**Details**:
+```
+- don't understand various <script> qualifiers
+
+  <style global lang="postcss"> ... 
+                                ... INTERESTING: global promotes global directives (all components regardless of DOM hierarchy)
+  
+  <style> ... INTERESTING: I can utilize tailwind function in a <style> tag that is NOT qualified with lang="postcss"
+
+- bundled css output size
+  * my public/build/bundle.css is 3 MEG (3,221,102) <<< on a DEV build
+  *                               5 K   (    5,046) <<< on a PROD build <<< KOOL
+```
+--->
+
+
+
+
+<!--- *** SUB-SECTION *************************************************************** --->
+# Setup tailwind-dynamic-color-themes
+
+Our application color themes are provided through the
+**tailwind-dynamic-color-themes** utility.  This is currently a faux
+dependency _(i.e. simulated)_, because it is **sourced here**.
+However it has the potential of being published as a full fledged npm
+library.  Please refer to the [tailwind-dynamic-color-themes
+README](./src/util/ui/tailwind-dynamic-color-themes/README.md) for
+full details.
+
+As a general rule, it is configured by following the "Getting Started"
+README instructions.
+
+- The key aspect is we create an application module _(see
+  `src/layout/colorTheme.js`)_ that promotes the `DCT` object, from which
+  the remainder of the API is gleaned.
+
+- From a **tooling perspective**, we must inform tailwind of our
+  **Context Colors**, by referencing this `DCT` object in
+  `tailwind.config.js`, through the following snippet:
+
+  ```js
+  tailwind.config.js
+  ==================
+  import DCT from './src/layout/colorTheme';
+
+  export default {
+
+    ... snip snip
+
+    // define our abstract Context Colors
+    theme: {
+      extend: {
+        colors: DCT.colorConfig(),
+      },
+    },
+
+    ... snip snip
+  };
+  ```
+
+  **ISSUE:**
+
+  There is an **issue** here in that we are importing application code
+  in this configuration file, which means it must support **ES
+  Modules**.
+
+  Currently, tailwind does NOT support ES Modules in it's
+  configuration file.
+
+  **FIX:**
+
+  To work around this, our `rollup.config.js` resolves this
+  configuration file, and passes it directly to the tailwindcss
+  plugin function:
+
+  ```js
+  rollup.config.js
+  ================
+  import tailwindcss    from 'tailwindcss';          // NEW: in support of ES Modules
+  import tailwindConfig from './tailwind.config.js'; //      (found in tailwind.config.js)
+  ... snip snip
+  export default {
+    ... snip snip
+    plugins: [
+      svelte({
+        ... snip snip
+        preprocess: sveltePreprocess({
+          ... snip snip
+          postcss: {
+            plugins: [
+              ... snip snip
+           // require("tailwindcss"),      // ... NEW: normal usage
+              tailwindcss(tailwindConfig), // ... NEW: in support of ES Modules (in tailwind.config.js)
+  ```
+
 
 
 <!--- *** SUB-SECTION *************************************************************** --->
@@ -788,13 +1137,124 @@ TODO: ?? details to follow
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Deployment
 
-**svelte-native-forms** is deployed on github pages (both the web-app and our documentation).
-
-TODO: ?? refine this when I actually do it (in svelte-native-forms)
+**svelte-native-forms** is deployed on [GitHub Pages] (both the demo
+web-app and our documentation).
 
 At the end of this process you should have:
 
-- AI: itemize this when I actually do it
+- A github pages `js.org` sub-domain: 
+  * FROM: https://kevinast.github.io/svelte-native-forms/
+  * TO:   https://svelte-native-forms.js.org/
+
+- AI: ?? The ability to deploy the formal docs (to github pages)
+
+- The ability to deploy the demo app (to github pages)
+  ```
+  $ npm run app:deploy
+  ```
+
+- Impacted Dependencies:
+  ```
+  gh-pages
+  ```
+
+- Impacted Scripts:
+  ```
+  app:deploy
+  docs:publish ?? AI
+  ```
+
+
+**Install gh-pages**
+
+All deployment scripts use the `gh-pages` utility, that simplifies publishing resources
+to [GitHub Pages].  Install as follows:
+
+```
+$ npm install --save-dev gh-pages
+```
+
+
+**Establish `js.org` sub-domain**
+
+Both our app and docs are deployed to [GitHub Pages].  To accommodate a
+more professional URL, [js.org] supports a sub-domain, so that our
+site is transformed:
+
+- **from this**: https://kevinast.github.io/svelte-native-forms/
+- **to this**:   https://svelte-native-forms.js.org/
+
+Simply follow the instructions on [js.org].  Here is my summary _(more
+notes hidden here in comment form)_:
+
+```
+ - create a temporary dir to deploy content to the gh-pages branch.
+   * EX: _docs/
+   * NOTE: can deploy to gh-pages branch at any time with:
+           $ npx gh-pages --dist _docs
+
+ - create a temporary index.html page at gh-pages root:
+   * NOTE: this must convey enough content to be accepted as a legit npm package
+
+ - create a CNAME file at gh-pages root:
+   * CNAME
+     =====
+     svelte-native-forms.js.org
+   * NOTE: Once this is done, you will not be able to browse your gh-pages
+           till js.org processes PR (below)
+
+ - issue a js.org PR to introduce our sub-domain
+   * new entry in: cnames_active.js
+     ... "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
+   * monitor PR acceptance (will take 24 hrs)
+
+ - once complete the sub-domain should be active
+   * NOTE: the original gh-pages link to the new sub-domain
+```
+
+**Relative App Resources**
+
+Because our app is deployed to a sub-directory of github pages, all
+startup html resource references should be relative.  Simply change
+`public/index.html` as follows:
+
+```diff
+public/index.html
+=================
+-   <link rel='icon' type='/image/png' href='/favicon.png'>
++   <link rel='icon' type='/image/png' href='favicon.png'>
+
+-   <link rel='stylesheet' href='/global.css'>
++   <link rel='stylesheet' href='global.css'>
+
+-   <link rel='stylesheet' href='/build/bundle.css'>
++   <link rel='stylesheet' href='build/bundle.css'>
+
+-   <script defer src='/build/bundle.js'></script>
++   <script defer src='build/bundle.js'></script>
+```
+
+**Add `app:deploy` Script**
+
+Add the following scripts to `package.json`:
+
+```
+package.json
+============
+{
+  ...
+  "scripts": {
+    "preapp:deploy": "npm run app:prodBuild",
+    "app:deploy": "gh-pages --dist public --dest app",
+    ... snip snip
+  }  
+}
+```
+
+
+**Add `docs:publish` Script** ?? AI
+
+
 
 <!--- Comment out KJB Notes
 
@@ -811,7 +1271,7 @@ At the end of this process you should have:
 - AI: retrofit this
 
       ********************************
-      * SUMMARIZE DEPLOYMENT PROCESS * ... stale master in: CreateReactApp.txt
+      * SUMMARIZE DEPLOYMENT PROCESS *
       ********************************
 
       > KEY: We are deploying BOTH docs and app on the same site
@@ -904,8 +1364,8 @@ At the end of this process you should have:
         - TERMINOLOGY:
           "terminology:COMMENT":   "app is DEPLOYED, and docs are PUBLISHED",
         - DEPLOY APP (NOTE: see CRA for setup required to deploy to a sub-directory ... there is a bit of config)
-          "preapp:deploy":         "npm run app:build",
-KEY       "app:deploy":            "gh-pages --dist build --dest app"
+          "preapp:deploy": "npm run app:prodBuild",
+          "app:deploy": "gh-pages --dist public --dest app",
         - PUBLISH DOCS
           "l8tr:docs:prepare:do:once":  "gitbook install",
           "l8tr:docs:build:COMMENT":    "NOTE: for gitbook build/serve, following diagnostics are useful: --log=debug --debug",
@@ -931,7 +1391,7 @@ KEY       "docs:publish":          "gh-pages --dist _docs --dest docs",
           - KEY: important concept: we are deploying our app in a sub-directory of our server
                  ... this is a bit different than we have done before
                  ... sidebar: and we are deploying our docs in a different sub-directory
-          - CRA has a new option that makes it EASY to deploy apps in a sub-directory of our server
+          - CRA (Create React App) has a new option that makes it EASY to deploy apps in a sub-directory of our server
             * we can simply plop our app into ANY dir
             * KEY: for us, this is a viable option BECAUSE we are NOT using the:
                    - HTML5 pushState history API
@@ -1000,15 +1460,25 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
 
         - prime the pump by putting a dummy page in the root:
 
-          * crete _docs directory where our machine generated gitbook will eventually be places
+          * create _docs directory where our machine generated gitbook will eventually be placed
             - .gitignore it
               # machine generated docs (from GitBook)
               /_book/
               /_docs/
 
           * add following temporary html file to this _docs 
-            _docs/index.html <<< NOTE: has to be "reasonable content"
-            ================ <<< NOTE: we can just deploy our app for this too (now that it can be plopped anywhere)
+            - NOTE: has to be "reasonable content"
+                    - per their README, their focus is on granting subdomain requests to
+                      projects with a clear relation to the JavaScript ecosystem and
+                      community (NOT personal pages, blogs, etc.).
+                    - Projects such as NPM packages, libraries, tools that have a clear
+                      direct relation to JavaScript, will be accepted when requesting a
+                      JS.ORG subdomain.
+                    - KJB: My experience is that by a) placing limited content in, and b) referencing other project docs and your README
+                           IT WILL BE ACCEPTED
+
+            _docs/index.html
+            ================
             <!DOCTYPE html>
             <html lang="en">
               <head>
@@ -1018,23 +1488,32 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
               <body>
                 <h1>svelte-native-forms</h1>
             
+                <p><i>... minimalist form validation with powerful results</i></p>
                 <p>
-                  <b>svelte-native-forms</b> promotes an interactive graphical
-                  visualization of an external system!
-                </p>
-                  <img src="./svelte-native-forms-logo.png"  width="250" alt="Logo"/>
-                <p>
-                  This is your view into External Systems!
-                </p>
-                  <img src="./svelte-native-forms-logo-eyes.jpg" width="500" alt="Logo Eyes"/>
-            
-                <p>
-                  This is currently work-in-progress and will be used to
-                  cross-communicate to co-workers on the project.
+                  Validating forms has notoriously been a painful development
+                  experience. Implementing client side validation in a user friendly way
+                  is a tedious and arduous process • you want to validate fields only at
+                  the appropriate time (when the user has had the chance to enter the
+                  data) • you want to present validation errors in a pleasing way • you
+                  may need to apply custom validation (specific to your application
+                  domain) • etc.
                 </p>
             
                 <p>
-                  Please take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/initial-tooling/docs/svelte-native-forms.md">Design Docs</a>.
+                  Even with the introduction of HTML5's Form Validation, it is still
+                  overly complex, and doesn't address many common scenarios (mentioned
+                  above). Without the proper approach, form validation can be one of the
+                  most difficult tasks in web development.
+                </p>
+            
+                <p>
+                  This sub-domain is currently work-in-progress and will
+                  eventually hold BOTH the formal documentation and the deployed app
+                  <i>(similar to other projects under my control: e.g. <a href="http://feature-u.js.org/">http://feature-u.js.org/</a>)</i>
+                </p>
+            
+                <p>
+                  For now you may wish to take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/main/README.md">Design Docs</a>.
                 </p>
             
               </body>
@@ -1071,30 +1550,21 @@ KEY: GREAT        - we can use same heuristic for dev and prod deployment
                    * via the web, edit the cnames_active.js file
                    * add your entry:
                          "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
-                   * commit:
-                     ... adding svelte-native-forms sub-domain
+                   * check in commit:
+                     >>> KEY: use this description (they will change it to this if you don't):
+                     ... NOT: adding svelte-native-forms sub-domain
+                     ... YES: svelte-native-forms.js
                    * issue New Pull Request
                    * back in the dns.js.org, monitor your Pull Request
                      ... https://github.com/js-org/js.org/pulls
-                         https://github.com/js-org/js.org/pull/3516
+                         https://github.com/js-org/js.org/pull/5555
                      ... should take effect within 24 hrs
                      - confirm: web site NO LONGER SERVES till they enact this
                        https://kevinast.github.io/svelte-native-forms/
-                     - wait for sub-domain to go live
-                       * GEEZE: they rejected this because it doesn't have reasonable content
-                         ... https://github.com/js-org/js.org/wiki/No-Content
-                         - add my README page
-                         - publish
-                           $ npx gh-pages --dist _docs
-                         - add note to pull request
-                           . I have added some minimal content to the page :-)
-                           . Please note that this is an active project, where the page will be used to both:
-                              - deploy a single-page-app
-                              - and define documentation 
-                             in order to collaborate to other team members.
-                           . Thank you for your service.
-                           . Kevin
-                       * ONCE MERGED 
+                     - wait for sub-domain to go live (24 hrs)
+                       * FIRST they will approve it
+                       * THEN they will apply the domain
+                       * ONCE ACCEPTED & MERGED 
                        * WORKS: should be able to now see the url:
                          ... https://svelte-native-forms.js.org/
 
@@ -1112,6 +1582,8 @@ KJB Notes --->
 [Project Setup]:                  #project-setup
   [Setup GitHub Project]:         #setup-github-project
   [Setup Svelte App Tooling]:     #setup-svelte-app-tooling
+  [Setup Tailwind CSS]:           #setup-tailwind-css
+  [Setup tailwind-dynamic-color-themes]: #setup-tailwind-dynamic-color-themes
   [Setup Absolute Imports]:       #setup-absolute-imports
   [Setup Node Builtins]:          #setup-node-builtins
   [Setup Jest Unit Testing]:      #setup-jest-unit-testing
@@ -1119,6 +1591,9 @@ KJB Notes --->
   [Setup Deployment]:             #setup-deployment
 
 [GitHub Pages]:                   https://pages.github.com/
+[js.org]:                         https://js.org/
 [npm]:                            https://www.npmjs.com/
+[Svelte]:                         https://svelte.dev/
 [sveltejs/template]:              https://github.com/sveltejs/template
 [sveltejs/component-template]:    https://github.com/sveltejs/component-template
+[Tailwind CSS]:                   https://tailwindcss.com/

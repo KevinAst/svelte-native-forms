@@ -5,6 +5,12 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 
+// KJB: supporting TailwindCSS
+import sveltePreprocess from 'svelte-preprocess';
+import tailwindcss      from 'tailwindcss';          // KJB: in support of ES Modules
+import tailwindConfig   from './tailwind.config.js'; //      (found in tailwind.config.js)
+                                                     //      - This is fully described in:
+                                                     //        TOOLING.md#setup-tailwind-dynamic-color-themes
 const production = !process.env.ROLLUP_WATCH;
 
 function serve() {
@@ -41,8 +47,23 @@ export default {
 			compilerOptions: {
 				// enable run-time checks when not in production
 				dev: !production
-			}
+			},
+
+      // KJB: supporting TailwindCSS
+      preprocess: sveltePreprocess({
+        // https://github.com/kaisermann/svelte-preprocess/#user-content-options
+        sourceMap: !production,
+        postcss: {
+          plugins: [
+          //require("tailwindcss"),      // ... KJB: normal usage
+            tailwindcss(tailwindConfig), // ... KJB: in support of ES Modules (in tailwind.config.js)
+            require("autoprefixer"),
+          //require("postcss-nesting"),
+          ],
+        },
+      }),
 		}),
+
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
 		css({ output: 'bundle.css' }),
