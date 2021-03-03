@@ -46,11 +46,11 @@ Using **DCT** ...
   off of **tailwind**'s numeric shade scale _(e.g. `primary-50`,
   `primary-100`, `primary-200`, etc.)_.
 
-- REFACTOR: Speaking of color shades, **DCT** even allows you to
-  [invert your color shades] at run-time _(light-to-dark, and
-  dark-to-light)_, **in effect doubling the number of color themes
-  available**, and potentially supporting an **automatic dark mode
-  theme** _(depending on how your colors are implemented)_.
+- Speaking of color shades, **DCT** even allows you to [invert your
+  color shades] at run-time _(light-to-dark, and dark-to-light)_, **in
+  effect doubling the number of color themes available**, and
+  potentially supporting an **automatic dark mode theme** _(depending
+  on how your colors are implemented)_.
   
 - Of course, you can explicitly define your own [Dark Mode] with
   minimal effort _(if [Shade Inversion] doesn't produce the desired
