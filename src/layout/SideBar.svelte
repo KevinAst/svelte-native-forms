@@ -101,15 +101,18 @@
             DIVIDER border-accentBorder border-r-2"
      bind:this={sideBarElm}>
 
-  <!-- SideBar Header (fixed height h-14 coorelates with height in <NavBar>) -->
-  <div class="LAYOUT flex-none h-14
-              MISC   px-4 bg-primaryLight"> <!-- BORDER border-accentBorder border-b-2 -->
-    <div class="text-onLight
-                flex items-center px-2 py-3 text-base font-medium italic
-                CURSOR  select-none">
-      Select a Demo ...
-    </div>
+  <!-- SideBar Header (fixed height [via p-4 adjustment] coorelates with height in <NavBar>) -->
+  <!-- ?? NEW ?? can I make  text-sm font-medium global  -->
+  <div class="p-4
+              text-onLight text-base font-bold
+              border-transparent border-l-8
+              CURSOR  select-none
+              LAYOUT  flex items-center">
+    <Icon name="clear_all"
+          class="mr-3 text-primary"/>
+    Select a Demo ...
   </div>
+
 
   <!-- SideBarItems WITH it's independent scroll bars -->
   <nav class="LAYOUT flex-1 overflow-y-auto
