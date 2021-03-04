@@ -102,7 +102,6 @@
      bind:this={sideBarElm}>
 
   <!-- SideBar Header (fixed height [via p-4 adjustment] coorelates with height in <NavBar>) -->
-  <!-- ?? NEW ?? can I make  text-sm font-medium global  -->
   <div class="p-4
               text-onLight text-base font-bold
               border-transparent border-l-8
@@ -116,14 +115,14 @@
 
   <!-- SideBarItems WITH it's independent scroll bars -->
   <nav class="LAYOUT flex-1 overflow-y-auto
-              MISC   p-2 space-y-1"
+              MISC   p-2 space-y-1 text-sm font-medium"
        aria-label="Sidebar">
 
     <!-- Selected Sample -->
     <span class="SELECTED-COLOR  bg-primary text-onDark
                  SELECTED-BORDER border-secondary border-l-8
                  CURSOR  select-none cursor-pointer
-                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                 OTHER group flex items-center px-2 py-2 rounded-md">
       <!-- Selected Icon -->
       <Icon name="home"
             class="mr-3
@@ -141,7 +140,7 @@
                  NON-SELECTED-BORDER  border-transparent border-l-8
                  HOVER hover:bg-primary hover:text-onDark
                  CURSOR  select-none cursor-pointer
-                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                 OTHER group flex items-center px-2 py-2 rounded-md">
       <!-- Non-Selected Icon -->
       <Icon name="people"
             class="mr-3 
@@ -161,7 +160,7 @@
                  NON-SELECTED-BORDER  border-transparent border-l-8
                  HOVER hover:bg-primary hover:text-onDark
                  CURSOR  select-none cursor-pointer
-                 OTHER group flex items-center px-2 py-2 text-sm font-medium rounded-md">
+                 OTHER group flex items-center px-2 py-2 rounded-md">
       <Icon name="folder"
             class="mr-3 
                    PRIMARY-COLOR text-primary
@@ -182,7 +181,7 @@
                    NON-SELECTED-BORDER  border-transparent border-l-8
                    HOVER hover:bg-primary hover:text-onDark
                    CURSOR  select-none cursor-pointer
-                   OTHER group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+                   OTHER group flex items-center pl-11 px-2 py-2 rounded-md">
         Overview
       </span>
 
@@ -190,7 +189,7 @@
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
                    CURSOR  select-none cursor-pointer
-                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+                   group flex items-center pl-11 px-2 py-2 rounded-md">
         Members
       </span>
 
@@ -198,7 +197,7 @@
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
                    CURSOR  select-none cursor-pointer
-                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+                   group flex items-center pl-11 px-2 py-2 rounded-md">
         Calendar
       </span>
 
@@ -206,7 +205,7 @@
                    border-transparent border-l-8
                    hover:bg-primary hover:text-onDark
                    CURSOR  select-none cursor-pointer
-                   group flex items-center pl-11 px-2 py-2 text-sm font-medium rounded-md">
+                   group flex items-center pl-11 px-2 py-2 rounded-md">
         Settings
       </span>
     </div>
