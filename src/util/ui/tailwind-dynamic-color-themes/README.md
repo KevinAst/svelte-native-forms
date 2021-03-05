@@ -2,8 +2,8 @@
 
 _... powerful tailwind color themes **(selectable at run-time)**_
 
-**NOTE:** TODO: This readme is a placeholder, should I decide to publish
-this utility :-)
+TODO: This readme is a placeholder, should I decide to publish this
+utility :-)
 
 Developing **dynamic color themes** _that are dynamically selectable
 at run-time_ is **a tedious and arduous process**.  Ideally **Dark
@@ -137,8 +137,6 @@ Make sense? ... _that was **Easy Peasy!**_
 <!--- *** Section ************************************************************************* ---> 
 ## Getting Started
 
-TODO: adjust samples with final context/real color used in my system
-
 Out of the starting gate, there are a number of things you must manage
 to setup your color themes.  This is not so much a reflection of the
 **DCT** utility, but rather the nature of the beast.  **DCT** itself
@@ -172,10 +170,14 @@ is easy to use, and _simplifies a number of burdensome details_.
 
 2. **Next**: We need to apply [Real Colors] to the process.  
    
-   This is accomplished through [`Themes`].  You will typically define
+   This is accomplished through [Themes].  You will typically define
    multiple themes _(that are changeable at run-time)_, but starting
-   out we can get by with one.  At lease one theme is required, else
+   out we can get by with one.  At least one theme is required, else
    our system would have **no color** at all.
+
+   [`Themes`] map **Real Colors** to your **Context Colors** at
+   run-time.  It's that simple!  In this example, we use the
+   **tailwind** color pallet for our **real colors**.
    
    **Our Initial Theme:**
    ```js
@@ -200,12 +202,9 @@ is easy to use, and _simplifies a number of burdensome details_.
      },
    };
    ```
-
-   [`Themes`] map **Real Colors** to your **Context Colors** at
-   run-time.  It's that simple!  In this example, we use the
-   **tailwind** color pallet for our **real colors**.
    
-3. **Next**: We must initialize our application with color themes.  
+3. **Next**: We must [pull these two aspects together] and initialize
+   our application with color themes.
    
    This is accomplished through the [`initDCT()`] function.  This
    fuses the relationship between our [`Schema`] and [`Themes`], and
@@ -290,7 +289,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    };
    ```
 
-   **NOTE:** Having trouble with this snippet, due to **ES Modules**?
+   **HINT:** Having trouble with this snippet, due to **ES Modules**?
    Please refer to [A Note on ES Modules in Tailwind Configuration].
    
 5. **Finally**: You are free to use your **Context Colors** in your markup.
@@ -380,11 +379,6 @@ something as abstract as a "primary" section, or as concrete as an
 "error" display.  You are in control of the "contextual" meaning in
 your application.  You define them however you wish _(ex: `primary`,
 `onPrimary`, `secondary`, `onSecondary`, `error`, `warning`, etc.)_.
-
-<!--- ?? TRASH (mentioned below)
-**NOTE:** For more insight on things to consider in defining your
-**Context Colors**, please refer to the [Color Systems] section.
- ---> 
 
 In **DCT** your **Context Colors** are first-class **tailwind**
 colors, so so you may use the standard color reference notation in
@@ -694,17 +688,35 @@ I am most familiar with Material, where they define:
   Using a secondary color is optional. It’s not necessary if you use
   variations of your primary color to accent elements.
 
+**Color Tools**
+
 <!--- Material UI Playground: https://material-ui.com/customization/color/#official-color-tool ---> 
 <!--- Material IO Playground: https://material.io/resources/color ---> 
 
-You can find find a number of interactive tools that will assist in
-getting you started.  Use them to get oriented to their color
-philosophy.  In turn, this will help define the [Context Color]
+You can find find a number of interactive tools that will assist you
+in getting started.  This will help define the [Context Color]
 structure you wish to use.
 
-Here is an awesome one: [Material IO Color Config Tool].  You can
-simply play with the sandbox, and then translate those colors to the
-standard **tailwind** color pallet.
+As an example, the [Material IO Color Config Tool] is a sandbox
+playground that allows you to interact with various colors and see how
+they look in various scenarios.  Once you are happy with your color
+selection, you can simply translate your chosen colors to "close"
+colors in the **tailwind** color pallet.
+
+**Accent Colors**
+
+Ever wondered how designers find the perfect color combinations?  Well
+there is a formula for that!  It uses a color wheel invented by Isaac
+Newton in 1666!
+
+There are several color combinations that you can use, to insure your
+colors are in harmony ... read all about it here: [Color theory and
+the color wheel].
+
+You can use a [Color Calculator] to assist in the process.  Simply
+seed it with one of **tailwind**'s base colors, calculate your accent
+color, and translate it back to a "close" **tailwind** color ...
+**Easy Peasy**!
 
 </ul>
 
@@ -797,7 +809,7 @@ configuration.
 
 You can work around this by resolving the `tailwind.config.js` in your
 controlling configuration _(e.g. the configuration file for webpack or
-rollup)_ ... as follows:
+rollup, etc.)_ ... as follows:
 
 ```js
 rollup.config.js
@@ -815,7 +827,7 @@ export default {
         postcss: {
           plugins: [
             ... snip snip
-         // require("tailwindcss"),      // ... NEW: normal usage
+         // require("tailwindcss"),      // ... OLD: normal usage
             tailwindcss(tailwindConfig), // ... NEW: in support of ES Modules (in tailwind.config.js)
 ```
 
@@ -1522,6 +1534,7 @@ Schema: [['primary'], ['secondary'], 'error'];
   [Real Colors]:                         #themes-real-colors
 
   [Pulling it all together]:             #pulling-it-all-together
+  [pull these two aspects together]:     #pulling-it-all-together
 
   [Context Color Shades]:                #context-color-shades
   [Color Shading]:                       #context-color-shades
@@ -1588,17 +1601,20 @@ Schema: [['primary'], ['secondary'], 'error'];
 
 <!--- external links ---> 
 
-[tailwindcss]:                    https://tailwindcss.com/
+[tailwindcss]:                        https://tailwindcss.com/
 
-[KISS Principle]:                 https://en.wikipedia.org/wiki/KISS_principle
+[KISS Principle]:                     https://en.wikipedia.org/wiki/KISS_principle
 
-[CSS Custom Properties]:          https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
+[CSS Custom Properties]:              https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties
 
-[Svelte]:                         https://svelte.dev/
+[Svelte]:                             https://svelte.dev/
 
-[Material]:                       https://material.io/design/color
-[IBM]:                            https://www.ibm.com/design/language/color/
-[Open Color]:                     https://yeun.github.io/open-color/
-[Material IO Color Config Tool]:  https://material.io/resources/color
+[Material]:                           https://material.io/design/color
+[IBM]:                                https://www.ibm.com/design/language/color/
+[Open Color]:                         https://yeun.github.io/open-color/
+[Material IO Color Config Tool]:      https://material.io/resources/color
 
-[in like flynn]:                  https://en.wikipedia.org/wiki/In_like_Flynn
+[Color theory and the color wheel]:   https://www.canva.com/colors/color-wheel/
+[Color Calculator]:                   https://www.sessions.edu/color-calculator/
+
+[in like flynn]:                      https://en.wikipedia.org/wiki/In_like_Flynn
