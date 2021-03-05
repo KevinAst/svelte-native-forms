@@ -170,10 +170,14 @@ is easy to use, and _simplifies a number of burdensome details_.
 
 2. **Next**: We need to apply [Real Colors] to the process.  
    
-   This is accomplished through [`Themes`].  You will typically define
+   This is accomplished through [Themes].  You will typically define
    multiple themes _(that are changeable at run-time)_, but starting
    out we can get by with one.  At least one theme is required, else
    our system would have **no color** at all.
+
+   [`Themes`] map **Real Colors** to your **Context Colors** at
+   run-time.  It's that simple!  In this example, we use the
+   **tailwind** color pallet for our **real colors**.
    
    **Our Initial Theme:**
    ```js
@@ -198,12 +202,9 @@ is easy to use, and _simplifies a number of burdensome details_.
      },
    };
    ```
-
-   [`Themes`] map **Real Colors** to your **Context Colors** at
-   run-time.  It's that simple!  In this example, we use the
-   **tailwind** color pallet for our **real colors**.
    
-3. **Next**: We must initialize our application with color themes.  
+3. **Next**: We must [pull these two aspects together] and initialize
+   our application with color themes.
    
    This is accomplished through the [`initDCT()`] function.  This
    fuses the relationship between our [`Schema`] and [`Themes`], and
@@ -1533,6 +1534,7 @@ Schema: [['primary'], ['secondary'], 'error'];
   [Real Colors]:                         #themes-real-colors
 
   [Pulling it all together]:             #pulling-it-all-together
+  [pull these two aspects together]:     #pulling-it-all-together
 
   [Context Color Shades]:                #context-color-shades
   [Color Shading]:                       #context-color-shades
