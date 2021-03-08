@@ -11,7 +11,7 @@
  import Menu                   from '../util/ui/Menu.svelte';
  import MenuItem               from '../util/ui/MenuItem.svelte';
 
- let profileMenu;
+ let userMenu;
 
 </script>
 
@@ -64,30 +64,27 @@
     <div class="flex items-center">
       <div class="ml-4 flex-shrink-0 flex items-center">
 
-        <ThemeSelector/>
-
-        <ThemeInversionSelector/>
-
         <Icon name="notifications"
               class="PRIMARY-COLOR text-primary
                      HOVER-COLOR   hover:text-primaryDark
                      CURSOR        select-none cursor-pointer"/>
 
-        <!-- Profile dropdown -->
+        <!-- User dropdown -->
         <div class="ml-3 relative">
           <button class="bg-secondary
                          flex text-sm rounded-full
                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-secondaryDark focus:ring-secondaryLight"
-                  on:click={profileMenu.openMenu}>
+                  on:click={userMenu.openMenu}>
             <Icon name="person"
                   class="PRIMARY-COLOR text-primary
                          HOVER-COLOR   hover:text-primaryDark
                          CURSOR        select-none cursor-pointer"/>
           </button>
-          <Menu bind:this={profileMenu}>
-            <MenuItem on:click={() => alert('Coming Soon: My Profile')}>My Profile</MenuItem>
-            <MenuItem on:click={(e) => { e.stopPropagation(); alert('Coming Soon: Settings ... keep menu up')}}>Settings</MenuItem>
-            <MenuItem on:click={() => alert('Coming Soon: Sign Out')}>Sign Out</MenuItem>
+          <Menu bind:this={userMenu}>
+            <MenuItem on:click={() => alert('Coming Soon: User Info')}>User Info</MenuItem>
+            <MenuItem on:click={(e) => e.stopPropagation()}><ThemeSelector/></MenuItem>
+            <MenuItem on:click={(e) => e.stopPropagation()}><ThemeInversionSelector/></MenuItem>
+            <MenuItem on:click={() => alert('Coming Soon: About')}>About</MenuItem>
           </Menu>
 
         </div>
