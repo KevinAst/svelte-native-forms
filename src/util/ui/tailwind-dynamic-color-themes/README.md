@@ -709,7 +709,7 @@ Ever wondered how designers find the perfect color combinations?  Well
 there is a formula for that!  It uses a color wheel invented by Isaac
 Newton in 1666!
 
-There are several color combinations that you can use, to insure your
+There are several color combinations that you can use, to ensure your
 colors are in harmony ... read all about it here: [Color theory and
 the color wheel].
 
