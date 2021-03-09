@@ -37,7 +37,7 @@
 <div class="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1
             bg-primaryLight
             ring-2 ring-accentBorder ring-opacity-5
-            CONTENT-RELATED text-sm font-bold select-none cursor-pointer"
+            CONTENT-RELATED text-sm font-bold select-none"
      in:scale={{duration: 250, start: 0.95}}
      out:scale={{duration: 250, start: 0.95}}
      on:click={closeMenu}
