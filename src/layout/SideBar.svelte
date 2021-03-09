@@ -58,6 +58,7 @@
  //   - SideBar width is adjustable (BY user via drag operation)
  import {onMount}  from 'svelte';
  import Icon       from '../util/ui/Icon.svelte';
+ import {slide}    from 'svelte/transition';
 
  let sideBarElm;
 
@@ -93,6 +94,11 @@
      ro.disconnect();
    };
  });
+
+ // AI: temporary state (will be refactored when data driven)
+ let selectedItem = 0; // AI: PUNT: this is too hoaky without some data to hang our hats on
+ let expanded = true;  // AI: very hoaky till we have some data to hang our hats on
+ $: expandedIcon = expanded ? 'expand_more' : 'expand_less';
 </script>
 
 <!-- SideBar Flex container WITH full height of screen, and resize control --> 
@@ -135,32 +141,13 @@
       </span>
     </span>
 
-    <!-- Non-Selected Sample -->
-    <span class="NON-SELECTED-COLOR text-onLight
-                 NON-SELECTED-BORDER  border-transparent border-l-8
-                 HOVER hover:bg-primary hover:text-onDark
-                 CURSOR  select-none cursor-pointer
-                 OTHER group flex items-center px-2 py-2 rounded-md">
-      <!-- Non-Selected Icon -->
-      <Icon name="people"
-            class="mr-3 
-                   PRIMARY-COLOR text-primary
-                   HOVER-COLOR   group-hover:text-primaryLight"/>
-      NON-SEL: Team
-      <!-- Non-Selected Notice -->
-      <span class="PRIMARY-COLOR             bg-primaryDark              text-onDark
-                   HOVER-COLOR   group-hover:bg-primaryLight group-hover:text-onLight
-                   ml-auto inline-block py-0.5 px-3 text-xs font-medium rounded-full">
-        3
-      </span>
-    </span>
-
     <!-- With expandable sections -->
     <span class="NON-SELECTED-COLOR text-onLight
                  NON-SELECTED-BORDER  border-transparent border-l-8
                  HOVER hover:bg-primary hover:text-onDark
                  CURSOR  select-none cursor-pointer
-                 OTHER group flex items-center px-2 py-2 rounded-md">
+                 OTHER group flex items-center px-2 py-2 rounded-md"
+          on:click={()=>expanded = !expanded}>
       <Icon name="folder"
             class="mr-3 
                    PRIMARY-COLOR text-primary
@@ -168,15 +155,16 @@
       Projects
       <!-- KJB: ml-auto moves to right (auto receives it's share of unused space) -->
       <!--      JUST LIKE: mx-auto would center in remaining space -->
-      <Icon name="expand_more"
+      <Icon name={expandedIcon}
             class="ml-auto 
                    PRIMARY-COLOR text-primary
                    HOVER-COLOR   group-hover:text-primaryLight"/>
     </span>
 
-    <!-- Expandable link section, ?? show/hide based on state -->
-    <div class="space-y-1">
-
+    <!-- Expandable link section -->
+    {#if expanded}
+    <div class="space-y-1"
+         transition:slide="{{duration: 300}}">
       <span class="NON-SELECTED-COLOR text-onLight
                    NON-SELECTED-BORDER  border-transparent border-l-8
                    HOVER hover:bg-primary hover:text-onDark
@@ -209,6 +197,27 @@
         Settings
       </span>
     </div>
+    {/if}
+
+    <!-- Non-Selected Sample -->
+    <span class="NON-SELECTED-COLOR text-onLight
+                 NON-SELECTED-BORDER  border-transparent border-l-8
+                 HOVER hover:bg-primary hover:text-onDark
+                 CURSOR  select-none cursor-pointer
+                 OTHER group flex items-center px-2 py-2 rounded-md">
+      <!-- Non-Selected Icon -->
+      <Icon name="people"
+            class="mr-3 
+                   PRIMARY-COLOR text-primary
+                   HOVER-COLOR   group-hover:text-primaryLight"/>
+      NON-SEL: Team
+      <!-- Non-Selected Notice -->
+      <span class="PRIMARY-COLOR             bg-primaryDark              text-onDark
+                   HOVER-COLOR   group-hover:bg-primaryLight group-hover:text-onLight
+                   ml-auto inline-block py-0.5 px-3 text-xs font-medium rounded-full">
+        3
+      </span>
+    </span>
 
   </nav>
 </div>
