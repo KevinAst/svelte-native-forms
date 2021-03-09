@@ -11,10 +11,11 @@
  });
 </script>
 
+<!-- removed: OTHER mr-1 px-3 py-2 (when placed in dropdown menu) -->
 <span class="text-onLight
              HOVER   hover:bg-primary hover:text-onDark
              CURSOR  select-none cursor-pointer
-             OTHER   mr-1 px-3 py-2 rounded-md text-sm font-medium"
+             OTHER   rounded-md text-sm font-medium"
       title="Adjust Theme Color">
 
   <Icon name="arrow_back_ios"

@@ -11,9 +11,10 @@
  });
 </script>
 
+<!-- removed: OTHER mr-1 px-3 py-2 (when placed in dropdown menu) -->
 <div class="text-onLight
             CURSOR  select-none cursor-pointer
-            OTHER   mr-1 px-3 py-2 rounded-md text-sm font-medium"
+            OTHER   rounded-md text-sm font-medium"
      title="Toggle Dark/Light"
      on:click={() => inversion = DCT.toggleInvertShade()}>
 

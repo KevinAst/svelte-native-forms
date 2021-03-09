@@ -10,6 +10,7 @@
  import Icon                   from '../util/ui/Icon.svelte';
  import Menu                   from '../util/ui/Menu.svelte';
  import MenuItem               from '../util/ui/MenuItem.svelte';
+ import Separator              from '../util/ui/Separator.svelte';
 
  let userMenu;
 
@@ -82,8 +83,10 @@
           </button>
           <Menu bind:this={userMenu}>
             <MenuItem on:click={() => alert('Coming Soon: User Info')}>User Info</MenuItem>
+            <Separator title="Themes"/>
             <MenuItem on:click={(e) => e.stopPropagation()}><ThemeSelector/></MenuItem>
             <MenuItem on:click={(e) => e.stopPropagation()}><ThemeInversionSelector/></MenuItem>
+            <Separator/>
             <MenuItem on:click={() => alert('Coming Soon: About')}>About</MenuItem>
           </Menu>
 
