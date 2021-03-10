@@ -85,7 +85,7 @@ Using **tw-themes** ...
   - [Dark Mode]
   - [Color Systems]
   - [A Note on App State]
-  - [A Note on tw-themes Reactivity]
+  - [A Note on TwThemes Reactivity]
   - [A Note on ES Modules in Tailwind Configuration]
   - [How do it know?]
 - [API]
@@ -323,10 +323,9 @@ is easy to use, and _simplifies a number of burdensome details_.
    Once you do this, you will need to provide a UI Control to change the
    active theme.
 
-   For a quick start, **tw-themes** provides some convenience functions that
-   allow you to quickly toggle through all your themes.  These
-   utilities are typically used as a dev tool.  Normally your app will
-   promote a more sophisticated UI control for this setting.
+   For a quick start, tw-themes provides some convenience functions
+   that allow you to quickly toggle through all your themes.  You may
+   chose to use these utilities, or build your own UI control.
 
    **Example** _(in [Svelte])_:
    ```html
@@ -356,7 +355,7 @@ The following sections discuss the basic concepts of **tw-themes**:
 - [Dark Mode]
 - [Color Systems]
 - [A Note on App State]
-- [A Note on tw-themes Reactivity]
+- [A Note on TwThemes Reactivity]
 - [A Note on ES Modules in Tailwind Configuration]
 - [How do it know?]
 
@@ -744,7 +743,7 @@ requirements of your application.
 
 
 <!--- *** Section ************************************************************************* ---> 
-## A Note on tw-themes Reactivity
+## A Note on TwThemes Reactivity
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
@@ -943,7 +942,7 @@ object at run-time.  The object wrapper (in this case) is simply a
 delivery mechanism.
 
 **NOTE**: For additional considerations regarding the [`TwThemes`] object,
-please refer to the discussions on [App State] and [tw-themes Reactivity].
+please refer to the discussions on [App State] and [TwThemes Reactivity].
 
 
 **API:**
@@ -1009,7 +1008,7 @@ object at run-time.  The object wrapper (in this case) is simply a
 delivery mechanism.
 
 **NOTE**: For additional considerations regarding the [`TwThemes`] object,
-please refer to the discussions on [App State] and [tw-themes Reactivity].
+please refer to the discussions on [App State] and [TwThemes Reactivity].
 
 
 </ul>
@@ -1063,9 +1062,8 @@ line" _(wrapping at the end)_.  These heuristics are defined by the
 **tw-themes** object, with the same "theme order" as defined in it's
 [`Themes`] reference.
 
-This utility is typically used as a dev tool, however it can be used
-in production _(if you wish)_.  Normally your app promotes a more
-sophisticated UI control for theme selection.
+You can easily wrap this utility into a sophisticated UI control
+and/or choose to build your own.
 
 **API:**
 
@@ -1091,9 +1089,8 @@ line" _(wrapping at the start)_.  These heuristics are defined by the
 **tw-themes** object, with the same "theme order" as defined in it's
 [`Themes`] reference.
 
-This utility is typically used as a dev tool, however it can be used
-in production _(if you wish)_.  Normally your app promotes a more
-sophisticated UI control for theme selection.
+You can easily wrap this utility into a sophisticated UI control
+and/or choose to build your own.
 
 **API:**
 
@@ -1117,9 +1114,8 @@ sophisticated UI control for theme selection.
 This function toggles the `invertShade` state of the active theme
 _(as defined by the **tw-themes** object)_.
 
-This utility is typically used as a dev tool, however it can be used
-in production _(if you wish)_.  Normally your app promotes a more
-sophisticated UI control for this setting.
+You can easily wrap this utility into a sophisticated UI control
+and/or choose to build your own.
 
 **API:**
 
@@ -1553,8 +1549,8 @@ Schema: [['primary'], ['secondary'], 'error'];
   [A Note on App State]:                 #a-note-on-app-state
   [App State]:                           #a-note-on-app-state
 
-  [A Note on tw-themes Reactivity]:      #a-note-on-tw-themes-reactivity
-  [tw-themes Reactivity]:                #a-note-on-tw-themes-reactivity
+  [A Note on TwThemes Reactivity]:       #a-note-on-twthemes-reactivity
+  [TwThemes Reactivity]:                 #a-note-on-twthemes-reactivity
 
   [A Note on ES Modules in Tailwind Configuration]:  #a-note-on-es-modules-in-tailwind-configuration
 
