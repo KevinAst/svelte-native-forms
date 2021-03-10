@@ -45,6 +45,7 @@ function gen(primary, secondary) {
 
 // our color themes ...
 const themes = {
+  'Warm Gray':   { contextColors: gen('warmGray', 'amber'), },
   'Cool Gray':   { contextColors: gen('coolGray', 'orange'), },
   'Black/White': {
     contextColors: {
@@ -59,6 +60,7 @@ const themes = {
   'Teal':    { contextColors: gen('teal',      'rose'),   },
 //'Blue':    { contextColors: gen('lightBlue', 'orange'), },
   'Cyan':    { contextColors: gen('cyan',      'orange'), },
+  'Indigo':  { contextColors: gen('indigo',    'amber'), },
 //'Red':     { contextColors: gen('red',       'green'),  },
 //'Rose':    { contextColors: gen('rose',      'green'),  },
 //'Pink':    { contextColors: gen('pink',      'lime'),   },
@@ -69,7 +71,7 @@ const themes = {
 //*** Initialize tailwind-dynamic-color-themes -and- promote the DCT object to our app
 //***
 
-const initialThemeName   = 'Cool Gray'; // AI: ENHANCE TO pull from local storage
+const initialThemeName   = 'Warm Gray'; // AI: ENHANCE TO pull from local storage
 const initialInvertShade = true;        //     ditto
 
 const DCT = initDCT(schema, themes, initialThemeName, initialInvertShade);
