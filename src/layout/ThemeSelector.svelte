@@ -3,11 +3,11 @@
  //   - Theme Selector Control
  import {onMount} from 'svelte';
  import Icon      from '../util/ui/Icon.svelte';
- import DCT       from './colorTheme';
+ import TwThemes  from './colorTheme';
 
  let theme;
  onMount( () => {
-   theme = DCT.getActiveThemeName();
+   theme = TwThemes.getActiveThemeName();
  });
 </script>
 
@@ -22,7 +22,7 @@
         title="Prior Theme"
         size="100%"
         class="hover:text-primaryDark"
-        on:click={() => theme = DCT.activatePriorTheme()}/>
+        on:click={() => theme = TwThemes.activatePriorTheme()}/>
 
   {theme}
 
@@ -30,5 +30,5 @@
         title="Next Theme"
         size="100%"
         class="hover:text-primaryDark"
-        on:click={() => theme = DCT.activateNextTheme()}/>
+        on:click={() => theme = TwThemes.activateNextTheme()}/>
 </span>

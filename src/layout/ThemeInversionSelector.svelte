@@ -3,11 +3,11 @@
  //   - Theme Inversion Selector Control
  import {onMount} from 'svelte';
  import Icon      from '../util/ui/Icon.svelte';
- import DCT       from './colorTheme';
+ import TwThemes  from './colorTheme';
 
  let inversion;
  onMount( () => {
-   inversion = DCT.getActiveInvertShade();
+   inversion = TwThemes.getActiveInvertShade();
  });
 </script>
 
@@ -16,7 +16,7 @@
             CURSOR  select-none cursor-pointer
             OTHER   rounded-md text-sm font-medium"
      title="Toggle Dark/Light"
-     on:click={() => inversion = DCT.toggleInvertShade()}>
+     on:click={() => inversion = TwThemes.toggleInvertShade()}>
 
   <!--  toggle indicator -->
   <span class="bg-primaryLight

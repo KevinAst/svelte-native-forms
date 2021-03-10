@@ -1,9 +1,6 @@
-# tailwind-dynamic-color-themes
+# tw-themes
 
-_... powerful tailwind color themes **(selectable at run-time)**_
-
-TODO: This readme is a placeholder, should I decide to publish this
-utility :-)
+_... powerful tailwind color themes **(dynamically selectable at run-time)**_
 
 Developing **dynamic color themes** _that are dynamically selectable
 at run-time_ is **a tedious and arduous process**.  Ideally **Dark
@@ -20,11 +17,10 @@ this utility may be just what you are looking for!
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-**tailwind-dynamic-color-themes** _(<mark>aka **DCT**</mark>)_ is a
-[tailwindcss] utility that facilitates _**dynamic color themes that
-are selectable at run-time**_.
+**tw-themes** is a [tailwindcss] utility that facilitates _**dynamic
+color themes that are selectable at run-time**_.
 
-Using **DCT** ...
+Using **tw-themes** ...
 
 - You define and use [Context Colors].  These are _abstract colors
   that have meaning in the context of your application_.  You define
@@ -36,32 +32,32 @@ Using **DCT** ...
   or more [Themes], which can be selected at run-time to **change your
   application colors on the fly!**
 
-- Your colors can be defined either through the **tailwind**'s
+  Your colors can be defined either through the **tailwind**'s
   standard color pallet, or your own custom colors _(or a combination
   of both)_.
 
-- It's common to use [Color Shading] to accentuate various
-  aspects of your UI.  In **DCT** you can define your own shade
+  It's common to use [Color Shading] to accentuate various
+  aspects of your UI.  In **tw-themes** you can define your own shade
   nomenclature _(e.g. `primaryLight`, `primaryDark`)_, or piggy back
   off of **tailwind**'s numeric shade scale _(e.g. `primary-50`,
   `primary-100`, `primary-200`, etc.)_.
 
-- Speaking of color shades, **DCT** even allows you to [invert your
+- Speaking of color shades, **tw-themes** even allows you to [invert your
   color shades] at run-time _(light-to-dark, and dark-to-light)_, **in
   effect doubling the number of color themes available**, and
   potentially supporting an **automatic dark mode theme** _(depending
   on how your colors are implemented)_.
   
-- Of course, you can explicitly define your own [Dark Mode] with
+  Of course, you can explicitly define your own [Dark Mode] with
   minimal effort _(if [Shade Inversion] doesn't produce the desired
   effect)_ ... it's merely a new theme!  Unlike **tailwind**'s new
-  **Dark Mode** feature, using **DCT** to define your **dark themes**
+  **Dark Mode** feature, using **tw-themes** to define your **dark themes**
   requires **NO CHANGES** to your markup _(the **tailwind** solution
   requires you to tediously add the `dark` variant throughout your
   markup)_.
 
 - Because **tailwind** needs to know about your Context Colors,
-  **DCT** provides a utility that auto-generates the required color
+  **tw-themes** provides a utility that auto-generates the required color
   definitions ... referenced in your `tailwind.config.js` _(part of
   the build process)_.
 
@@ -69,9 +65,7 @@ Using **DCT** ...
   accomplished through the use of CSS Variables _(see [How do it
   know?])_ ... _**inquiring minds want to know!**_
 
-Make sense? ... _that was **Easy Peasy!**_
-
-**DCT** promotes a <mark>**clean and simple approach**</mark> to
+**tw-themes** promotes a <mark>**clean and simple approach**</mark> to
  _**dynamic color themes**_ that yields <mark>**powerful
  results**</mark>.
 
@@ -91,12 +85,12 @@ Make sense? ... _that was **Easy Peasy!**_
   - [Dark Mode]
   - [Color Systems]
   - [A Note on App State]
-  - [A Note on DCT Reactivity]
+  - [A Note on tw-themes Reactivity]
   - [A Note on ES Modules in Tailwind Configuration]
   - [How do it know?]
 - [API]
-  - [`initDCT(schema, themes, \[initialThemeName\], \[initialInvertShade\]): DCT`]
-  - [`DCT`]:
+  - [`initTwThemes(schema, themes, \[initialThemeName\], \[initialInvertShade\]): TwThemes`]
+  - [`TwThemes`]:
     - change the active theme:
       - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
       - [`activateNextTheme(): activeThemeName`]
@@ -107,11 +101,11 @@ Make sense? ... _that was **Easy Peasy!**_
       - [`getActiveThemeName(): activeThemeName`]
       - [`getActiveInvertShade(): activeInvertShade`]
     - auto configure **tailwind**:
-      - [`colorConfig(): TWColors`]
+      - [`colorConfig(): TwColors`]
 - [Types]
   - [`Schema`]
   - [`Themes`]
-  - [`TWColors`]
+  - [`TwColors`]
 
 
 <!--- *** Section ************************************************************************* ---> 
@@ -119,7 +113,7 @@ Make sense? ... _that was **Easy Peasy!**_
 
 - **peerDependencies**:
 
-  **DCT** has a peerDependency on **tailwindcss** _which also needs to
+  **tw-themes** has a peerDependency on **tailwindcss** _which also needs to
   be configured_.  Most likely you should already have this installed
   ... but just in case:
 
@@ -130,7 +124,7 @@ Make sense? ... _that was **Easy Peasy!**_
 - **the main event**:
 
   ```shell
-  npm install --save tailwind-dynamic-color-themes
+  npm install --save tw-themes
   ```
 
 
@@ -139,7 +133,7 @@ Make sense? ... _that was **Easy Peasy!**_
 
 Out of the starting gate, there are a number of things you must manage
 to setup your color themes.  This is not so much a reflection of the
-**DCT** utility, but rather the nature of the beast.  **DCT** itself
+**tw-themes** utility, but rather the nature of the beast.  **tw-themes** itself
 is easy to use, and _simplifies a number of burdensome details_.
 
 1. **First**: You must determine the [Context Colors] that you will use in
@@ -153,7 +147,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    [Color Shading], [Shade Inversion], [Dark Mode], and [Color
    Systems].
    
-   The end result of this step will be your **DCT** [`Schema`].  For
+   The end result of this step will be your **tw-themes** [`Schema`].  For
    sake of example, let's say we will be using the following **Context
    Colors** _(remember this definition can be whatever you desire)_:
    
@@ -206,16 +200,16 @@ is easy to use, and _simplifies a number of burdensome details_.
 3. **Next**: We must [pull these two aspects together] and initialize
    our application with color themes.
    
-   This is accomplished through the [`initDCT()`] function.  This
+   This is accomplished through the [`initTwThemes()`] function.  This
    fuses the relationship between our [`Schema`] and [`Themes`], and
-   initializes **DCT** making it available for use in the application.
+   initializes **tw-themes** making it available for use in the application.
 
    We place this in a separate module to provide a **"single source of
    truth"**.
    
    **colorTheme.js**
    ```js
-   import {initDCT} from 'tailwind-dynamic-color-themes';
+   import {initTwThemes} from 'tw-themes';
    
    const schema = ['primaryLight',   'primary',   'primaryDark',
                    'secondaryLight', 'secondary', 'secondaryDark',
@@ -246,16 +240,16 @@ is easy to use, and _simplifies a number of burdensome details_.
      },
    };
    
-   const DCT = initDCT(schema, themes);
-   export default DCT;
+   const TwThemes = initTwThemes(schema, themes);
+   export default TwThemes;
    ```
 
-   **Please Note** that our module exports the [`DCT`] object
-   _(returned from [`initDCT()`])_.  This object contains the
-   remaining **DCT** API, and can be used by other aspects of our
+   **Please Note** that our module exports the [`TwThemes`] object
+   _(returned from [`initTwThemes()`])_.  This object contains the
+   remaining **tw-themes** API, and can be used by other aspects of our
    application.
 
-   Because this module executes [`initDCT()`] in-line _(i.e. in module
+   Because this module executes [`initTwThemes()`] in-line _(i.e. in module
    scope)_, the mere act of importing it will initialize our system.
    As a result, this module must be imported very early in our
    application start-up process.
@@ -269,20 +263,20 @@ is easy to use, and _simplifies a number of burdensome details_.
 4. **Last**: We must define our new [Context Colors] to **tailwind**.
    
    Remember, **tailwind** requires a build process, that is driven from
-   `tailwind.config.js`.  Fortunately **DCT** provides a utility function
+   `tailwind.config.js`.  Fortunately **tw-themes** provides a utility function
    you may use to provide this definition.  Because our `colorTheme.js`
    module promotes a **"single source of truth"**, we can be assured that
    **tailwind** has the latest up-to-date information.
    
    **tailwind.config.js**
    ```js
-   import DCT from './src/layout/colorTheme';
+   import TwThemes from './src/layout/colorTheme';
    export default {
      ... snip snip
      // define our abstract Context Colors
      theme: {
        extend: {
-         colors: DCT.colorConfig(),
+         colors: TwThemes.colorConfig(),
        },
      },
      ... snip snip
@@ -302,7 +296,7 @@ is easy to use, and _simplifies a number of burdensome details_.
 
 6. **Bonus**: [Shade Inversion]
 
-   **DCT** offers a unique feature that allows you to invert the
+   **tw-themes** offers a unique feature that allows you to invert the
    shades of your theme at run-time _(light-to-dark, and
    dark-to-light)_.  This has the effect of **doubling the number of
    color themes available**, and potentially supporting an **automatic
@@ -312,7 +306,7 @@ is easy to use, and _simplifies a number of burdensome details_.
    with this option _(only **tailwind** colors support **shade
    inversion** - custom colors simply no-op)_.  Simply **add a UI
    control** _(somewhere in your app)_ that invokes the
-   [`DCT.toggleInvertShade()`] function.
+   [`TwThemes.toggleInvertShade()`] function.
 
 7. **Later**: You will want to define multiple color themes.
    
@@ -322,31 +316,30 @@ is easy to use, and _simplifies a number of burdensome details_.
    Once you do this, you will need to provide a UI Control to change the
    active theme.
 
-   For a quick start, **DCT** provides some convenience functions that
+   For a quick start, **tw-themes** provides some convenience functions that
    allow you to quickly toggle through all your themes.  These
    utilities are typically used as a dev tool.  Normally your app will
    promote a more sophisticated UI control for this setting.
 
    **Example** _(in [Svelte])_:
    ```html
-   <button on:click={DCT.activateNextTheme}>Next Theme</button>
-   <button on:click={DCT.activatePriorTheme}>Prior Theme</button>
-   <button on:click={DCT.toggleInvertShade}>Toggle Shade</button>
+   <button on:click={TwThemes.activateNextTheme}>Next Theme</button>
+   <button on:click={TwThemes.activatePriorTheme}>Prior Theme</button>
+   <button on:click={TwThemes.toggleInvertShade}>Toggle Shade</button>
    ```
 
    The syntax _(above)_ will vary depending on the front-end framework
    you are using.  The relevant point is: you merely need to invoke
-   one of the appropriate [`DCT`] functions.
+   one of the appropriate [`TwThemes`] functions.
 
 
 <!--- *** Section ************************************************************************* ---> 
 ## Concepts
 
-**tailwind-dynamic-color-themes** _(<mark>aka **DCT**</mark>)_ is a
-[tailwindcss] utility that facilitates _**dynamic color themes that
-are selectable at run-time**_.
+**tw-themes** is a [tailwindcss] utility that facilitates _**dynamic
+color themes that are selectable at run-time**_.
 
-The following sections discuss the basic concepts of **DCT**:
+The following sections discuss the basic concepts of **tw-themes**:
 
 - [Context Colors (Color Abstraction)]
 - [Themes (Real Colors)]
@@ -356,7 +349,7 @@ The following sections discuss the basic concepts of **DCT**:
 - [Dark Mode]
 - [Color Systems]
 - [A Note on App State]
-- [A Note on DCT Reactivity]
+- [A Note on tw-themes Reactivity]
 - [A Note on ES Modules in Tailwind Configuration]
 - [How do it know?]
 
@@ -380,7 +373,7 @@ something as abstract as a "primary" section, or as concrete as an
 your application.  You define them however you wish _(ex: `primary`,
 `onPrimary`, `secondary`, `onSecondary`, `error`, `warning`, etc.)_.
 
-In **DCT** your **Context Colors** are first-class **tailwind**
+In **tw-themes** your **Context Colors** are first-class **tailwind**
 colors, so so you may use the standard color reference notation in
 your markup _(ex: `text-primary`, `bg-secondary-400`, etc.)_.
 
@@ -400,9 +393,9 @@ There is a **big payoff** however, and that is the **ease at which** you can
 
 
 **SideBar:** Because **tailwind** needs to know about your **Context
-Colors**, **DCT** provides a utility that you will reference in the
+Colors**, **tw-themes** provides a utility that you will reference in the
 color section of your `tailwind.config.js` _(part of the build process
-... see: [`DCT.colorConfig()`])_.
+... see: [`TwThemes.colorConfig()`])_.
 
 </ul>
 
@@ -424,7 +417,7 @@ Never the less, once you have gone through this process, it is a
 minimal effort to define multiple themes, so you might as well take
 the plunge!
 
-In **DCT** **Real Colors** are supplied through **tailwind**'s
+In **tw-themes** **Real Colors** are supplied through **tailwind**'s
 [standard color
 pallet](https://tailwindcss.com/docs/customizing-colors#color-palette-reference).
 This includes a total of 220 colors _(22 base colors, each with 10
@@ -448,31 +441,31 @@ _(i.e. [`Themes`])_ are closely related within your application.  Each
 theme maps real colors to your context colors.
 
 The fusion of this relationship is accomplished through the
-[`initDCT()`] function, which accepts both `schema` and `themes`
+[`initTwThemes()`] function, which accepts both `schema` and `themes`
 parameters, providing a central place where these two aspects
 can be affirmed and validated.
 
 Interestingly enough, this is the only public function promoted by
-**DCT**.  It however returns a [`DCT`] object which in turn promotes
+**tw-themes**.  It however returns a [`TwThemes`] object which in turn promotes
 the remaining API.  The reason for this is to fuse the relationship
-between the `schema` and `themes`.  The `DCT` object contains
+between the `schema` and `themes`.  The `TwThemes` object contains
 functions to:
 
 - change the active theme at run-time ... see:
-  [`DCT.activateTheme()`], 
-  [`DCT.activateNextTheme()`],
-  [`DCT.activatePriorTheme()`],
-  [`DCT.toggleInvertShade()`]
+  [`TwThemes.activateTheme()`], 
+  [`TwThemes.activateNextTheme()`],
+  [`TwThemes.activatePriorTheme()`],
+  [`TwThemes.toggleInvertShade()`]
 
 - miscellaneous API in support of the app's theme selection UI
   control ... see:
-  [`DCT.getThemes()`],
-  [`DCT.getActiveThemeName()`],
-  [`DCT.getActiveInvertShade()`]
+  [`TwThemes.getThemes()`],
+  [`TwThemes.getActiveThemeName()`],
+  [`TwThemes.getActiveInvertShade()`]
 
 - auto configure the **tailwind** context colors in
   `tailwind.config.js` _(part of the build process)_ ... see:
-  [`DCT.colorConfig()`]
+  [`TwThemes.colorConfig()`]
 
 </ul>
 
@@ -489,7 +482,7 @@ helping to distinguish various aspects of your UI.  As an example, you
 may need three distinct shades for your primary context color:
 `primaryLight`, `primary`, and `primaryDark`.
 
-In **DCT** you have a choice when defining your context color shades:
+In **tw-themes** you have a choice when defining your context color shades:
 
 - you can define your own shade nomenclature _(e.g. `primaryLight`,
   `primary`, `primaryDark`)_
@@ -571,7 +564,7 @@ all of the markup in your entire application.
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-A unique feature of **DCT** is the ability to invert your color shades
+A unique feature of **tw-themes** is the ability to invert your color shades
 at run-time.
 
 When you do this your light shades become dark and your dark shades
@@ -582,8 +575,8 @@ You can choose to use this feature or simply let sleeping dogs lie
 _(i.e. leave it alone)_.
 
 Shade inversion is accomplished at run-time, when the active theme is
-specified _(either through [`DCT.activateTheme()`] or
-[`DCT.toggleInvertShade()`])_.
+specified _(either through [`TwThemes.activateTheme()`] or
+[`TwThemes.toggleInvertShade()`])_.
 
 The interesting aspect of this feature is it has the potential of
 supporting an **automated dark mode**, depending on how your color
@@ -602,22 +595,22 @@ colors will simply no-op on **shade inversion** requests.
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 As we have discussed, it is possible to automatically glean a **Dark
-Mode** by using **DCT**'s [Shade Inversion] feature.  It really
+Mode** by using **tw-themes**'s [Shade Inversion] feature.  It really
 depends on how your color scheme is implemented.
 
 If your color philosophy produces dark modes by simply inverting the
-color shades, you are [in like flynn]!  Simply alias the **DCT**
+color shades, you are [in like flynn]!  Simply alias the **tw-themes**
 inversion state to a dark mode and you are done!
 
 As a fallback, if this doesn't work _(for whatever reason)_, don't
 fret ... dark modes are easily achieved!
 
-Dark modes are extremely simple to implement in **DCT**!  You simply
+Dark modes are extremely simple to implement in **tw-themes**!  You simply
 define a theme that adjusts your colors to a dark color strategy.
 It's really no different than defining themes with distinct base
 colors.
 
-Unlike **tailwind**'s **Dark Mode** feature, in **DCT** there are
+Unlike **tailwind**'s **Dark Mode** feature, in **tw-themes** there are
 **NO** changes to your markup, because you have abstracted this away
 by using [Context Colors].
 
@@ -726,8 +719,8 @@ color, and translate it back to a "close" **tailwind** color ...
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-**DCT** introduces one piece of state in your application ... that is
-the [`DCT`] object.  How you manage this state is up to the
+**tw-themes** introduces one piece of state in your application ... that is
+the [`TwThemes`] object.  How you manage this state is up to the
 requirements of your application.
 
 - If your application runs exclusively on the browser, then you should
@@ -744,11 +737,11 @@ requirements of your application.
 
 
 <!--- *** Section ************************************************************************* ---> 
-## A Note on DCT Reactivity
+## A Note on tw-themes Reactivity
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-The [`DCT`] object represents an additional piece of application state, of
+The [`TwThemes`] object represents an additional piece of application state, of
 which **certain aspects can change**.  It contains four pieces of state:
 
 - Two are non-changing static resources:
@@ -758,7 +751,7 @@ which **certain aspects can change**.  It contains four pieces of state:
   * the `activeThemeName`
   * the `activeInvertShade` indicator
 
-In spite of the fact that the last two resources can change, **DCT**
+In spite of the fact that the last two resources can change, **tw-themes**
 provides **no means** by which this reactivity can be tracked
 ... _other than the app module which stimulated it's change_.
 
@@ -769,17 +762,17 @@ cases.  The **unique thing** about this fact is that **this component controls
 both the display and update** of this state.  As a result it **can easily
 manage the reactivity, _because it knows when it changes_**.
 
-Consequently, **DCT** uses the [KISS Principle] so as not to
+Consequently, **tw-themes** uses the [KISS Principle] so as not to
 complicate matters.
 
 If your application is an exception to this rule, you can easily wrap
-[`DCT`] in the state management solution of your choosing to promote
+[`TwThemes`] in the state management solution of your choosing to promote
 it's reactivity.
 
 **FUTURE**: Provide reactivity through simple event (doesn't complicate API at all)!
 ```
 TODO: - We can easily provide reactivity by simply emitting a custom
-        DOM event on the <body>: dctThemeChanged - containing:
+        DOM event on the <body>: TwThemeChanged - containing:
         activeThemeName/activeInvertShade
 
       - reword this section
@@ -797,11 +790,11 @@ TODO: - We can easily provide reactivity by simply emitting a custom
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-The [`DCT.colorConfig()`] function conveys the **Context Colors** to
+The [`TwThemes.colorConfig()`] function conveys the **Context Colors** to
 tailwind by referencing it directly in the `tailwind.config.js`.  This
 is a nice feature because it provides a **"single source of truth"**.
 
-There is an **issue** however, in that by accessing the `DCT` object
+There is an **issue** however, in that by accessing the `TwThemes` object
 in `tailwind.config.js`, we are importing application code _(in the
 configuration)_.  Typically our application code contains **ES
 Modules**.  Currently, tailwind does NOT support ES Modules in it's
@@ -844,7 +837,7 @@ Ever heard the joke about the thermos keeping **"hot things hot"**,
 and **"cold thing cold"?** The confused bystander asked: **"How do it
 know?"**
 
-You may be wondering how **DCT** implements the dynamic color mapping
+You may be wondering how **tw-themes** implements the dynamic color mapping
 of **real colors** to **context colors?**
 
 _While this is an internal implementation detail_, the simple answer is:
@@ -856,8 +849,8 @@ _While this is an internal implementation detail_, the simple answer is:
   tailwind.config.js
   ==================
     ... snip snip
-    colors: { // ... OUTPUT from: dct.colorConfig()
-      primary:  "var(--dct-primary)",
+    colors: { // ... OUTPUT from: TwThemes.colorConfig()
+      primary:  "var(--twt-primary)",
       ... snip snip
     }
   ```
@@ -866,11 +859,11 @@ _While this is an internal implementation detail_, the simple answer is:
   in the `<body>` tag _(sourced from the theme's real color)_:
 
   ```html
-  <body style="--dct-primary: #B91C1C;">
+  <body style="--twt-primary: #B91C1C;">
   ```
 
 You can actually see this in your browser's dev tools.  Simple filter
-the Styles section with "--dct" _(the prefix used for all **DCT** CSS
+the Styles section with "--twt" _(the prefix used for all **tw-themes** CSS
 Variables)_:
 
 <p align="center"><img src="img/DevToolsContextColors.png" alt="Dev Tools Context Colors"></p>
@@ -883,11 +876,11 @@ If you change your theme, you will see these colors change.
 <!--- *** Section ************************************************************************* ---> 
 ## API
 
-The **tailwind-dynamic-color-themes** API is promoted through a [`DCT`]
-object _(returned from [`initDCT()`])_.
+The **tw-themes** API is promoted through a [`TwThemes`]
+object _(returned from [`initTwThemes()`])_.
 
-- [`initDCT(schema, themes, \[initialThemeName\], \[initialInvertShade\]): DCT`]
-- [`DCT`]:
+- [`initTwThemes(schema, themes, \[initialThemeName\], \[initialInvertShade\]): TwThemes`]
+- [`TwThemes`]:
   - change the active theme:
     - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
     - [`activateNextTheme(): activeThemeName`]
@@ -898,15 +891,15 @@ object _(returned from [`initDCT()`])_.
     - [`getActiveThemeName(): activeThemeName`]
     - [`getActiveInvertShade(): activeInvertShade`]
   - auto configure **tailwind**:
-    - [`colorConfig(): TWColors`]
+    - [`colorConfig(): TwColors`]
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `initDCT()`
+## `initTwThemes()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-The `initDCT()` function is the entry point into **DCT**.  It
+The `initTwThemes()` function is the entry point into **tw-themes**.  It
 initializes the utility for use in your application, and must be
 invoked very early in the application startup lifecycle _(typically in
 a module scoped context)_.
@@ -916,40 +909,40 @@ the `initialThemeName`/`initialInvertShade` will be activated
 automatically.  This allows the application to manage this `initial`
 state _(for example in the browser's local storage)_.
 
-In essence `initDCT()` is an object creator.  It returns the [`DCT`]
-object, from which from which all remaining **DCT** API is promoted.
+In essence `initTwThemes()` is an object creator.  It returns the [`TwThemes`]
+object, from which from which all remaining **tw-themes** API is promoted.
 This is done so as to fuse the relationship between the `schema` and
-`themes`.  The `DCT` object contains functions to:
+`themes`.  The `TwThemes` object contains functions to:
 
 - change the active theme at run-time ... see:
-  [`DCT.activateTheme()`], 
-  [`DCT.activateNextTheme()`],
-  [`DCT.activatePriorTheme()`],
-  [`DCT.toggleInvertShade()`]
+  [`TwThemes.activateTheme()`], 
+  [`TwThemes.activateNextTheme()`],
+  [`TwThemes.activatePriorTheme()`],
+  [`TwThemes.toggleInvertShade()`]
 
 - miscellaneous API in support of the app's theme selection UI
   control ... see:
-  [`DCT.getThemes()`],
-  [`DCT.getActiveThemeName()`],
-  [`DCT.getActiveInvertShade()`]
+  [`TwThemes.getThemes()`],
+  [`TwThemes.getActiveThemeName()`],
+  [`TwThemes.getActiveInvertShade()`]
 
 - auto configure the **tailwind** context colors in
   `tailwind.config.js` _(part of the build process)_ ... see:
-  [`DCT.colorConfig()`]
+  [`TwThemes.colorConfig()`]
 
-**NOTE**: These [`DCT`] methods are in reality functions _(not
+**NOTE**: These [`TwThemes`] methods are in reality functions _(not
 methods)_.  In other words, they can be used without dereferencing the
 object at run-time.  The object wrapper (in this case) is simply a
 delivery mechanism.
 
-**NOTE**: For additional considerations regarding the [`DCT`] object,
-please refer to the discussions on [App State] and [DCT Reactivity].
+**NOTE**: For additional considerations regarding the [`TwThemes`] object,
+please refer to the discussions on [App State] and [tw-themes Reactivity].
 
 
 **API:**
 
 ```js
-+ initDCT(schema, themes, [initialThemeName], [initialInvertShade]): DCT
++ initTwThemes(schema, themes, [initialThemeName], [initialInvertShade]): TwThemes
 ```
 
 **Parameters:**
@@ -971,23 +964,23 @@ please refer to the discussions on [App State] and [DCT Reactivity].
 
   **DEFAULT**: `false`
 
-**Return:** {[`DCT`]} - a `DCT` object, from which
-from which all remaining **DCT** API is promoted.
+**Return:** {[`TwThemes`]} - a `TwThemes` object, from which
+from which all remaining **tw-themes** API is promoted.
 
 </ul>
 
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT`
+## `TwThemes`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-The **DCT** object _(returned from [`initDCT()`])_ fuses the
+The **tw-themes** object _(returned from [`initTwThemes()`])_ fuses the
 relationship between the [`Schema`] and [`Themes`], and promotes the
 following API:
 
-**DCT API:**
+**TwThemes API:**
 
 - change the active theme at run-time:
   - [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]
@@ -1001,22 +994,22 @@ following API:
   - [`getActiveInvertShade(): activeInvertShade`]
 - auto configure the **tailwind** context colors in
   `tailwind.config.js` _(part of the build process)_:
-  - [`colorConfig(): TWColors`]
+  - [`colorConfig(): TwColors`]
 
-**NOTE**: These **DCT** methods are in reality functions _(not
+**NOTE**: These **tw-themes** methods are in reality functions _(not
 methods)_.  In other words, they can be used without dereferencing the
 object at run-time.  The object wrapper (in this case) is simply a
 delivery mechanism.
 
-**NOTE**: For additional considerations regarding the [`DCT`] object,
-please refer to the discussions on [App State] and [DCT Reactivity].
+**NOTE**: For additional considerations regarding the [`TwThemes`] object,
+please refer to the discussions on [App State] and [tw-themes Reactivity].
 
 
 </ul>
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.activateTheme()`
+## `TwThemes.activateTheme()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
@@ -1029,7 +1022,7 @@ real colors defined by the theme.
 **API:**
 
 ```js
-DCT: {
+TwThemes: {
   + activateTheme({[themeName], [invertShade]}): [activeThemeName, activeInvertShade]
 }
 ```
@@ -1054,13 +1047,13 @@ DCT: {
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.activateNextTheme()`
+## `TwThemes.activateNextTheme()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 `activateNextTheme()` advances the current theme to the next one "in
 line" _(wrapping at the end)_.  These heuristics are defined by the
-**DCT** object, with the same "theme order" as defined in it's
+**tw-themes** object, with the same "theme order" as defined in it's
 [`Themes`] reference.
 
 This utility is typically used as a dev tool, however it can be used
@@ -1082,13 +1075,13 @@ sophisticated UI control for theme selection.
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.activatePriorTheme()`
+## `TwThemes.activatePriorTheme()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 `activatePriorTheme()` advances the current theme to the prior one "in
 line" _(wrapping at the start)_.  These heuristics are defined by the
-**DCT** object, with the same "theme order" as defined in it's
+**tw-themes** object, with the same "theme order" as defined in it's
 [`Themes`] reference.
 
 This utility is typically used as a dev tool, however it can be used
@@ -1110,12 +1103,12 @@ sophisticated UI control for theme selection.
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.toggleInvertShade()`
+## `TwThemes.toggleInvertShade()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 This function toggles the `invertShade` state of the active theme
-_(as defined by the **DCT** object)_.
+_(as defined by the **tw-themes** object)_.
 
 This utility is typically used as a dev tool, however it can be used
 in production _(if you wish)_.  Normally your app promotes a more
@@ -1135,11 +1128,11 @@ sophisticated UI control for this setting.
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.getThemes()`
+## `TwThemes.getThemes()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-Return an iteratable array of all themes in the **DCT** object.  This
+Return an iteratable array of all themes in the **tw-themes** object.  This
 is provided as a convenience, because it is typically needed by the
 App's theme selection UI control.
 
@@ -1160,7 +1153,7 @@ sub-structure of the [`Themes`] object, **with the injection of a
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.getActiveThemeName()`
+## `TwThemes.getActiveThemeName()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
@@ -1169,7 +1162,7 @@ provided as a convenience, because it is typically needed by the App's
 theme selection UI control.
 
 **Note:** The return value of this method represents a dynamic
-resource that can change.  Please refer to the discussion on [DCT
+resource that can change.  Please refer to the discussion on [TwThemes
 Reactivity].
 
 
@@ -1187,7 +1180,7 @@ Reactivity].
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.getActiveInvertShade()`
+## `TwThemes.getActiveInvertShade()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
@@ -1196,7 +1189,7 @@ convenience, because it is typically needed by the App's theme
 selection UI control.
 
 **Note:** The return value of this method represents a dynamic
-resource that can change.  Please refer to the discussion on [DCT
+resource that can change.  Please refer to the discussion on [TwThemes
 Reactivity].
 
 **API:**
@@ -1215,14 +1208,14 @@ Reactivity].
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `DCT.colorConfig()`
+## `TwThemes.colorConfig()`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
 The `colorConfig()` function is to be be used in the
 `tailwind.config.js` color section _(as part of the build process)_.
 It generates a configuration structure that defines the context colors
-in-use, as defined by the [`Schema`] contained in the [`DCT`] object.
+in-use, as defined by the [`Schema`] contained in the [`TwThemes`] object.
 
 These color definitions reference CSS Variables that are dynamically
 maintained _(at run-time)_ by the active theme.
@@ -1230,27 +1223,27 @@ maintained _(at run-time)_ by the active theme.
 **API:**
 
 ```js
-DCT: {
-  + colorConfig(): TWColors
+TwThemes: {
+  + colorConfig(): TwColors
 }
 ```
 
 **Parameters:** NONE
 
-**Return:** {[`TWColors`]} - a **tailwind** JSON color structure to be
+**Return:** {[`TwColors`]} - a **tailwind** JSON color structure to be
 referenced in the `tailwind.config.js` color section.
 
 **Usage:**
 ```js
 tailwind.config.js
 ==================
-import DCT from './src/layout/colorTheme';
+import TwThemes from './src/layout/colorTheme';
 export default {
   ... snip snip
   theme: {
     ... snip snip
     extend: {
-      colors: DCT.colorConfig(), // define the context colors in-use
+      colors: TwThemes.colorConfig(), // define the context colors in-use
     },
   },
 };
@@ -1266,11 +1259,11 @@ Please refer to [A Note on ES Modules in Tailwind Configuration].
 <!--- *** Section ************************************************************************* ---> 
 ## Types
 
-**DCT** promote the following types:
+**tw-themes** promote the following types:
 
 - [`Schema`]
 - [`Themes`]
-- [`TWColors`]
+- [`TwColors`]
 
 
 
@@ -1281,7 +1274,7 @@ Please refer to [A Note on ES Modules in Tailwind Configuration].
 
 A `Schema` defines the [Context Colors] that are used in your
 application (i.e. referenced in your markup).  A `Schema` is one of
-two essential parameters supplied to [`initDCT()`] _(the
+two essential parameters supplied to [`initTwThemes()`] _(the
 other is [`Themes`])_.
 
 To fully understand this topic, please refer to discussions on
@@ -1356,7 +1349,7 @@ colors specified in the app's [`Schema`].  It defines one or more
 "named" themes through it's sub-structure _(one for each theme)_.
 
 `Themes` represent the second essential parameter supplied to
-[`initDCT()`] _(the other is [`Schema`])_.
+[`initTwThemes()`] _(the other is [`Schema`])_.
 
 **Structure Example:**
 
@@ -1394,7 +1387,7 @@ Themes: {
 ```
 
 - Each "named" theme is defined through a sub-structure, keyed by the
-  `themeName` which is referenced in [`DCT.activateTheme()`].  The
+  `themeName` which is referenced in [`TwThemes.activateTheme()`].  The
   example above has two `themeNames`: `Emerald` and `Amber`.
 
 - The sub-structure contains the following fields:
@@ -1444,7 +1437,7 @@ Themes: {
         errors you may receive.  For example:
 
         ```
-        Error: initDCT() parameter violation: 
+        Error: initTwThemes() parameter violation: 
                theme: 'My Best Theme' contextColor: 'primaryDark' realColor: 'red' 
                invalid realColor: 
                  references multiple tailwind shaded colors (without a dash -),
@@ -1464,13 +1457,13 @@ off of the **tailwind** color pallet, for the following reasons:
 
 
 <!--- *** Section ************************************************************************* ---> 
-## `TWColors`
+## `TwColors`
 
 <ul><!--- indentation hack for github - other attempts with style is stripped (be careful with number bullets) ---> 
 
-`TWColors` is a **tailwind** JSON color structure to be referenced in
+`TwColors` is a **tailwind** JSON color structure to be referenced in
 the `tailwind.config.js` color section.  It is returned from the
-[`DCT.colorConfig()`] function.
+[`TwThemes.colorConfig()`] function.
 
 These color definitions reference CSS Variables that are dynamically
 maintained _(at run-time)_ by the active theme.
@@ -1481,35 +1474,35 @@ maintained _(at run-time)_ by the active theme.
 // using the following Schema:
 Schema: [['primary'], ['secondary'], 'error'];
 
-// yields this TWColors: 
+// yields this TwColors: 
 {
   "primary": {
-    "50": "var(--dct-primary-50)",
-    "100": "var(--dct-primary-100)",
-    "200": "var(--dct-primary-200)",
-    "300": "var(--dct-primary-300)",
-    "400": "var(--dct-primary-400)",
-    "500": "var(--dct-primary-500)",
-    "600": "var(--dct-primary-600)",
-    "700": "var(--dct-primary-700)",
-    "800": "var(--dct-primary-800)",
-    "900": "var(--dct-primary-900)",
-    "DEFAULT": "var(--dct-primary)"
+    "50": "var(--twt-primary-50)",
+    "100": "var(--twt-primary-100)",
+    "200": "var(--twt-primary-200)",
+    "300": "var(--twt-primary-300)",
+    "400": "var(--twt-primary-400)",
+    "500": "var(--twt-primary-500)",
+    "600": "var(--twt-primary-600)",
+    "700": "var(--twt-primary-700)",
+    "800": "var(--twt-primary-800)",
+    "900": "var(--twt-primary-900)",
+    "DEFAULT": "var(--twt-primary)"
   },
   "secondary": {
-    "50": "var(--dct-secondary-50)",
-    "100": "var(--dct-secondary-100)",
-    "200": "var(--dct-secondary-200)",
-    "300": "var(--dct-secondary-300)",
-    "400": "var(--dct-secondary-400)",
-    "500": "var(--dct-secondary-500)",
-    "600": "var(--dct-secondary-600)",
-    "700": "var(--dct-secondary-700)",
-    "800": "var(--dct-secondary-800)",
-    "900": "var(--dct-secondary-900)",
-    "DEFAULT": "var(--dct-secondary)"
+    "50": "var(--twt-secondary-50)",
+    "100": "var(--twt-secondary-100)",
+    "200": "var(--twt-secondary-200)",
+    "300": "var(--twt-secondary-300)",
+    "400": "var(--twt-secondary-400)",
+    "500": "var(--twt-secondary-500)",
+    "600": "var(--twt-secondary-600)",
+    "700": "var(--twt-secondary-700)",
+    "800": "var(--twt-secondary-800)",
+    "900": "var(--twt-secondary-900)",
+    "DEFAULT": "var(--twt-secondary)"
   },
-  "error": "var(--dct-error)",
+  "error": "var(--twt-error)",
 }
 ```
 
@@ -1520,7 +1513,7 @@ Schema: [['primary'], ['secondary'], 'error'];
 <!--- *** REFERENCE LINKS ************************************************************************* ---> 
 <!---     NOTE: some links are duplicated with alias link label text                                --->
 
-<!--- **DCT** ---> 
+<!--- **tw-themes** ---> 
 [Install]:                               #install
 [Getting Started]:                       #getting-started
 [Concepts]:                              #concepts
@@ -1553,8 +1546,8 @@ Schema: [['primary'], ['secondary'], 'error'];
   [A Note on App State]:                 #a-note-on-app-state
   [App State]:                           #a-note-on-app-state
 
-  [A Note on DCT Reactivity]:            #a-note-on-dct-reactivity
-  [DCT Reactivity]:                      #a-note-on-dct-reactivity
+  [A Note on tw-themes Reactivity]:      #a-note-on-tw-themes-reactivity
+  [tw-themes Reactivity]:                #a-note-on-tw-themes-reactivity
 
   [A Note on ES Modules in Tailwind Configuration]:  #a-note-on-es-modules-in-tailwind-configuration
 
@@ -1564,40 +1557,40 @@ Schema: [['primary'], ['secondary'], 'error'];
 
   <!--- NOTE: each function supports different link labels (with and without API)  ---> 
 
-  [`initDCT()`]:                                                                  #initdct
-  [`initDCT(schema, themes, \[initialThemeName\], \[initialInvertShade\]): DCT`]: #initdct
+  [`initTwThemes()`]:                    #inittwthemes
+  [`initTwThemes(schema, themes, \[initialThemeName\], \[initialInvertShade\]): TwThemes`]: #inittwthemes
 
-  [`DCT`]:                               #dct
+  [`TwThemes`]:                          #twthemes
 
-  [`DCT.colorConfig()`]:                 #dctcolorconfig
-  [`colorConfig(): TWColors`]:           #dctcolorconfig
+  [`TwThemes.colorConfig()`]:                    #twthemescolorconfig
+  [`colorConfig(): TwColors`]:                   #twthemescolorconfig
 
-  [`DCT.activateTheme()`]:               #dctactivatetheme
-  [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]: #dctactivatetheme
+  [`TwThemes.activateTheme()`]:                  #twthemesactivatetheme
+  [`activateTheme({\[themeName\], \[invertShade\]}): \[activeThemeName, activeInvertShade\]`]: #twthemesactivatetheme
 
-  [`DCT.activateNextTheme()`]:           #dctactivatenexttheme
-  [`activateNextTheme(): activeThemeName`]: #dctactivatenexttheme
+  [`TwThemes.activateNextTheme()`]:              #twthemesactivatenexttheme
+  [`activateNextTheme(): activeThemeName`]:      #twthemesactivatenexttheme
 
-  [`DCT.activatePriorTheme()`]:           #dctactivatepriortheme
-  [`activatePriorTheme(): activeThemeName`]: #dctactivatepriortheme
+  [`TwThemes.activatePriorTheme()`]:             #twthemesactivatepriortheme
+  [`activatePriorTheme(): activeThemeName`]:     #twthemesactivatepriortheme
 
-  [`DCT.toggleInvertShade()`]:           #dcttoggleinvertshade
-  [`toggleInvertShade(): activeInvertShade`]: #dcttoggleinvertshade
+  [`TwThemes.toggleInvertShade()`]:              #twthemestoggleinvertshade
+  [`toggleInvertShade(): activeInvertShade`]:    #twthemestoggleinvertshade
 
-  [`DCT.getThemes()`]:                   #dctgetthemes
-  [`getThemes(): Theme\[\]`]:            #dctgetthemes
+  [`TwThemes.getThemes()`]:                      #twthemesgetthemes
+  [`getThemes(): Theme\[\]`]:                    #twthemesgetthemes
 
-  [`DCT.getActiveThemeName()`]:          #dctgetactivethemename
-  [`getActiveThemeName(): activeThemeName`]: #dctgetactivethemename
+  [`TwThemes.getActiveThemeName()`]:             #twthemesgetactivethemename
+  [`getActiveThemeName(): activeThemeName`]:     #twthemesgetactivethemename
 
-  [`DCT.getActiveInvertShade()`]:        #dctgetactiveinvertshade
-  [`getActiveInvertShade(): activeInvertShade`]: #dctgetactiveinvertshade
+  [`TwThemes.getActiveInvertShade()`]:           #twthemesgetactiveinvertshade
+  [`getActiveInvertShade(): activeInvertShade`]: #twthemesgetactiveinvertshade
 
 [Types]:                                 #types
   [`Schema`]:                            #schema
   [`Themes`]:                            #themes
   [`Theme`]:                             #themes
-  [`TWColors`]:                          #twcolors
+  [`TwColors`]:                          #twcolors
 
 <!--- external links ---> 
 

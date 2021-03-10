@@ -10,30 +10,30 @@ import {isArray,
 //***
 
 
-// the prefix of all CSS Variables - 'dct': tailwind-dynamic-color-themes
-const prefix = 'dct';
+// the prefix of all CSS Variables - 'twt': tw-themes
+const prefix = 'twt';
 
 // the standard shades supported by tailwindcss colors out-of-the-box
 const shades = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900'];
 
 // parameter indicator to apply run-time defaults
-const runtimeDefault = 'DCT-runtimeDefault';
+const runtimeDefault = 'runtimeDefault';
 
 //***
-//*** + initDCT(schema, themes, [initialThemeName], [initialInvertShade]): DCT
+//*** + initTwThemes(schema, themes, [initialThemeName], [initialInvertShade]): TwThemes
 //***
-export default function initDCT(schema, themes, initialThemeName=runtimeDefault, initialInvertShade=false) {
+export default function initTwThemes(schema, themes, initialThemeName=runtimeDefault, initialInvertShade=false) {
 
-  // carve out our "crucial" DCT object state
-  // NOTE: all DCT object state begins with underbar (as a convention)
-  const _schema = schema; // active schema ... alias to initDCT() param, making underbar state consistent
+  // carve out our "crucial" TwThemes object state
+  // NOTE: all TwThemes object state begins with underbar (as a convention)
+  const _schema = schema; // active schema ... alias to initTwThemes() param, making underbar state consistent
   const _themes = themes; // active themes ... ditto
   let _activeThemeName;   // active themeName   ... maintained by activateTheme()
   let _activeInvertShade; // active invertShade ... ditto
 
   // provide basic parameter validation
   // ... additional validation is applied when setup our value-added structures (below)
-  const checkParam = check.prefix('initDCT() parameter violation: ');
+  const checkParam = check.prefix('initTwThemes() parameter violation: ');
   // ... schema
   checkParam(schema,          'schema is required');
   checkParam(isArray(schema), 'schema must be an array of strings (context color names)');
@@ -236,7 +236,7 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
   function getRealTWColor(twColorName, shade='500') {
 
-    // NOTE: Due to the pre-checks done in initDCT(), 
+    // NOTE: Due to the pre-checks done in initTwThemes(), 
     //       there is NO need to check `twColors` error conditions
     //       ... this is a tightly controlled internal helper
 
@@ -259,7 +259,7 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
         if (!realColor) {
           // UNEXPECTED: expecting to invert black/white, but there is something else in the mix
           //             ... just PUNT and return the un-inverted single color
-          console.warn(`tailwind-dynamic-color-themes: UNEXPECTED CONDITION in getRealTWColor(twColorName: '${twColorName}', shade: '${shade}) when inverting color ` + 
+          console.warn(`tw-themes: UNEXPECTED CONDITION in getRealTWColor(twColorName: '${twColorName}', shade: '${shade}) when inverting color ` + 
                        `... expecting to invert black/white, but there is apparently an additional tailwind single color in the mix ` +
                        '... PUNT and use the un-inverted single color');
           return twSingleColor;
@@ -449,11 +449,11 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
 
   //***
-  //*** + colorConfig(): TWColors
+  //*** + colorConfig(): TwColors
   //***
 
   function colorConfig() {
-    // generate our JSON color structure ... see: TWColors in README
+    // generate our JSON color structure ... see: TwColors in README
     const colors = {};
     _schema.forEach( (contextColorRef) => {
       const contextColorName   = isString(contextColorRef) ? contextColorRef : contextColorRef[0];
@@ -480,11 +480,11 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
 
 
   //***
-  //*** end of initDCT()
+  //*** end of initTwThemes()
   //***
 
   // that's all folks :-)
-  // ... return our DCT object, from which from which all remaining functionality is promoted :-)
+  // ... return our TwThemes object, from which from which all remaining functionality is promoted :-)
   return {
     activateTheme,
     activateNextTheme,
@@ -495,7 +495,8 @@ export default function initDCT(schema, themes, initialThemeName=runtimeDefault,
     getActiveInvertShade,
     colorConfig,
   };
-} // ... end of: initDCT()
+
+} // ... end of: initTwThemes()
 
 
 

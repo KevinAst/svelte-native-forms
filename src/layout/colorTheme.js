@@ -1,4 +1,4 @@
-import {initDCT} from '../util/ui/tailwind-dynamic-color-themes/index'; // AI: for some reason, when imported from tailwind.config.js, NodeJS does NOT know how to resolve this WITHOUT index
+import {initTwThemes} from '../util/ui/tw-themes/index'; // AI: for some reason, when imported from tailwind.config.js, NodeJS does NOT know how to resolve this WITHOUT index
 
 // our color schema ...
 const schema = [
@@ -68,11 +68,11 @@ const themes = {
 
 
 //***
-//*** Initialize tailwind-dynamic-color-themes -and- promote the DCT object to our app
+//*** Initialize tw-themes -and- promote the TwThemes object to our app
 //***
 
 const initialThemeName   = 'Warm'; // AI: ENHANCE TO pull from local storage
 const initialInvertShade = true;   //     ditto
 
-const DCT = initDCT(schema, themes, initialThemeName, initialInvertShade);
-export default DCT;
+const TwThemes = initTwThemes(schema, themes, initialThemeName, initialInvertShade);
+export default TwThemes;
