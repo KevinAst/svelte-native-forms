@@ -1,4 +1,4 @@
-import {initTwThemes} from '../util/ui/tw-themes/index'; // AI: for some reason, when imported from tailwind.config.js, NodeJS does NOT know how to resolve this WITHOUT index
+import {initTwThemes} from 'tw-themes';
 
 // our color schema ...
 const schema = [
