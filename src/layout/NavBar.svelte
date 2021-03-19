@@ -8,6 +8,12 @@
  import ThemeSelector          from './ThemeSelector.svelte';
  import ThemeInversionSelector from './ThemeInversionSelector.svelte';
  import Icon                   from '../util/ui/Icon.svelte';
+ import Menu                   from '../util/ui/Menu.svelte';
+ import MenuItem               from '../util/ui/MenuItem.svelte';
+ import Separator              from '../util/ui/Separator.svelte';
+
+ let userMenu;
+
 </script>
 
 <!-- NavBar
@@ -59,47 +65,31 @@
     <div class="flex items-center">
       <div class="ml-4 flex-shrink-0 flex items-center">
 
-        <ThemeSelector/>
-
-        <ThemeInversionSelector/>
-
         <Icon name="notifications"
               class="PRIMARY-COLOR text-primary
                      HOVER-COLOR   hover:text-primaryDark
                      CURSOR        select-none cursor-pointer"/>
 
-        <!-- Profile dropdown -->
+        <!-- User dropdown -->
         <div class="ml-3 relative">
           <button class="bg-secondary
                          flex text-sm rounded-full
                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-secondaryDark focus:ring-secondaryLight"
-                  id="user-menu">
+                  on:click={userMenu.openMenu}>
             <Icon name="person"
                   class="PRIMARY-COLOR text-primary
                          HOVER-COLOR   hover:text-primaryDark
                          CURSOR        select-none cursor-pointer"/>
           </button>
-          <!--
-               Profile dropdown panel, show/hide based on dropdown state.
+          <Menu bind:this={userMenu}>
+            <MenuItem on:click={() => alert('Coming Soon: User Info')}>User Info</MenuItem>
+            <Separator title="Themes"/>
+            <MenuItem on:click={(e) => e.stopPropagation()}><ThemeSelector/></MenuItem>
+            <MenuItem on:click={(e) => e.stopPropagation()}><ThemeInversionSelector/></MenuItem>
+            <Separator/>
+            <MenuItem on:click={() => alert('Coming Soon: About')}>About</MenuItem>
+          </Menu>
 
-               Entering: "transition ease-out    duration-200"
-               From:     "transform  opacity-0   scale-95"
-               To:       "transform  opacity-100 scale-100"
-               Leaving:  "transition ease-in     duration-75"
-               From:     "transform  opacity-100 scale-100"
-               To:       "transform  opacity-0   scale-95"
-             -->
-          <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1
-                      bg-primaryLight
-                      ring-2 ring-accentBorder ring-opacity-5
-                      CONTENT-RELATED text-sm font-bold select-none cursor-pointer"
-               role="menu"
-               aria-orientation="vertical"
-               aria-labelledby="user-menu">
-            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Your Profile</span>
-            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Settings</span>
-            <span class="block px-4 py-2 text-onLight hover:bg-primary hover:text-onDark" role="menuitem">Sign Out</span>
-          </div>
         </div>
       </div>
     </div> <!-- end of ... Right Section of NavBar -->
