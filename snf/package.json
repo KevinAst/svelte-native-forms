@@ -25,6 +25,9 @@
   "module": "dist/index.mjs",
   "main": "dist/index.js",
   "files": [
+    "package.json",
+    "LICENSE.md",
+    "README.md",
     "src",
     "dist"
   ],
