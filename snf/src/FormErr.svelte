@@ -1,8 +1,8 @@
 <script>
  import DispErrDefault from './DispErr.svelte';
- import verify         from '../../verify.js';
+ import check          from './util/check';
  import {isString,
-         isFunction}   from '../../typeCheck';
+         isFunction}   from './util/typeCheck';
  import {onMount}      from 'svelte';
  import {get}          from './catalog';
  
@@ -23,11 +23,11 @@
  export let DispErr = DispErrDefault;
 
  // validate INPUT properties
- const check = verify.prefix(`<FormErr> component property violation: `);
+ const checkInput = check.prefix(`<FormErr> component property violation: `);
  // ... errMsg
- check(isString(errMsg),     'errMsg (when supplied) must be a string');
+ checkInput(isString(errMsg),     'errMsg (when supplied) must be a string');
  // ... DispErr
- check(isFunction(DispErr),  'DispErr (when supplied) must be a Svelte Component');
+ checkInput(isFunction(DispErr),  'DispErr (when supplied) must be a Svelte Component');
 
  // monitor the reactive store that reflect's our form error status
  let isFormValid;
@@ -55,7 +55,7 @@
    }
 
    // NOT FOUND - generate error
-   check(false, `UNSUCCESSFUL "implicit wiring" to the <form> of interest ... REASON: ${errQualifier}`);
+   checkInput(false, `UNSUCCESSFUL "implicit wiring" to the <form> of interest ... REASON: ${errQualifier}`);
  }
 
  // reflectively use the supplied errMsg ONLY when the form has errors

@@ -1,8 +1,8 @@
 import {writable}        from 'svelte/store';
-import verify            from '../../verify';
+import check             from './util/check';
 import {isString,
         isPlainObject,
-        isFunction}      from '../../typeCheck';
+        isFunction}      from './util/typeCheck';
 import {get,
         register,
         unregister}      from './catalog';
@@ -76,16 +76,16 @@ export default class FieldChecker {
     //*** validate supplied parameters
     //***
 
-    const check = verify.prefix('fieldCheckerAction parameter violation: ');
+    const checkParam = check.prefix('fieldCheckerAction parameter violation: ');
 
     // fieldNode:
-    check(fieldNode, 'a DOM elm was expected (by svelte) but is missing ... something is wrong');
-    check(['INPUT', 'SELECT', 'TEXTAREA'].indexOf(fieldNode.nodeName) >= -1,
+    checkParam(fieldNode, 'a DOM elm was expected (by svelte) but is missing ... something is wrong');
+    checkParam(['INPUT', 'SELECT', 'TEXTAREA'].indexOf(fieldNode.nodeName) >= -1,
           `this action should be used on an interactive form element, NOT a <${fieldNode.nodeName.toLowerCase()}>`);
-    check(fieldNode.form, "this action's interactive form element MUST BE part of a <form>");
+    checkParam(fieldNode.form, "this action's interactive form element MUST BE part of a <form>");
 
     // clientParams:
-    check(isPlainObject(clientParams), "client supplied parameters should be named parameters (ex: {validate, initialValue: 'abc'})");
+    checkParam(isPlainObject(clientParams), "client supplied parameters should be named parameters (ex: {validate, initialValue: 'abc'})");
     // ... descturcture our individual clientParams (i.e. named parameters)
     const {validate,
            initialValue,
@@ -105,7 +105,7 @@ export default class FieldChecker {
 
     // validate:
     if (validate) {
-      check(isFunction(validate),  'validate (when supplied) must be a function');
+      checkParam(isFunction(validate),  'validate (when supplied) must be a function');
     }
 
     // initialValue: NO VALIDATION NEEDED (any value is acceptable)
@@ -114,21 +114,21 @@ export default class FieldChecker {
 
     // changeBoundValue:
     if (this.initialValueSupplied() && this.boundValueSupplied()) {
-      check(changeBoundValue,             'changeBoundValue is required when initialValue and boundValue are supplied');
-      check(isFunction(changeBoundValue), 'changeBoundValue must be a function');
+      checkParam(changeBoundValue,             'changeBoundValue is required when initialValue and boundValue are supplied');
+      checkParam(isFunction(changeBoundValue), 'changeBoundValue must be a function');
     }
     else {
-      check(!changeBoundValue, 'changeBoundValue is ONLY NEEDED when BOTH initialValue and boundValue are supplied');
+      checkParam(!changeBoundValue, 'changeBoundValue is ONLY NEEDED when BOTH initialValue and boundValue are supplied');
     }
 
     // unrecognized positional parameter
     // NOTE: when defaulting entire struct, arguments.length is 0
     // ... prob an overkill, since svelte is in control of this API
-    check(arguments.length <= 2, `unrecognized positional parameters (only named parameters may be specified) ... ${arguments.length} positional parameters were found`);
+    checkParam(arguments.length <= 2, `unrecognized positional parameters (only named parameters may be specified) ... ${arguments.length} positional parameters were found`);
 
     // unrecognized named parameter
     const unknownArgKeys = Object.keys(unknownNamedArgs);
-    check(unknownArgKeys.length === 0,  `unrecognized named parameter(s): ${unknownArgKeys}`);
+    checkParam(unknownArgKeys.length === 0,  `unrecognized named parameter(s): ${unknownArgKeys}`);
 
 
     //***
@@ -137,7 +137,7 @@ export default class FieldChecker {
 
     // extract our fieldName from elm.name or elm.id (name takes precedence)
     this._fieldName = fieldNode.getAttribute('name') || fieldNode.getAttribute('id');
-    check(this._fieldName, 'the actions form element MUST have a name -or- id attribute ... defining our actions fieldName (name takes precedence)');
+    checkParam(this._fieldName, 'the actions form element MUST have a name -or- id attribute ... defining our actions fieldName (name takes precedence)');
 
     // retain additional state in self
     this._parentForm    = null;      // defined later via: registerParentForm()
@@ -337,7 +337,7 @@ export default class FieldChecker {
     // ... this is a central spot where we can check to insure our structure has been setup correctly
     //     - due to the dynamics of our wiring (gleaning our hierarchy from the DOM hierarchy
     //     - driven by our svelte actions
-    verify(this._parentForm, `*** ERROR *** Invalid FormChecker structure (FieldChecker has NO parent FormChecker) ... did you forget to apply the formChecker action on your <form>?`);
+    check(this._parentForm, `*** ERROR *** Invalid FormChecker structure (FieldChecker has NO parent FormChecker) ... did you forget to apply the formChecker action on your <form>?`);
 
     // fulfill request
     return this._parentForm;
@@ -350,13 +350,13 @@ export default class FieldChecker {
    */
   registerParentForm(parentForm) {
     // validate parameters
-    const check = verify.prefix(`FieldChecker[{name: '${this.getFieldName()}'}].registerParentForm(): parameter violation: `);
+    const checkParam = check.prefix(`FieldChecker[{name: '${this.getFieldName()}'}].registerParentForm(): parameter violation: `);
     // ... parentForm
-    check(parentForm,                      'parentForm is required');
-    check(parentForm.registerFieldChecker, 'parentForm must be a FormChecker instance');
+    checkParam(parentForm,                      'parentForm is required');
+    checkParam(parentForm.registerFieldChecker, 'parentForm must be a FormChecker instance');
     // ... above uses duck type check to avoid circular dependency import needed for `instanceof FormChecker` semantics
     // ... should NOT already have a registered parentForm
-    check(this._parentForm===null || this._parentForm===parentForm, "self's parentForm is ALREADY registered :-(");
+    checkParam(this._parentForm===null || this._parentForm===parentForm, "self's parentForm is ALREADY registered :-(");
 
     // retain our parentForm
     this._parentForm = parentForm;
@@ -371,9 +371,9 @@ export default class FieldChecker {
    */
   removeParentForm() {
     // validate state
-    const check = verify.prefix(`FieldChecker[{name: '${this.getFieldName()}'}].removeParentForm(): `);
+    const checkParam = check.prefix(`FieldChecker[{name: '${this.getFieldName()}'}].removeParentForm(): `);
     // ... should HAVE a registered parentForm
-    check(this._parentForm!==null, "NO parentForm is registered to self ... can't remove it :-(");
+    checkParam(this._parentForm!==null, "NO parentForm is registered to self ... can't remove it :-(");
 
     // remove our parentForm
     this._parentForm = null;
@@ -480,7 +480,7 @@ export default class FieldChecker {
         const fieldValues = this.getParentForm().getFieldValues();
         errMsg            = this._validate(fieldValues);
         // ... verify app logic returns the correct errMsg type
-        verify(isString(errMsg), `*** ERROR *** FieldChecker: return from validate() [for fieldName: '${fieldName}'] MUST be a string ... use an empty string ('') to designate valid`);
+        check(isString(errMsg), `*** ERROR *** FieldChecker: return from validate() [for fieldName: '${fieldName}'] MUST be a string ... use an empty string ('') to designate valid`);
       }
 
       // sync self's errMsg

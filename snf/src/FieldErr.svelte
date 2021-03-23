@@ -1,8 +1,8 @@
 <script>
  import DispErrDefault from './DispErr.svelte';
- import verify         from '../../verify.js';
+ import check          from './util/check';
  import {isString,
-         isFunction}   from '../../typeCheck';
+         isFunction}   from './util/typeCheck';
  import {onMount}      from 'svelte';
  import {get}          from './catalog';
  
@@ -33,13 +33,13 @@
  export let DispErr = DispErrDefault;
  
  // validate INPUT properties
- const check = verify.prefix(`<FieldErr> component property violation: `);
+ const checkInput = check.prefix(`<FieldErr> component property violation: `);
  // ... forName
  if (forName) {
-   check(isString(forName), 'forName (when supplied) must be a string');
+   checkInput(isString(forName), 'forName (when supplied) must be a string');
  }
  // ... DispErr (defaulted above)
- check(isFunction(DispErr),  'DispErr (when supplied) must be a Svelte Component');
+ checkInput(isFunction(DispErr),  'DispErr (when supplied) must be a Svelte Component');
 
  // monitor the reactive store that reflect's the field error of interest
  // ... an empty string ('') represents no error
@@ -72,7 +72,7 @@
      errQualifier = 'NO <label> ancestor of <FieldErr> was found';
    }
    // NOT FOUND - generate error
-   check(false, `UNSUCCESSFUL "implicit wiring" to the field of interest\nREASON: ${errQualifier}\n` +
+   checkInput(false, `UNSUCCESSFUL "implicit wiring" to the field of interest\nREASON: ${errQualifier}\n` +
                 '1: either contain your field (managed by use:fieldChecker) and <FieldErr> in a <label>\n' +
                 '2: or use the forName property to make the wiring explicit');
  }
@@ -87,11 +87,11 @@
    if (forName) {
      // locate any <form> ancestor of <FieldErr>
      const formAncestor = domWiringHook.closest('form');
-     check(formAncestor, `cannot wire up field through forName '${forName}' ... REASON: NO <form> ancestor`);
+     checkInput(formAncestor, `cannot wire up field through forName '${forName}' ... REASON: NO <form> ancestor`);
      const formChecker = get(formAncestor.dataset.snfKey);
-     check(formChecker, `cannot wire up field through forName '${forName}' ... REASON: the <form> ancestor is NOT managed by svelte-native-forms (it must must employ the use:formChecker directive)`);
+     checkInput(formChecker, `cannot wire up field through forName '${forName}' ... REASON: the <form> ancestor is NOT managed by svelte-native-forms (it must must employ the use:formChecker directive)`);
      const fieldChecker = formChecker.getFieldCheckerByName(forName);
-     check(fieldChecker, `cannot wire up field through forName '${forName}' ... REASON: there is NO field managed by that name`);
+     checkInput(fieldChecker, `cannot wire up field through forName '${forName}' ... REASON: there is NO field managed by that name`);
      fieldErrMsg = fieldChecker.getErrMsgStore(); // ... wiring complete
    }
    // implicit wiring

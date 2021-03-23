@@ -1,7 +1,7 @@
 import {writable}        from 'svelte/store';
-import verify            from '../../verify.js';
+import check             from './util/check';
 import {isFunction,
-        isPlainObject}   from '../../typeCheck';
+        isPlainObject}   from './util/typeCheck';
 import {get,
         register,
         unregister}      from './catalog';
@@ -67,14 +67,14 @@ export default class FormChecker {
     //*** validate supplied parameters
     //***
 
-    const check = verify.prefix('formCheckerAction parameter violation: ');
+    const checkParam = check.prefix('formCheckerAction parameter violation: ');
 
     // formNode:
-    check(formNode,                     'a DOM elm was expected (by svelte) but is missing ... something is wrong');
-    check(formNode.nodeName === 'FORM', `this svelte action should be used on a <form> element, NOT a <${formNode.nodeName.toLowerCase()}>`);
+    checkParam(formNode,                     'a DOM elm was expected (by svelte) but is missing ... something is wrong');
+    checkParam(formNode.nodeName === 'FORM', `this svelte action should be used on a <form> element, NOT a <${formNode.nodeName.toLowerCase()}>`);
 
     // clientParams:
-    check(isPlainObject(clientParams), "client supplied parameters should be named parameters (ex: {submit})");
+    checkParam(isPlainObject(clientParams), "client supplied parameters should be named parameters (ex: {submit})");
     // ... descturcture our individual clientParams (i.e. named parameters)
     const {submit,
            errStyles=errStylesDEFAULT,
@@ -87,21 +87,21 @@ export default class FormChecker {
     this._errStyles  = errStyles;
 
     // submit:
-    check(submit,             'submit is required');
-    check(isFunction(submit), 'submit must be a function');
+    checkParam(submit,             'submit is required');
+    checkParam(isFunction(submit), 'submit must be a function');
 
     // errStyles (optional):
-    check(errStyles === null || 
+    checkParam(errStyles === null || 
           isPlainObject(errStyles), 'errStyles must be a plain object with camelCaseKey/value in-line styling pairs -OR- null to disable');
 
     // unrecognized positional parameter
     // NOTE: when defaulting entire struct, arguments.length is 0
     // ... prob an overkill, since svelte is in control of this API
-    check(arguments.length <= 2, `unrecognized positional parameters (only named parameters may be specified) ... ${arguments.length} positional parameters were found`);
+    checkParam(arguments.length <= 2, `unrecognized positional parameters (only named parameters may be specified) ... ${arguments.length} positional parameters were found`);
 
     // unrecognized named parameter
     const unknownArgKeys = Object.keys(unknownNamedArgs);
-    check(unknownArgKeys.length === 0,  `unrecognized named parameter(s): ${unknownArgKeys}`);
+    checkParam(unknownArgKeys.length === 0,  `unrecognized named parameter(s): ${unknownArgKeys}`);
 
 
     //***
@@ -157,7 +157,7 @@ export default class FormChecker {
     // ... while leaving the Constraint Validation API in place (so we can tap into that)
     // <form novalidate ...>
     // ... we perform all field validation :-)
-    check(!formNode.hasAttribute('novalidate'), 'the <form> element should NOT manage the "novalidate" attribute ... this is the job of formCheckerAction');
+    checkParam(!formNode.hasAttribute('novalidate'), 'the <form> element should NOT manage the "novalidate" attribute ... this is the job of formCheckerAction');
     formNode.setAttribute('novalidate', true);
 
     // register the on:submit event to our <form>
@@ -256,16 +256,16 @@ export default class FormChecker {
    */
   registerFieldChecker(fieldChecker) {
     // validate parameters
-    const check = verify.prefix(`FormChecker.registerFieldChecker(): parameter violation: `);
+    const checkParam = check.prefix(`FormChecker.registerFieldChecker(): parameter violation: `);
     // ... fieldChecker
-    check(fieldChecker,                    'fieldChecker is required');
-    check(fieldChecker.registerParentForm, 'fieldChecker must be a FieldChecker instance');
+    checkParam(fieldChecker,                    'fieldChecker is required');
+    checkParam(fieldChecker.registerParentForm, 'fieldChecker must be a FieldChecker instance');
     // ... above uses duck type check to avoid circular dependency import needed for `instanceof FieldChecker` semantics
 
 
     // supplied fieldChecker's name must be unique
     const nonUniqueObj = this._fieldCheckers.find( (f) => f.getFieldName() === fieldChecker.getFieldName() );
-    check(!nonUniqueObj, `supplied fieldChecker's name ('${fieldChecker.getFieldName()}') is NOT unique ... it already exists`);
+    checkParam(!nonUniqueObj, `supplied fieldChecker's name ('${fieldChecker.getFieldName()}') is NOT unique ... it already exists`);
 
     // register to self
     this._fieldCheckers.push(fieldChecker);
@@ -281,10 +281,10 @@ export default class FormChecker {
    */
   removeFieldChecker(fieldChecker) {
     // validate parameters
-    const check = verify.prefix(`FormChecker.removeFieldChecker(): parameter violation: `);
+    const checkParam = check.prefix(`FormChecker.removeFieldChecker(): parameter violation: `);
     // ... fieldChecker
-    check(fieldChecker,                         'fieldChecker is required');
-    check(fieldChecker.registerParentForm, 'fieldChecker must be a FieldChecker instance');
+    checkParam(fieldChecker,                         'fieldChecker is required');
+    checkParam(fieldChecker.registerParentForm, 'fieldChecker must be a FieldChecker instance');
     // ... above uses duck type check to avoid circular dependency import needed for `instanceof FieldChecker` semantics
 
     // remove from self
