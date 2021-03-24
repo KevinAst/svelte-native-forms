@@ -44,6 +44,8 @@ unmodified)_!
   - [Setup Absolute Imports]
   - [Setup Docs Tooling]
   - [Setup js.org sub-domain]
+- [Deploy Project]
+- [Setup New Feature Branch]
 
 <!--- *** SECTION *************************************************************** --->
 # NPM Scripts
@@ -1158,6 +1160,121 @@ KJB Notes --->
 
 
 
+<!--- *** SECTION *************************************************************** --->
+# Deploy Project
+
+AI: ?? This may not yet be complete, but it is close (should include details of inner/outer projects)
+
+
+This section chronicles the steps in deploying **svelte-native-forms**
+to NPM, and publishing the **docs** and **demo app**.
+
+**Feature Branch**:
+
+Typically all development is done in a **feature branch**.  If you are
+about to deploy, presumably your branch is complete and documented.
+
+1. finalize version -and- history notes:
+
+   - for the new version, use [semantic standards](http://semver.org/)
+
+   - update version in:
+     * `package.json` (both inner and outer projects)
+     * `docs/toc.md` (version is referenced at top)
+     * `docs/history.md` (within the "running" notes)
+
+   - review/finalize all documentation impacted by change
+     * also insure README.md does NOT need to change
+       - NOTE: don't forget, the README is duplicated in the inner
+         project _(sync as necessary)_!
+
+   - optionally: save a link-neutral version of change history comments (to use in git tagging)
+     * pull from history.md _(normalizing any reference links)_
+     * ALTERNATE: simply reference the documentation history section (in the git tag)
+
+       EX: https://svelte-native-forms.js.org/history.html#v0_1_0
+
+**main Branch**:
+
+1. issue PR (pull request) and merge to main branch
+
+2. sync main to local machine (where the deployment will occur)
+
+3. verify version is correct in:
+   * `package.json` (both inner and outer projects)
+   * `docs/toc.md`
+   * `docs/history.md`
+
+4. now, everything should be checked in to main and ready to publish
+
+5. tag the release (in github)
+   * verify the history page github links are correct (now that the tag exists)
+
+6. publish **svelte-native-forms** to npm **_(THIS IS IT!)_**:
+
+   ```
+    $ cd snf/snf # go into inner project (where our library is)
+    $ npm publish
+      + svelte-native-forms@v.v.v
+   ```
+
+   verify publish was successful
+   - receive email from npm
+   - npm package: https://www.npmjs.com/package/svelte-native-forms
+   - unpkg.com:   https://unpkg.com/svelte-native-forms/
+
+7. publish **svelte-native-forms** documentation:
+
+   ```
+   $ npm run docs:publish
+   ```
+  
+   verify publish docs was successful
+   - https://svelte-native-forms.js.org/docs
+     * see new version
+     * see correct history
+
+
+8. deploy **svelte-native-forms** demo app:
+
+   ```
+   $ npm run app:deploy
+   ```
+  
+   verify deployed app was successful
+   - https://svelte-native-forms.js.org/app
+     * see new version
+
+
+9. optionally test the new package in an external project (by installing it)
+
+
+<!--- *** SECTION *************************************************************** --->
+# Setup New Feature Branch
+
+AI: ?? This may not yet be complete, but it is close (should include details of inner/outer projects)
+
+This section documents the steps to setup a new **feature branch**
+(where all development is typically done):
+
+1. create a new branch (typically spawned from the "main" branch).
+
+   **EX**: `next7`
+
+2. devise "best guess" as to the next version number _(may be
+   premature, but this can subsequently change)_.
+
+   Reflect this in: 
+   * `package.json` (both inner and outer projects)
+   * `docs/toc.md` (version is referenced at top)
+   * `docs/history.md` (within the "running" notes)
+
+3. setup new running Revision History (in `docs/history.md`)
+
+   This provides a place where we can incrementally maintain "running"
+   revision notes.
+
+
 
 
 <!--- *** LINKS ***************************************************************** --->
@@ -1173,7 +1290,8 @@ KJB Notes --->
   [Setup Absolute Imports]:       #setup-absolute-imports
   [Setup Docs Tooling]:           #setup-docs-tooling
   [Setup js.org sub-domain]:      #setup-jsorg-sub-domain
-
+[Deploy Project]:                 #deploy-project
+[Setup New Feature Branch]:       #setup-new-feature-branch
 
 [GitHub Pages]:                   https://pages.github.com/
 [js.org]:                         https://js.org/
