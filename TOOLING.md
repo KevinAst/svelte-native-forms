@@ -13,13 +13,15 @@ one"**!
    **b:** the **formal documentation**
    _(both of which are published on [GitHub Pages])_.
 
-   The tooling for this project is **seeded from [sveltejs/template]**
-   _(the project template for Svelte apps)_.
+   The tooling for this project is **documented here** and is **seeded
+   from [sveltejs/template]** _(the project template for Svelte
+   apps)_.
 
 2. The **inner project** _(found in the `snf/` directory)_ is the **utility
    library** _(published on [npm])_.
 
-   The tooling for this project is **seeded from
+   The tooling for this project is **documented in the inner
+   [TOOLING.md](snf/TOOLING.md)** and is **seeded from
    [sveltejs/component-template]** _(the base for building shareable
    Svelte components)_.
 
@@ -40,10 +42,8 @@ unmodified)_!
   - [Setup Tailwind CSS]
   - [Setup tw-themes]
   - [Setup Absolute Imports]
-  - [Setup Node Builtins]
-  - [Setup Jest Unit Testing]
-  - [Setup Documentation Tooling]
-  - [Setup Deployment]
+  - [Setup Docs Tooling]
+  - [Setup js.org sub-domain]
 
 <!--- *** SECTION *************************************************************** --->
 # NPM Scripts
@@ -51,17 +51,29 @@ unmodified)_!
 This section provides a summary of the available **NPM Scripts**
 _(organized by task)_:
 
-
 ```
 DEVELOPMENT
 ===========
+APP:
 app:devServe ... launch dev server, with continuous build (watching for code changes)
                  http://localhost:5000/
                  NOTE: the internals of this script:
                        1. invokes the rollup bundler in a "watch" state (to: public/build)
                        2. implicitly invokes "npm start" to launch the server
 
-docs:serve ..... AI: ?? launch documentation server, continuously watching for docs changes
+DOCS:
+docs:build   ... AI: ?? manually build the docs (into the _book/ dir)
+                 1. start an internal web server pointing to _book/ dir
+                 2. manually re-execute docs:build whenever docs/ change
+
+
+APP
+===
+app:devServe ... launch dev server, with continuous build (watching for code changes)
+                 http://localhost:5000/
+                 NOTE: the internals of this script:
+                       1. invokes the rollup bundler in a "watch" state (to: public/build)
+                       2. implicitly invokes "npm start" to launch the server
 
 start .......... start a static file server from the contents of public/
                  http://localhost:5000/
@@ -70,28 +82,6 @@ start .......... start a static file server from the contents of public/
                  NOTE: You can invoke this explicitly to server the contents of
                        a production build (i.e. app:prodBuild)
 
-
-TESTING
-=======
-test ........... AI: ?? run test suite, one time
-test:watch ..... AI: ?? run test suite, continuously watching for module changes
-
-
-CODE QUALITY
-============
-app:lint ....... AI: ?? verify code quality, linting BOTH production and test code
-                 NOTE: Real-time linting is ALSO available in the VSCode editor.
-
-app:check ...... AI: ?? convenience script to:
-                 - verify code quality (lint)
-                 - show outdated installed packages
-                 - run tests (against our master src)
-
-pkgReview ...... AI: ?? show outdated installed packages
-
-
-DEPLOYMENT       NOTE: we DEPLOY the application
-==========
 app:deploy ..... deploy latest application to https://svelte-native-forms.js.org/app/
                  NOTE: This script FIRST builds the app from scratch
                        ... via preapp:deploy
@@ -99,31 +89,37 @@ app:deploy ..... deploy latest application to https://svelte-native-forms.js.org
 app:prodBuild .. build production bundle (to: public/build)
                  NOTE: This is implicitly invoked from app:deploy
 
+app:clean ...... AI: ?? clean the machine-generated public/build directory
 
-app:clean ...... AI: ?? clean all machine-generated app/build directories
 
-
-PUBLISH          NOTE: we PUBLISH the documentation
-=======
-docs:publish ... AI: ?? publish the latest documentation to https://svelte-native-forms.js.org/docs/
+DOCS
+====
+docs:build   ... AI: ?? manually build the docs (into the _book/ dir)
+                 - NOTE: this build is executed as the first step in docs:publish
+                 - FOR DOCS DEVELOPMENT:
+                   1. start an internal web server pointing to _book/ dir
+                   2. manually re-execute docs:build whenever docs/ change
+                 - this is MUCH PREFERRED over docs:serve
+                   * it is MUCH FASTER!
+                   * docs:serve is very antiquated (a dead project)
+                     * it is extremely slow
+                     * it constantly stops when any file changes
+                                    
+docs:publish ... AI: ?? publish the latest docs to https://svelte-native-forms.js.org/docs/
                  NOTE: this script FIRST builds the docs from scratch
                        ... via predocs:publish
 
-                 >>> OPTIONALLY:
-docs:build   ... AI: ?? you can manually build the docs (into the _book/ dir)
-                 HOWEVER it is not typically necessary 
-                 BECAUSE this build is executed as the first step in docs:publish
+docs:clean   ... AI: ?? clean machine-generated docs/ directory
 
-docs:clean   ... AI: ?? clean all machine-generated docs directories
+                 >>> ANTIQUATED (see notes on docs:build)
+docs:serve ..... launch docs server, continuously watching for docs changes
+                 NOTE: adding `--log=debug --debug` to this npm script CAN BE USEFUL
 
 
 MISC
 ====
 clean .......... AI: ?? cleans ALL machine-generated directories
 ```
-
-
-
 
 
 <!--- *** SECTION *************************************************************** --->
@@ -152,9 +148,9 @@ Dependency                        | Type        | Usage                   | Refe
 --------------------------------- | ----------- | ----------------------- | ----------------
 `@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
-`rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
 `autoprefixer`                    | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
-`gh-pages`                        | **TOOLING** | Deployment              | [Setup Deployment]
+`gh-pages`                        | **TOOLING** | Deployment              | [Setup Svelte App Tooling]
+`rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
 `rollup-plugin-css-only`          | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-svelte`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
@@ -163,32 +159,14 @@ Dependency                        | Type        | Usage                   | Refe
 `svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte App Tooling]
 `svelte-preprocess`               | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
 `tailwindcss`                     | **TOOLING**<br>**APP**   | Tailwind CSS Build<br>and application code  | [Setup Tailwind CSS]<br>and app code: `src/...`
-`tw-themes`                       | **TOOLING**<br>**APP**   | a faux dependency (sourced here but a potential npm lib)  | [Setup tw-themes] and app code: `src/...`
+`tw-themes`                       | **TOOLING**<br>**APP**   | Tailwind Themes   <br>and application code  | [Setup tw-themes]   <br>and app code: `src/...`
 
 
 **OLD TEMPLATE:** ?? synced above (remove when complete)
 
 Dependency                        | Type        | Usage                   | Refer To
 --------------------------------- | ----------- | ----------------------- | ----------------
-`@babel/core`                     | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
-`@babel/preset-env`               | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
-<del>`@rollup/plugin-alias`</del> | **TOOLING** | Absolute Imports        | [Setup Absolute Imports]
-`babel-jest`                      | **TOOLING** | Jest Testing related    | [Setup Jest Unit Testing]
-`crc`                             | **APP**     | CRC Hashing Utility     | app code: `src/util/crc.js`
-`enumify`                         | **APP**     | Enumeration Utility     | app code: `src/...`
-`jest`                            | **TOOLING** | Jest Testing Framework  | [Setup Jest Unit Testing]
-`konva`                           | **APP**     | Konva canvas 2D lib     | app code: `src/...`
-`lodash.isequal`                  | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`lodash.isfunction`               | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`lodash.isobject`                 | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`lodash.isplainobject`            | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`lodash.isstring`                 | **APP**     | Validation              | app code: `src/util/typeCheck.js`
-`rollup-plugin-node-builtins`     | **TOOLING** | Build some npm packages | [Setup Node Builtins]
-`rollup-plugin-node-globals`      | **TOOLING** | Build some npm packages | [Setup Node Builtins]
-`rollup-plugin-postcss`           | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)] ?? TRASH
-`sass`                            | **TOOLING** | UI Kit related          | [Setup UI Kit (SMUI)] ?? TRASH
-`svelte-material-ui`              | **APP**<br>**TOOLING** | UI Kit       | app code: `src/...`<br>[Setup UI Kit (SMUI)] ?? TRASH
-
+`@rollup/plugin-alias`            | **TOOLING** | Absolute Imports        | [Setup Absolute Imports]
 
 
 <!--- *** SECTION *************************************************************** --->
@@ -208,6 +186,7 @@ svelte-native-forms/
   public/ .............. the app deployment root (with generated build/) see: "Setup Svelte App Tooling"
   README.md ............ basic project docs
   rollup.config.js ..... the rollup bundler configuration (used by Svelte) see: "Setup Svelte App Tooling"
+  snf/ ................. the inner project, hosting our util lib published on npm see: snf/TOOLING.md
   src/ ................. the app source code
     main.js ............ mainline entry point (redirect to Main.svelte)
     Main.svelte ........ general place to do setup/config (including Tailwind)
@@ -217,10 +196,9 @@ svelte-native-forms/
   TOOLING.md ........... this document :-)
 
   ?? L8TR: (as needed)
-  _docs/ ............... machine generated docs see: "AI"
-  babel.config.js ...... babel configuration used by jest see: "Setup Jest Unit Testing"
-  docs/ ................ master source of our on-line docs see: "AI"
-  jest.config.js ....... jest unit testing configuration see: "Setup Jest Unit Testing"
+  _book/ ............... machine generated docs (output of GitBook) see: "Setup Docs Tooling"
+  docs/ ................ master source of GitBook project docs  see: "Setup Docs Tooling"
+    *.md ............... various Markdown files making up our docs
 ```
 
 
@@ -246,10 +224,8 @@ were carried out, however in some cases the order can be changed.
   - [Setup Tailwind CSS]
   - [Setup tw-themes]
   - [Setup Absolute Imports]
-  - [Setup Node Builtins]
-  - [Setup Jest Unit Testing]
-  - [Setup Documentation Tooling]
-  - [Setup Deployment]
+  - [Setup Docs Tooling]
+  - [Setup js.org sub-domain]
 
 
 
@@ -332,7 +308,9 @@ KJB Notes --->
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Svelte App Tooling
 
-This task assumes you are "starting from scratch", setting up the
+**svelte-native-forms** uses a Svelte App for it's **Demo App**.
+
+This setup assumes you are "starting from scratch", setting up the
 Svelte tooling _(the compiler, etc.)_, with the basic application code
 template.
 
@@ -340,10 +318,21 @@ At the end of this process you should have:
 
 - A running Svelte app _(a very basic template starting point)_
 
+- The ability to deploy the demo app (to github pages)
+
+  ```
+  $ npm run app:deploy
+  ```
+
+  The **svelte-native-forms** demo app is deployed on [GitHub Pages]
+  (along with the documentation).
+
+
 - Impacted Dependencies:
   ```
   @rollup/plugin-commonjs
   @rollup/plugin-node-resolve
+  gh-pages
   rollup
   rollup-plugin-css-only
   rollup-plugin-livereload
@@ -364,18 +353,19 @@ At the end of this process you should have:
     src/ ................. the app source code (the basic template starting point)
   ```
 
-**Original Instructions**:
+
+**Install Template**:
+
+Make a copy of the [Svelte Template Repo](https://github.com/sveltejs/template)
+using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that copies git repositories)_
+
+_Original Instructions_:
 - [Getting started with Svelte](https://svelte.dev/blog/the-easiest-way-to-get-started#2_Use_degit)
   _(from the Svelte site - the horses mouth)_
 - [Getting Started with Svelte 3](https://www.digitalocean.com/community/tutorials/getting-started-with-svelte-3)
   _(pretty much same instructions)_
 - [Svelte Template Repo](https://github.com/sveltejs/template)
 
-
-**Summary**:
-
-Make a copy of the [Svelte Template Repo](https://github.com/sveltejs/template)
-using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that copies git repositories)_
 
 ```
 - Summary Instructions:
@@ -393,13 +383,6 @@ using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that co
 
 - Summary of npm scripts:
 
-  * start .......... start a static file server from the contents of public/
-                     http://localhost:5000/
-                     NOTE: This is implicitly invoked from app:devServe script
-                           As a result, it CANNOT be renamed :-(
-                     NOTE: You can invoke this explicitly to server the contents of
-                           a production build (i.e. app:prodBuild)
-
                      >>> renamed FROM: dev
   * app:devServe ... launch dev server, with continuous build (watching for code changes)
                      http://localhost:5000/
@@ -407,10 +390,75 @@ using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that co
                            1. invokes the rollup bundler in a "watch" state (to: public/build)
                            2. implicitly invokes "npm start" to launch the server
 
+  * start .......... start a static file server from the contents of public/
+                     http://localhost:5000/
+                     NOTE: This is implicitly invoked from app:devServe script
+                           As a result, it CANNOT be renamed :-(
+                     NOTE: You can invoke this explicitly to server the contents of
+                           a production build (i.e. app:prodBuild)
+
+  * app:deploy ..... deploy latest application to https://svelte-native-forms.js.org/app/
+                     NOTE: This script FIRST builds the app from scratch
+                           ... via preapp:deploy
+
                      >>> renamed FROM: build
   * app:prodBuild .. build production bundle (to: public/build)
                      NOTE: This is implicitly invoked from app:deploy
+
+  * app:clean ...... AI: ?? clean the machine-generated public/build directory
 ```
+
+**Install gh-pages**:
+
+**NOTE**: Some of these dependencies overlap with other setup (Install
+only what is missing):
+
+All deployment scripts use the `gh-pages` utility, that simplifies publishing resources
+to [GitHub Pages].  Install as follows:
+
+```
+$ npm install --save-dev gh-pages
+```
+
+**Relative App Resources**
+
+Because our app is deployed to a sub-directory of github pages, all
+startup html resource references should be relative.  Simply change
+`public/index.html` as follows:
+
+```diff
+public/index.html
+=================
+-   <link rel='icon' type='/image/png' href='/favicon.png'>
++   <link rel='icon' type='/image/png' href='favicon.png'>
+
+-   <link rel='stylesheet' href='/global.css'>
++   <link rel='stylesheet' href='global.css'>
+
+-   <link rel='stylesheet' href='/build/bundle.css'>
++   <link rel='stylesheet' href='build/bundle.css'>
+
+-   <script defer src='/build/bundle.js'></script>
++   <script defer src='build/bundle.js'></script>
+```
+
+**Add `app:deploy` Script**
+
+Add the following scripts to `package.json`:
+
+```
+package.json
+============
+{
+  ...
+  "scripts": {
+    "preapp:deploy": "npm run app:prodBuild",
+    "app:deploy": "gh-pages --dist public --dest app",
+    ... snip snip
+  }  
+}
+```
+
 
 _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 
@@ -741,19 +789,40 @@ _My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup tw-themes
 
-Our application color themes are provided through the **tw-themes**
-utility.  This is currently a faux dependency _(i.e. simulated)_,
-because it is **sourced here**.  However it has the potential of being
-published as a full fledged npm library.  Please refer to the
-[tw-themes README](./src/util/ui/tw-themes/README.md) for full
-details.
+Our application color themes are provided through [tw-themes].
 
-As a general rule, it is configured by following the "Getting Started"
-README instructions.
+At the end of this process you should have:
+
+- Application access to the TwThemes object (where color themes can be activated)
+
+- Impacted Dependencies:
+  ```
+  tw-themes
+  ```
+
+- Impacted Files:
+  ```
+  svelte-native-forms/
+    rollup.config.js
+    tailwind.config.js
+  ```
+
+**Original Instructions**:
+- [tw-themes] _(see **Install** and **Getting Started** sections)_
+
+
+**Summary**:
+
+- Install Dependencies:
+
+  ```
+  $ npm install --save-dev tw-themes
+    + tw-themes@0.1.1
+  ```
 
 - The key aspect is we create an application module _(see
-  `src/layout/colorTheme.js`)_ that promotes the `TwThemes` object, from which
-  the remainder of the API is gleaned.
+  `src/layout/colorTheme.js`)_ that promotes the `TwThemes` object,
+  from which the remainder of the API is gleaned.
 
 - From a **tooling perspective**, we must inform tailwind of our
   **Context Colors**, by referencing this `TwThemes` object in
@@ -914,230 +983,18 @@ At the end of this process you should have:
     };
     ```
 
-
 <!--- *** SUB-SECTION *************************************************************** --->
-# Setup Node Builtins
-
-TODO: ?? WHAT?
-
-Some npm packages utilize node builtins.  This requires some
-additional rollup configuration!
-
-I ran across this using the `crc` npm package, which uses `buffer`
-internally, **which in turn requires this setup**.
-
-Without this rollup configuration, you will receive the following
-error from the svelte build process:
-
-```
-(!) Missing shims for Node.js built-ins
-Creating a browser bundle that depends on 'buffer'.
-You might need to include https://www.npmjs.com/package/rollup-plugin-node-builtins       
-(!) Plugin node-resolve: preferring built-in module 'buffer' over local alternative at 
-    'C:\dev\svelte-native-forms\node_modules\buffer\index.js', pass 'preferBuiltins: false'
-    to disable this behavior or 'preferBuiltins: true' to disable this warning
-(!) Unresolved dependencies
-https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
-
-buffer (imported by 
-        node_modules\crc\crc1.js,
-        node_modules\crc\crc8.js,
-        node_modules\crc\crc16xmodem.js,
-        node_modules\crc\crc16modbus.js,
-        node_modules\crc\crc16.js,
-        node_modules\crc\crc16ccitt.js,
-        node_modules\crc\crc16kermit.js,
-        node_modules\crc\crc24.js,
-        node_modules\crc\crcjam.js,
-        node_modules\crc\crc32.js,
-        node_modules\crc\crc81wire.js,
-        node_modules\crc\create_buffer.js)
-
-(!) Missing global variable name
-Use output.globals to specify browser global variable names corresponding to external modules
-buffer (guessing 'buffer')
-```
-
-**Links**:
-- [use node builtins in browser with rollup](https://openbase.io/js/rollup-plugin-node-builtins)
-- [npm rollup-plugin-node-builtins](https://www.npmjs.com/package/rollup-plugin-node-builtins)
-- [npm rollup-plugin-node-globals](https://www.npmjs.com/package/rollup-plugin-node-globals)
-
-
-At the end of this process you should have:
-
-- The ability to use npm packages that utilize node builtins _(such as
-  `buffer`, used by `crc`)_.
-
-- Impacted Dependencies:
-  ```
-  rollup-plugin-node-builtins
-  rollup-plugin-node-globals
-  ```
-
-- Impacted Files:
-  ```
-  svelte-native-forms/
-    rollup.config.js ... modified to include Node Builtin configuration
-  ```
-
-**Installation Details**:
-
-- Install required dependencies:
-  ```
-  $ npm install --save-dev rollup-plugin-node-builtins
-    + rollup-plugin-node-builtins@2.1.2
-      added 99 packages from 57 contributors and audited 267136 packages in 12.685s
-      found 2 moderate severity vulnerabilities
-
-  $ npm install --save-dev rollup-plugin-node-globals
-    + rollup-plugin-node-globals@1.4.0
-      added 5 packages from 79 contributors and audited 267145 packages in 9.376s
-      found 2 moderate severity vulnerabilities
-  ```
-
-
-- Configure `rollup.config.js` _(in support of **Node Builtins**)_
-
-  * For details, see embedded comments (`Node Builtins`) in `rollup.config.js`
-
-  * **rollup.config.js** _sample_
-    ```js
-    // KJB: in support of: Node Builtins, used by some npm packages (e.g. crc/buffer), requiring built-in shim for modules designed for Browserfy
-    import globals   from 'rollup-plugin-node-globals';
-    import builtins  from 'rollup-plugin-node-builtins';
-
-    export default {
-      ...
-      plugins: [
-        ...
-        // KJB: in support of: Node Builtins, used by some npm packages (e.g. crc/buffer), requiring built-in shim for modules designed for Browserfy
-        globals(),
-        builtins(),
-      ]
-    };
-    ```
-
-
-<!--- *** SUB-SECTION *************************************************************** --->
-# Setup Jest Unit Testing
-
-TODO: ?? update when in-use
-
-**svelte-native-forms** uses [Jest](https://jestjs.io/en/) as it's unit
-testing framework.  Svelte is **not** pre-configured with any testing
-solution, so you must configure this yourself.
-
-
-**Links**:
-- [Jest](https://jestjs.io/en/)
-- [Jest Installation](https://jestjs.io/docs/en/getting-started.html)
-- [Testing Svelte components with Jest](https://dev.to/jpblancodb/testing-svelte-components-with-jest-53h3)
-- [How to test Svelte components](https://timdeschryver.dev/blog/how-to-test-svelte-components)
-
-At the end of this process you should have:
-
-- The ability to use Jest in testing your JavaScript modules _(**not**
-  GUI)_.
-
-- Impacted Dependencies:
-  ```
-  @babel/core
-  @babel/preset-env
-  babel-jest
-  jest
-  ```
-
-- Impacted Files:
-  ```
-  svelte-native-forms/
-    babel.config.js ...... babel configuration used by jest  [see: "Setup Jest Unit Testing")
-    jest.config.js ....... jest unit testing configuration [see: "Setup Jest Unit Testing")
-  ```
-
-**Installation Details**:
-
-**NOTE**: Jest requires babel, which not available in Svelte
-          out-of-the-box, so you must install it manually.
-
-**SideBar**: **svelte-native-forms** does **not** systematically test the GUI
-             itself, only business logic in JavaScript modules.  As a result, any
-             UI related dependency found in the linked instructions were omitted.
-
-- Install required dependencies (Jest and Babel):
-  ```
-  $ npm install --save-dev @babel/core @babel/preset-env jest babel-jest
-    + jest@25.4.0
-      added 620 packages from 281 contributors and audited 260964 packages in 36.954s
-    + babel-jest@25.4.0
-    + @babel/core@7.9.0
-    + @babel/preset-env@7.9.5
-      added 68 packages from 7 contributors and updated 2 packages in 21.756s
-  ```
-
-- Configure Jest/Babel by adding two files _(in project root)_:
-  * **jest.config.js**:
-    ```js
-    // configuration of jest unit tests
-    module.exports = {
-      transform: {
-        "^.+\\.js$": "babel-jest"
-      },
-      moduleFileExtensions: ["js"],
-    
-      // KJB: other UNNEEDED (I think)
-      // testPathIgnorePatterns: ["node_modules"],
-      // bail: false,
-      // verbose: true,
-      // transformIgnorePatterns: ["node_modules"],
-    };
-    ```
-  * **babel.config.js**:
-    ```js
-    // babel needed for jest unit tests :-(
-    // ... Svelte has it's own ES6 mechanism :-)
-    module.exports = {
-      presets: [
-        [
-          "@babel/preset-env",
-          {
-            targets: {
-              node: "current"
-            }
-          }
-        ]
-      ]
-    };
-    ```
-
-- Setup the **Testing NPM Scripts**:
-
-  **babel.config.js**:
-  ```js
-  ... snip snip
-
-  "scripts": {
-    ...
-    "test":       "jest src",
-    "test:watch": "npm run test -- --watch"
-  },
-
-  ... snip snip
-  ```
-
-
-<!--- *** SUB-SECTION *************************************************************** --->
-# Setup Documentation Tooling
+# Setup Docs Tooling
 
 TODO: ?? details to follow
 
 
 
 <!--- *** SUB-SECTION *************************************************************** --->
-# Setup Deployment
+# Setup js.org sub-domain
 
-**svelte-native-forms** is deployed on [GitHub Pages] (both the demo
-web-app and our documentation).
+To accommodate a more professional URL, [js.org] supports a
+sub-domain registration process.
 
 At the end of this process you should have:
 
@@ -1145,429 +1002,159 @@ At the end of this process you should have:
   * FROM: https://kevinast.github.io/svelte-native-forms/
   * TO:   https://svelte-native-forms.js.org/
 
-- AI: ?? The ability to deploy the formal docs (to github pages)
+To accomplish this, simply follow the instructions on [js.org].  Here
+is my summary _(more notes hidden here in comment form)_:
 
-- The ability to deploy the demo app (to github pages)
+- First setup a preliminary set of docs that are deployable to
+  [GitHub Pages].  `js.org` requires "reasonable content" before
+  they will approve your request.  Alternatively you can create
+  some temporary content that shows your intent.
+
+
+- Create a CNAME file at gh-pages root.  In our case the gh-pages root
+  is the parent of both our published resources (`docs` and `app`).
+  You want to publish a temporary resource directly in the gh-pages
+  root.
+
+  **tempLoc/CNAME**
   ```
-  $ npm run app:deploy
+  svelte-native-forms.js.org
   ```
 
-- Impacted Dependencies:
-  ```
-  gh-pages
-  ```
+  * Deploy this temporary resource to the [GitHub Pages] root:
 
-- Impacted Scripts:
-  ```
-  app:deploy
-  docs:publish ?? AI
-  ```
+    ```
+    $ npx gh-pages --dist tempLoc
+    ```
 
+    NOTE: Once this is done, you will not be able to browse your gh-pages
+          till js.org processes your PR (below).
 
-**Install gh-pages**
+- Fork the `js.org` project and issue a PR to introduce our sub-domain
+  * new entry in: 
 
-All deployment scripts use the `gh-pages` utility, that simplifies publishing resources
-to [GitHub Pages].  Install as follows:
+    **cnames_active.js**
+    ```
+    "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
+    ```
 
-```
-$ npm install --save-dev gh-pages
-```
+- Monitor PR acceptance (will take 24 hrs).
 
-
-**Establish `js.org` sub-domain**
-
-Both our app and docs are deployed to [GitHub Pages].  To accommodate a
-more professional URL, [js.org] supports a sub-domain, so that our
-site is transformed:
-
-- **from this**: https://kevinast.github.io/svelte-native-forms/
-- **to this**:   https://svelte-native-forms.js.org/
-
-Simply follow the instructions on [js.org].  Here is my summary _(more
-notes hidden here in comment form)_:
-
-```
- - create a temporary dir to deploy content to the gh-pages branch.
-   * EX: _docs/
-   * NOTE: can deploy to gh-pages branch at any time with:
-           $ npx gh-pages --dist _docs
-
- - create a temporary index.html page at gh-pages root:
-   * NOTE: this must convey enough content to be accepted as a legit npm package
-
- - create a CNAME file at gh-pages root:
-   * CNAME
-     =====
-     svelte-native-forms.js.org
-   * NOTE: Once this is done, you will not be able to browse your gh-pages
-           till js.org processes PR (below)
-
- - issue a js.org PR to introduce our sub-domain
-   * new entry in: cnames_active.js
-     ... "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
-   * monitor PR acceptance (will take 24 hrs)
-
- - once complete the sub-domain should be active
-   * NOTE: the original gh-pages link to the new sub-domain
-```
-
-**Relative App Resources**
-
-Because our app is deployed to a sub-directory of github pages, all
-startup html resource references should be relative.  Simply change
-`public/index.html` as follows:
-
-```diff
-public/index.html
-=================
--   <link rel='icon' type='/image/png' href='/favicon.png'>
-+   <link rel='icon' type='/image/png' href='favicon.png'>
-
--   <link rel='stylesheet' href='/global.css'>
-+   <link rel='stylesheet' href='global.css'>
-
--   <link rel='stylesheet' href='/build/bundle.css'>
-+   <link rel='stylesheet' href='build/bundle.css'>
-
--   <script defer src='/build/bundle.js'></script>
-+   <script defer src='build/bundle.js'></script>
-```
-
-**Add `app:deploy` Script**
-
-Add the following scripts to `package.json`:
-
-```
-package.json
-============
-{
-  ...
-  "scripts": {
-    "preapp:deploy": "npm run app:prodBuild",
-    "app:deploy": "gh-pages --dist public --dest app",
-    ... snip snip
-  }  
-}
-```
-
-
-**Add `docs:publish` Script** ?? AI
-
-
+- Once complete the sub-domain should be active
 
 <!--- Comment out KJB Notes
 
-**Deploy App VIA gh-pages** _(KJB Notes)_:
+****************
+* setup js.org * ... can be done FIRST OR LAST
+****************
 
-```
-> REFERENCE: Create React App (Deployment)
-  ... see: https://create-react-app.dev/docs/deployment/#github-pages-https-pagesgithubcom
-> REFERENCE: CreateReactApp.txt
-  ... see: CreateReactApp.txt (see: "deploy app VIA gh-pages")
-           c:/data/tech/dev/ReactJS/notes/CreateReactApp.txt
+  - either setup a preliminary set of docs -or- put a dummy page in place
+    ... needed to be accepted by js.org
 
-> ********************************************************************************
-- AI: retrofit this
+    * following temporary html file:
+      - NOTE: has to be "reasonable content"
+              - per their README, their focus is on granting subdomain requests to
+                projects with a clear relation to the JavaScript ecosystem and
+                community (NOT personal pages, blogs, etc.).
+              - Projects such as NPM packages, libraries, tools that have a clear
+                direct relation to JavaScript, will be accepted when requesting a
+                JS.ORG subdomain.
+              - KJB: My experience is that by a) placing limited content in, and b) referencing other project docs and your README
+                     IT WILL BE ACCEPTED
 
-      ********************************
-      * SUMMARIZE DEPLOYMENT PROCESS *
-      ********************************
+      _docs/index.html
+      ================
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8" />
+          <title>svelte-native-forms</title>
+        </head>
+        <body>
+          <h1>svelte-native-forms</h1>
+      
+          <p><i>... minimalist form validation with powerful results</i></p>
+          <p>
+            Validating forms has notoriously been a painful development
+            experience. Implementing client side validation in a user friendly way
+            is a tedious and arduous process • you want to validate fields only at
+            the appropriate time (when the user has had the chance to enter the
+            data) • you want to present validation errors in a pleasing way • you
+            may need to apply custom validation (specific to your application
+            domain) • etc.
+          </p>
+      
+          <p>
+            Even with the introduction of HTML5's Form Validation, it is still
+            overly complex, and doesn't address many common scenarios (mentioned
+            above). Without the proper approach, form validation can be one of the
+            most difficult tasks in web development.
+          </p>
+      
+          <p>
+            This sub-domain is currently work-in-progress and will
+            eventually hold BOTH the formal documentation and the deployed app
+            <i>(similar to other projects under my control: e.g. <a href="http://feature-u.js.org/">http://feature-u.js.org/</a>)</i>
+          </p>
+      
+          <p>
+            For now you may wish to take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/main/README.md">Design Docs</a>.
+          </p>
+      
+        </body>
+      </html>
 
-      > KEY: We are deploying BOTH docs and app on the same site
+    * deploy file to gh-pages
+      $ npx gh-pages --dist _docs
 
-      * setup js.org sub-domain web alias (takes time to resolve)
-        - for detailed steps see: "setup js.org" below 
-        - FROM: https://kevinast.github.io/svelte-native-forms
-          TO:   https://svelte-native-forms.js.org
-        - you can actually do this at ANY TIME (first or last)
-          BECAUSE: there is NO build dependency on the deployment domain
-          EVERYTHING IS USING RELATIVE RESOURCES!!!
+    * test site
+      ... https://KevinAst.github.io/svelte-native-forms
 
-      > following steps assume the js.org sub-domain is in place
-        ... but (again) you can actually do this first or last
+  - setup the js.org sub-domain alias: https://svelte-native-forms.js.org/
+    ... see: c:/data/tech/dev/GitHub.txt (configure the js.org subdomain) ... prob a bit stale
+    * KEY:  js.org offers sub-domain that points to GitHub Pages
+    * NICE: https://svelte-native-forms.js.org/
+            https://kevinast.github.io/svelte-native-forms
 
-      > GENERAL
-      * site organization:
-        /              ... root
-          CNAME        ... the gh-pages custom domain
-          index.html   ... a redirector to our docs
-                           ex: FROM: https://svelte-native-forms.js.org/
-                               TO:   https://svelte-native-forms.js.org/docs
+    * setup CNAME file at root and deploy to gh-pages
+        CNAME
+        =====
+        svelte-native-forms.js.org
 
-          docs/        ... app documentation
-            bla            FROM: {project}/_docs ... machine generated from {project}/docs (via gitbook)
-            bla            ex:   https://svelte-native-forms.js.org/docs
-
-          app/         ... app deployment
-            bla            FROM: {project}/build ... machine generated from {project}/ (via create-react-app)
-            bla            ex:   https://svelte-native-forms.js.org/app
-
-
-      > GENERAL -and- DOCS-RELATED
-      * setup deployment root
-        - this is MANUALLY done ONE TIME
-          ... using temporary local dirs
-          ... mastered in gh-pages only
-          ... should never change
-              ... if (for some reason) a change is needed
-                  you can edit via github web on gh-pages branch
-
-        - define temporary local files
-          {project}/
-            _docs/
-              CNAME
-              =====
-              svelte-native-forms.js.org
-
-              index.html  ... redirector to docs
-              ==========
-              <!DOCTYPE html>
-              <html lang="en">
-                <head>
-                  <meta charset="UTF-8">
-                  <meta http-equiv="refresh" content="1; url=./docs">
-                  <script>
-                    window.location.href = "./docs"
-                  </script>
-                  <title>svelte-native-forms docs redirect</title>
-                </head>
-                <body>
-                  <h1>svelte-native-forms docs redirect</h1>
-                  <p>
-                    If you are not redirected automatically, follow this link to the
-                    <a href="./docs">svelte-native-forms docs</a>
-                  </p>
-                </body>
-              </html>
-
-              docs/
-                index.html ... temporary file JUST to see it work (will be replaced with gitbook soon)
-
-        - publish docs to gh-pages MANUALLY
-          $ npx gh-pages --dist _docs
-
-        - WORKS: test redirection to docs
-          https://svelte-native-forms.js.org/
-
-        - you can now discard {project}/_docs
-          ... should never change
-              ... if (for some reason) a change is needed
-                  you can edit via github web on gh-pages branch
-          ... and the sub-dirs are published from other sources
-
-
-      > GENERAL
-      > DOCS-RELATED
-      > APP-RELATED
-      * setup the deployment scripts (in package.json)
-        - TERMINOLOGY:
-          "terminology:COMMENT":   "app is DEPLOYED, and docs are PUBLISHED",
-        - DEPLOY APP (NOTE: see CRA for setup required to deploy to a sub-directory ... there is a bit of config)
-          "preapp:deploy": "npm run app:prodBuild",
-          "app:deploy": "gh-pages --dist public --dest app",
-        - PUBLISH DOCS
-          "l8tr:docs:prepare:do:once":  "gitbook install",
-          "l8tr:docs:build:COMMENT":    "NOTE: for gitbook build/serve, following diagnostics are useful: --log=debug --debug",
-          "l8tr:docs:build":            "gitbook build",
-          "l8tr:docs:serve":            "gitbook serve",
-          "l8tr:predocs:publish":       "npm run docs:build",
-KEY       "docs:publish":          "gh-pages --dist _docs --dest docs",
-          "docs:gitbook:help":     "gitbook help",
-
-      > DOCS-RELATED
-      * change {project}/_docs to something different -and- test script: docs:publish
-        - NOTE: just reposition the docs root down and modify
-        - NOTE: this will eventually be machine generated
-        - run script
-          $ npm run docs:publish
-        - WORKED: verify root has NOT changed
-        - WORKED: verify root/docs HAS changed
-
-      > APP-RELATED
-      * setup app deployment
-
-        > BACKGROUND:
-          - KEY: important concept: we are deploying our app in a sub-directory of our server
-                 ... this is a bit different than we have done before
-                 ... sidebar: and we are deploying our docs in a different sub-directory
-          - CRA (Create React App) has a new option that makes it EASY to deploy apps in a sub-directory of our server
-            * we can simply plop our app into ANY dir
-            * KEY: for us, this is a viable option BECAUSE we are NOT using the:
-                   - HTML5 pushState history API
-                   - or not using client-side routing (KJB: they mean routing with history)
-            * SUMMARY: this is accomplished by:
-DO THIS       - using the following "homepage" in our package.json
-                  package.json
-                  ============
-                  "homepage": ".", ... CRA makes all asset paths relative to index.html
-DO THIS       - AND making all our run-time resource retrievals RELATIVE (no starting slash)
-                ... this is the resources found in {project}/public
-                ... ex: 
-                        * KonvaSandboxScreen.js
-                          <img src="svelte-native-forms-logo.png" width="300" alt="Logo" className={classes.entry} /> ... NOT: /svelte-native-forms-logo.png
-                        * initializeFirebase.js
-                          const resp = await fetch('fbac'); ... NOT: '/fbac'
-          
-              - BOTTOM LINE:
-KEY: GREAT      * by using this deployment technique (package.json directive of "homepage": ".")
-                  AND employing relative resource paths (in fetch() and <img/> etc)
-                      NOTE: I did in fact test absolute paths
-                            > these absolute paths WORK in dev, but BREAK in production (when deployed to a sub-dir)
-                            > ... SO the relative paths are a required technique
-KEY: GREAT        - we can deploy the app to ANY sub-directory
-                    * in addition BECAUSE we are NOT using:
-                      * HTML5 pushState history API
-                      * or not using client-side routing (KJB: they mean routing with history)
-KEY: GREAT        - we can use same heuristic for dev and prod deployment
-
-
-        - DO THIS:
-          * apply the "DO THIS" (above)
-          * test app
-            - in dev
-              $ npm run app:start
-                ... http://localhost:3000/
-            - in prod
-              $ npm run app:deploy
-                ... https://svelte-native-forms.js.org/app/
-
-      > GENERAL
-      * check in / sync
-        ... finalize app deployment process (supporting BOTH docs and app on the same site)
-
-      > GENERAL
-      * once app is deployed in production,
-        - setup shortcut to run as an app (not in browser)
-          * this chrome procedure has changed (since last chrome version)
-            > YES: this is what we want
-              - create a shortcut -AND- check the "Open as window"
-                ... THIS DOES IT ALL!!!
-            > NO:  this is a bit quirky
-              - create a shortcut
-              - manually alter the properties target, adding the following option AT THE END (delimited with space)
-                  -app=http://localhost:3000/
-              - works pretty well, but is missing some ... hamburger menu
-
-        - bookmark app
-          
-
-      ****************
-      * setup js.org * ... can be done FIRST OR LAST
-      ****************
-
-      * I am going to be deploying BOTH app and docs to gh-pages
-
-        - prime the pump by putting a dummy page in the root:
-
-          * create _docs directory where our machine generated gitbook will eventually be placed
-            - .gitignore it
-              # machine generated docs (from GitBook)
-              /_book/
-              /_docs/
-
-          * add following temporary html file to this _docs 
-            - NOTE: has to be "reasonable content"
-                    - per their README, their focus is on granting subdomain requests to
-                      projects with a clear relation to the JavaScript ecosystem and
-                      community (NOT personal pages, blogs, etc.).
-                    - Projects such as NPM packages, libraries, tools that have a clear
-                      direct relation to JavaScript, will be accepted when requesting a
-                      JS.ORG subdomain.
-                    - KJB: My experience is that by a) placing limited content in, and b) referencing other project docs and your README
-                           IT WILL BE ACCEPTED
-
-            _docs/index.html
-            ================
-            <!DOCTYPE html>
-            <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <title>svelte-native-forms</title>
-              </head>
-              <body>
-                <h1>svelte-native-forms</h1>
-            
-                <p><i>... minimalist form validation with powerful results</i></p>
-                <p>
-                  Validating forms has notoriously been a painful development
-                  experience. Implementing client side validation in a user friendly way
-                  is a tedious and arduous process • you want to validate fields only at
-                  the appropriate time (when the user has had the chance to enter the
-                  data) • you want to present validation errors in a pleasing way • you
-                  may need to apply custom validation (specific to your application
-                  domain) • etc.
-                </p>
-            
-                <p>
-                  Even with the introduction of HTML5's Form Validation, it is still
-                  overly complex, and doesn't address many common scenarios (mentioned
-                  above). Without the proper approach, form validation can be one of the
-                  most difficult tasks in web development.
-                </p>
-            
-                <p>
-                  This sub-domain is currently work-in-progress and will
-                  eventually hold BOTH the formal documentation and the deployed app
-                  <i>(similar to other projects under my control: e.g. <a href="http://feature-u.js.org/">http://feature-u.js.org/</a>)</i>
-                </p>
-            
-                <p>
-                  For now you may wish to take a look at the initial <a href="https://github.com/KevinAst/svelte-native-forms/blob/main/README.md">Design Docs</a>.
-                </p>
-            
-              </body>
-            </html>
-
-          * deploy file to gh-pages
-            $ npx gh-pages --dist _docs
-
-          * test site
-            ... https://KevinAst.github.io/svelte-native-forms
-
-        - setup the js.org sub-domain alias: https://svelte-native-forms.js.org/
-          ... see: c:/data/tech/dev/GitHub.txt (configure the js.org subdomain) ... prob a bit stale
-          * KEY:  js.org offers sub-domain that points to GitHub Pages
-          * NICE: https://svelte-native-forms.js.org/
-                  https://kevinast.github.io/svelte-native-forms
-
-          * setup CNAME file at root and deploy to gh-pages
-              CNAME
-              =====
-              svelte-native-forms.js.org
-
-             - issue a PR that adds my sub-domain to js.org
-               * all done from the web
-               * IF NEED BE (in lue of syncing old repo - which is a major deal), simply delete your copy of an old dns.js.org fork
-                 - from your github dns.js.org fork
-                 - click settings
-                 - at bottom click delete repository
-               * from the github js-org/dns.js.org project
-                 ... https://github.com/js-org/js.org     <<< FYI: used to be dns.js.org
-               * click the FORK button
-                 ... this adds the dns.js.org to MY github
-                 ... https://github.com/KevinAst/js.org    <<< FYI: used to be dns.js.org
-                   * via the web, edit the cnames_active.js file
-                   * add your entry:
-                         "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
-                   * check in commit:
-                     >>> KEY: use this description (they will change it to this if you don't):
-                     ... NOT: adding svelte-native-forms sub-domain
-                     ... YES: svelte-native-forms.js
-                   * issue New Pull Request
-                   * back in the dns.js.org, monitor your Pull Request
-                     ... https://github.com/js-org/js.org/pulls
-                         https://github.com/js-org/js.org/pull/5555
-                     ... should take effect within 24 hrs
-                     - confirm: web site NO LONGER SERVES till they enact this
-                       https://kevinast.github.io/svelte-native-forms/
-                     - wait for sub-domain to go live (24 hrs)
-                       * FIRST they will approve it
-                       * THEN they will apply the domain
-                       * ONCE ACCEPTED & MERGED 
-                       * WORKS: should be able to now see the url:
-                         ... https://svelte-native-forms.js.org/
+       - issue a PR that adds my sub-domain to js.org
+         * all done from the web
+         * IF NEED BE (in lue of syncing old repo - which is a major deal), simply delete your copy of an old dns.js.org fork
+           - from your github dns.js.org fork
+           - click settings
+           - at bottom click delete repository
+         * from the github js-org/dns.js.org project
+           ... https://github.com/js-org/js.org     <<< FYI: used to be dns.js.org
+         * click the FORK button
+           ... this adds the dns.js.org to MY github
+           ... https://github.com/KevinAst/js.org    <<< FYI: used to be dns.js.org
+             * via the web, edit the cnames_active.js file
+             * add your entry:
+                   "svelte-native-forms": "kevinast.github.io/svelte-native-forms",
+             * check in commit:
+               >>> KEY: use this description (they will change it to this if you don't):
+               ... NOT: adding svelte-native-forms sub-domain
+               ... YES: svelte-native-forms.js.org
+             * issue New Pull Request
+             * back in the dns.js.org, monitor your Pull Request
+               ... https://github.com/js-org/js.org/pulls
+                   https://github.com/js-org/js.org/pull/5555
+               ... should take effect within 24 hrs
+               - confirm: web site NO LONGER SERVES till they enact this
+                 https://kevinast.github.io/svelte-native-forms/
+               - wait for sub-domain to go live (24 hrs)
+                 * FIRST they will approve it
+                 * THEN they will apply the domain
+                 * ONCE ACCEPTED & MERGED 
+                 * WORKS: should be able to now see the url:
+                   ... https://svelte-native-forms.js.org/
 
 KJB Notes --->
+
 
 
 
@@ -1584,10 +1171,9 @@ KJB Notes --->
   [Setup Tailwind CSS]:           #setup-tailwind-css
   [Setup tw-themes]:              #setup-tw-themes
   [Setup Absolute Imports]:       #setup-absolute-imports
-  [Setup Node Builtins]:          #setup-node-builtins
-  [Setup Jest Unit Testing]:      #setup-jest-unit-testing
-  [Setup Documentation Tooling]:  #setup-documentation-tooling
-  [Setup Deployment]:             #setup-deployment
+  [Setup Docs Tooling]:           #setup-docs-tooling
+  [Setup js.org sub-domain]:      #setup-jsorg-sub-domain
+
 
 [GitHub Pages]:                   https://pages.github.com/
 [js.org]:                         https://js.org/
@@ -1596,3 +1182,4 @@ KJB Notes --->
 [sveltejs/template]:              https://github.com/sveltejs/template
 [sveltejs/component-template]:    https://github.com/sveltejs/component-template
 [Tailwind CSS]:                   https://tailwindcss.com/
+[tw-themes]:                      https://tw-themes.js.org/
