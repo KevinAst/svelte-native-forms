@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/KevinAst/svelte-native-forms.git"
   },
+  "bugs": {
+    "url": "https://github.com/KevinAst/svelte-native-forms/issues"
+  },
   "keywords": [
     "svelte-native-forms",
     "svelte",
@@ -16,6 +19,7 @@
     "geeku",
     "astx"
   ],
+  "author": "Kevin J. Bridges <kevin@wiiBridges.com> (https://github.com/KevinAst)",
   "license": "MIT",
   "scripts": {
     "app:deploy": "gh-pages --dist public --dest app",
