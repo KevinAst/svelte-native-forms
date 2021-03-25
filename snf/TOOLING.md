@@ -4,8 +4,69 @@ This documents the tooling of the **Inner** - **svelte-native-forms**
 project _(i.e. the library published on [npm])_.
 It is **seeded from [sveltejs/component-template]** _(the base for
 building shareable Svelte components)_.
+
 To understand why there are two projects (inner/outer), please refer
 to the outer TOOLING [Two Projects in One] section.
+
+**Please Note**:
+
+<ul>
+
+  I attempted to combine everything in a single project, by defining
+  two distinct `rollup.config.js` files:
+
+  - `rollup.config.js` ... for demo app (from [sveltejs/template])
+  - `rollup.lib.config.js` ... for comp lib (from: [sveltejs/component-template])
+
+  And adjusting the build script to reference `rollup.lib.config.js`:
+
+  ```
+  package.json
+  ============
+  ... 
+  {
+    "scripts": {
+      ...
+      "lib:build": "rollup -c rollup.lib.config.js",
+      "prepublishOnly": "npm run lib:build"
+    },
+  }
+  ```
+
+
+  This should have worked, because both templates have the same
+  dependencies.
+
+  **However** I received the following error in building the library:
+
+  ```
+  $ npm run lib:build
+    > rollup -c rollup.lib.config.js
+      snf/src/index.js → dist/index.mjs, dist/index.js...
+      [!] Error: Unexpected token (Note that you need plugins to import files that are not JavaScript)
+      snf\src\DispErr.css (1:0)
+      1: .error.svelte-8h9b00{font-size:80%;font-weight:bold;font-style:italic;color:#900}
+         ^
+  ```
+
+  For some reason it doesn't like the CSS `<style>` in DispErr.svelte.
+  **Unsure why this is happening**.  The only diff is the npm
+  dependency versions (between the app and lib templates):
+
+  ```
+                                  NOT WORKING :-(
+                                  GENERALLY NEWER
+  dependency                      app (outer proj)    lib (inner proj)
+  ==============================  ================    ================
+  "@rollup/plugin-node-resolve":  "^11.0.0"           "^9.0.0",
+  "rollup":                       "^2.3.4"            "^2.0.0",
+  "rollup-plugin-svelte":         "^7.0.0"            "^6.0.0",
+  "svelte":                       "^3.0.0"            "^3.0.0"
+  ```
+
+</ul>
+
+
 
 # At a Glance
 
@@ -22,7 +83,7 @@ This section provides a summary of the available **NPM Scripts**:
 
 ```
 LIB
-===
+=====
 build .......... build production bundle to: dist/ (index.js, index.mjs)
                  NOTE: This is implicitly invoked from "npm publish" 
                        via prepublishOnly
@@ -74,245 +135,144 @@ summary:
 
 ```
 svelte-native-forms/
-  .gitignore ........... git repo exclusions (typically machine generated)
-  dist/ ................ machine generated library (to deploy) see: "Setup Svelte Comp Packaging"
-  LICENSE.md ........... our MIT License
-  node_modules/ ........ dependent packages (maintained by npm)
-  package.json ......... project meta data with dependencies
-  package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-  README.md ............ basic project docs
-  rollup.config.js ..... the rollup bundler configuration see: "Setup Svelte Comp Packaging"
-  src/ ................. the library source code
-  TOOLING.md ........... this document :-)
+  snf/
+    .gitignore ........... git repo exclusions (typically machine generated)
+    dist/ ................ machine generated library (to deploy) see: "Setup Svelte Comp Packaging"
+    LICENSE.md ........... our MIT License
+    node_modules/ ........ dependent packages (maintained by npm)
+    package.json ......... project meta data with dependencies
+    package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
+    README.md ............ basic project docs
+    rollup.config.js ..... the rollup bundler configuration see: "Setup Svelte Comp Packaging"
+    src/ ................. the library source code
+    TOOLING.md ........... this document :-)
 ```
 
 
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Svelte Comp Packaging
 
-??$$ RETROFIT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-**svelte-native-forms** uses a Svelte App for it's **Demo App**.
-
-This setup assumes you are "starting from scratch", setting up the
-Svelte tooling _(the compiler, etc.)_, with the basic application code
-template.
+The **svelte-native-forms** (published to NPM) is packaged using the
+[sveltejs/component-template] _(the base for building shareable Svelte
+components)_.
 
 At the end of this process you should have:
 
-- A running Svelte app _(a very basic template starting point)_
-
-- The ability to deploy the demo app (to github pages)
+- The ability to publish the **svelte-native-forms** library to NPM.
 
   ```
-  $ npm run app:deploy
+  $ npm publish
+    + svelte-native-forms@v.v.v
   ```
-
-  The **svelte-native-forms** demo app is deployed on [GitHub Pages]
-  (along with the documentation).
-
 
 - Impacted Dependencies:
   ```
-  @rollup/plugin-commonjs
   @rollup/plugin-node-resolve
-  gh-pages
   rollup
-  rollup-plugin-css-only
-  rollup-plugin-livereload
   rollup-plugin-svelte
-  rollup-plugin-terser
-  sirv-cli
   svelte
   ```
 
 - Impacted Files:
   ```
   svelte-native-forms/
-    node_modules/ ........ install location of dependent packages (maintained by npm)
-    package.json ......... project meta data with dependencies
-    package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
-    public/ .............. the Svelte app deployment root (with generated build/) [see: "Setup Svelte Comp Packaging"]
-    rollup.config.js ..... the rollup bundler configuration (used by Svelte) [see: "Setup Svelte Comp Packaging"]
-    src/ ................. the app source code (the basic template starting point)
+    snf/
+      .gitignore ........... git repo exclusions (typically machine generated)
+      dist/ ................ machine generated library (to deploy) see: "Setup Svelte Comp Packaging"
+      LICENSE.md ........... our MIT License
+      node_modules/ ........ dependent packages (maintained by npm)
+      package.json ......... project meta data with dependencies
+      package-lock.json .... exhaustive dependency list with installed "locked" versions (maintained by npm)
+      README.md ............ basic project docs
+      rollup.config.js ..... the rollup bundler configuration see: "Setup Svelte Comp Packaging"
+      src/ ................. the library source code
+      TOOLING.md ........... this document :-)
   ```
-
 
 **Install Template**:
 
-Make a copy of the [Svelte Template Repo](https://github.com/sveltejs/template)
-using [degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool that copies git repositories)_
-
-_Original Instructions_:
-- [Getting started with Svelte](https://svelte.dev/blog/the-easiest-way-to-get-started#2_Use_degit)
-  _(from the Svelte site - the horses mouth)_
-- [Getting Started with Svelte 3](https://www.digitalocean.com/community/tutorials/getting-started-with-svelte-3)
-  _(pretty much same instructions)_
-- [Svelte Template Repo](https://github.com/sveltejs/template)
+Make a copy of the [sveltejs/component-template] using
+[degit](https://github.com/Rich-Harris/degit) _(a Rich Harris tool
+that copies git repositories)_
 
 
 ```
 - Summary Instructions:
-  $ cd c:/dev
-  $ npx degit sveltejs/template svelte-native-forms
-  $ cd svelte-native-forms
-  $ npm install
-  $ npm run dev
 
-  * Update package.json with any additional fields you may desire
-    (description, homepage, repository, keywords, license, etc.)
+  $ cd c:/dev/svelte-native-forms/
+  $ npx degit sveltejs/component-template snf
+  $ cd c:/dev/svelte-native-forms/snf
 
-  * Move sirv-cli FROM: dependencies TO: devDependencies (in package.json)
-    ... unsure why template registers this as dependencies
-
-- Summary of npm scripts:
-
-                     >>> renamed FROM: dev
-  * app:devServe ... launch dev server, with continuous build (watching for code changes)
-                     http://localhost:5000/
-                     NOTE: the internals of this script:
-                           1. invokes the rollup bundler in a "watch" state (to: public/build)
-                           2. implicitly invokes "npm start" to launch the server
-
-  * start .......... start a static file server from the contents of public/
-                     http://localhost:5000/
-                     NOTE: This is implicitly invoked from app:devServe script
-                           As a result, it CANNOT be renamed :-(
-                     NOTE: You can invoke this explicitly to server the contents of
-                           a production build (i.e. app:prodBuild)
-
-  * app:deploy ..... deploy latest application to https://svelte-native-forms.js.org/app/
-                     NOTE: This script FIRST builds the app from scratch
-                           ... via preapp:deploy
-
-                     >>> renamed FROM: build
-  * app:prodBuild .. build production bundle (to: public/build)
-                     NOTE: This is implicitly invoked from app:deploy
-
-  * app:clean ...... AI: ?? clean the machine-generated public/build directory
-```
-
-**Install gh-pages**:
-
-**NOTE**: Some of these dependencies overlap with other setup (Install
-only what is missing):
-
-All deployment scripts use the `gh-pages` utility, that simplifies publishing resources
-to [GitHub Pages].  Install as follows:
-
-```
-$ npm install --save-dev gh-pages
-```
-
-**Relative App Resources**
-
-Because our app is deployed to a sub-directory of github pages, all
-startup html resource references should be relative.  Simply change
-`public/index.html` as follows:
-
-```diff
-public/index.html
-=================
--   <link rel='icon' type='/image/png' href='/favicon.png'>
-+   <link rel='icon' type='/image/png' href='favicon.png'>
-
--   <link rel='stylesheet' href='/global.css'>
-+   <link rel='stylesheet' href='global.css'>
-
--   <link rel='stylesheet' href='/build/bundle.css'>
-+   <link rel='stylesheet' href='build/bundle.css'>
-
--   <script defer src='/build/bundle.js'></script>
-+   <script defer src='build/bundle.js'></script>
-```
-
-**Add `app:deploy` Script**
-
-Add the following scripts to `package.json`:
-
-```
-package.json
-============
-{
-  ...
-  "scripts": {
-    "preapp:deploy": "npm run app:prodBuild",
-    "app:deploy": "gh-pages --dist public --dest app",
-    ... snip snip
-  }  
-}
-```
-
-
-_My personal Detailed Notes are "hidden" (in comment form) in this doc ..._
-
-<!--- Comment out KJB Notes
-**Details**:
-```
-- create a new project
-  $ cd c:/dev
-  # copy template to your project root
-  $ npx degit sveltejs/template svelte-native-forms
-
-- setup the new project
-  $ cd svelte-native-forms
-  * edit package.json
+  * update package.json fields (from outer project):
+    package.json
+    ============
     "name": "svelte-native-forms",
     "version": "0.1.0",
+    "description": "minimalist form validation with powerful results",
+    "homepage": "https://svelte-native-forms.js.org/",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/KevinAst/svelte-native-forms.git"
+    },
+    "bugs": {
+      "url": "https://github.com/KevinAst/svelte-native-forms/issues"
+    },
+    "keywords": [
+      "svelte-native-forms",
+      "svelte",
+      "form",
+      "validation",
+      "utility",
+      "geeku",
+      "astx"
+    ],
+    "author": "Kevin J. Bridges <kevin@wiiBridges.com> (https://github.com/KevinAst)",
+    "license": "MIT",
+
+  * supplement additional "files" package.json
+    "files": [
+      "package.json",  <<< NEW
+      "LICENSE.md",    <<< NEW ALSO ADD THE LICENSE.md
+      "README.md",     <<< NEW
+      "src",
+      "dist"
+    ],
+
   $ npm install
-    added 74 packages from 130 contributors and audited 104 packages in 4.591s
+    added 22 packages from 58 contributors and audited 23 packages in 2.612s
 
-    KJB NOTE: Svelte is the latest V3 (specified in template pkg: "svelte": "^3.0.0")
-              Installed Svelte IS: 3.20.1
+  * add package-lock.json to .gitignore
+    .gitignore
+    ==========
+    # not really interested in package-lock.json in repo
+    /package-lock.json
 
-- configure static resources
-  * public/index.html
-    - change Title: svelte-native-forms
-    - change resource resolution FROM absolute TO relative, making it deployable in a relative directory
-  * change the public/favicon.png to be svelte-native-forms specific
-    - define the various svelte-native-forms icons
-      public/
-        svelte-native-forms.png            ... our favicon
-        svelte-native-forms-logo.png       ... our logo
-        svelte-native-forms-logo-eyes.jpg  ... prying eyes
-    - update index.html
-      * reference svelte-native-forms.png
-    - delete template favicon.png
+  * replace README with our own
+    README.md
+    =========
+    # svelte-native-forms
+    *... minimalist form validation with powerful results*
+    TODO: eventually a copy of outer project README (once our formal docs are fully up and running)
 
-- configure VSCode
-  * setup VSCode workspace file (and edit):
-    c:/dev/svelte-native-forms.code-workspace 
-  * launch this workspace
-  * ONE TIME: NOW load the VSCode "svelte" extension
+  * populate utility src (from seed project):
+    - c:/dev/svelte-native-forms/snf/src
 
-- run the dev app
-  $ npm run dev
-  > NAVIGATE TO http://localhost:5000/
+  * test build script
+    $ npm run build
+    - created:
+      dist/
+        index.js
+        index.mjs
 
-- you can now change code, and it is rebuilt
-
-- ONE TIME: setup Svelte Dev Tools
-  * install from chrome web store
-  * KJB: has some visibility of props and state within the DOM
-         * doesn't appear to have var names associated with each (they are like array indices ... hmmmm)
-
-- FOR PRODUCTION BUILDS
-  # build optimized lib
-  $ npm run build
-    ... creates:
-        public/
-          build/ <<< creates this new
-            bundle.css
-            bundle.css.map
-            bundle.js
-            bundle.js.map
-  # can now run this production build
-    ... uses sirv that includes your dependencies ... hmmm 
-  $ npm run start
 ```
-KJB Notes --->
 
+**NOTE**: You can now deploy **svelte-native-forms** using standard
+npm command _(see outer TOOLING [Deploy Project] for details)_:
 
+```
+$ npm publish
+  + svelte-native-forms@v.v.v
+```
 
 
 <!--- *** LINKS ***************************************************************** --->
@@ -324,5 +284,7 @@ KJB Notes --->
 
 
 [Two Projects in One]:            ../TOOLING.md#two-projects-in-one
+[Deploy Project]:                 ../TOOLING.md#deploy-project
 [npm]:                            https://www.npmjs.com/
+[sveltejs/template]:              https://github.com/sveltejs/template
 [sveltejs/component-template]:    https://github.com/sveltejs/component-template
