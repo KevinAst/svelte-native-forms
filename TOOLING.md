@@ -148,6 +148,7 @@ referencing when/where they were introduced/configured.
 
 Dependency                        | Type        | Usage                   | Refer To
 --------------------------------- | ----------- | ----------------------- | ----------------
+`@rollup/plugin-alias`            | **TOOLING** | Absolute Imports        | [Setup Absolute Imports]
 `@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `autoprefixer`                    | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
@@ -162,13 +163,6 @@ Dependency                        | Type        | Usage                   | Refe
 `svelte-preprocess`               | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
 `tailwindcss`                     | **TOOLING**<br>**APP**   | Tailwind CSS Build<br>and application code  | [Setup Tailwind CSS]<br>and app code: `src/...`
 `tw-themes`                       | **TOOLING**<br>**APP**   | Tailwind Themes   <br>and application code  | [Setup tw-themes]   <br>and app code: `src/...`
-
-
-**OLD TEMPLATE:** ?? synced above (remove when complete)
-
-Dependency                        | Type        | Usage                   | Refer To
---------------------------------- | ----------- | ----------------------- | ----------------
-`@rollup/plugin-alias`            | **TOOLING** | Absolute Imports        | [Setup Absolute Imports]
 
 
 <!--- *** SECTION *************************************************************** --->
@@ -890,15 +884,20 @@ At the end of this process you should have:
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Absolute Imports
 
-TODO: ?? update this when we start using it
+We setup a 'svelte-native-forms' absolute import to make it appear
+that our demo code is importing the installed package, even though it
+is aliased to this code base.
 
-**NOTE**: Due to a bug in the [alias rollup
-plugin](https://www.npmjs.com/package/@rollup/plugin-alias), resulting
-in duplicate JS class definitions, we are currently **NOT** using
-Absolute Imports _(details
-[here](https://github.com/rollup/plugins/issues/296)
-and
-[here](https://stackoverflow.com/questions/61756633/svelte-compiler-generating-multiple-javascript-class-definitions))_
+**NOTE**: There is a know bug in the [alias rollup
+plugin](https://www.npmjs.com/package/@rollup/plugin-alias), detailed
+[here](https://github.com/rollup/plugins/issues/296) and
+[here](https://stackoverflow.com/questions/61756633/svelte-compiler-generating-multiple-javascript-class-definitions).
+This bug is only relevant when you use a mix of both absolute and
+relative imports on a module that maintains state.  When this happens
+there are two modules, and their state is duplicated :-( Currently, we
+restrict the usage of absolute imports to the simulated
+'svelte-native-forms' package.  Please be aware of this known bug,
+should you choose to expand the usage of absolute imports.
 
 To alleviate the pain of relative path imports (for example):
 
@@ -957,8 +956,8 @@ At the end of this process you should have:
 - Install required dependencies (@rollup/plugin-alias):
   ```
   $ npm install --save-dev @rollup/plugin-alias
-    + @rollup/plugin-alias@3.1.0
-      added 1 package from 1 contributor and audited 266253 packages in 7.754s
+    + @rollup/plugin-alias@3.1.2
+      added 2 packages from 2 contributors and audited 206 packages in 1.963s
   ```
 
 - Configure `rollup.config.js` _(in support of **Absolute Imports**)_
@@ -976,11 +975,11 @@ At the end of this process you should have:
         // KJB: Absolute Imports
         alias({
           entries: [
-            // allow:      import TreeView  from "~/util/comp/TreeView.svelte";
-            // instead of: import TreeView  from "../../../../util/comp/TreeView.svelte";
-            { find: '~', replacement: 'src' },
+            // allow:      import {formChecker}  from "svelte-native-forms";
+            // instead of: import {formChecker}  from "../../snf/src";
+            { find: 'svelte-native-forms', replacement: 'snf/src/index.js' },
           ]
-        }),
+        })
       ]
     };
     ```
