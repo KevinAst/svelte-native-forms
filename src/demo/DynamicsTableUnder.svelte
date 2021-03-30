@@ -68,7 +68,7 @@
   <p>
     <button>Add</button>
     <button on:click|preventDefault={formController.reset}>Reset</button>
-    <p>
+  </p>
 
 </form>
 
