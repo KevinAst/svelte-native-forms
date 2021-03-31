@@ -23,15 +23,14 @@
       on:form-controller={retainController}>
 
   <!-- PkgEntryType -->
-  <label>
-    Type:
-    {#each pkgEntryTypes as t}
-    <label class="radio">
-      <input type="radio" value={t} bind:group={pkgEntryType}>
-      {t}
-    </label>
-    {/each}
+  <b>Type:</b>
+  {#each pkgEntryTypes as t}
+  <label class="radio">
+    <input type="radio" value={t} bind:group={pkgEntryType}>
+    {t}
   </label>
+  {/each}
+  
 
   <table> <!-- table provides nicely aligned labels -->
     <!-- Name -->
