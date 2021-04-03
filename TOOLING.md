@@ -42,6 +42,7 @@ unmodified)_!
   - [Setup Tailwind CSS]
   - [Setup tw-themes]
   - [Setup Absolute Imports]
+  - [Setup Code Samples]
   - [Setup Docs Tooling]
   - [Setup js.org sub-domain]
 - [Deploy Project]
@@ -59,9 +60,6 @@ DEVELOPMENT
 APP:
 app:devServe ... launch dev server, with continuous build (watching for code changes)
                  http://localhost:5000/
-                 NOTE: the internals of this script:
-                       1. invokes the rollup bundler in a "watch" state (to: public/build)
-                       2. implicitly invokes "npm start" to launch the server
 
 DOCS:
 docs:build   ... AI: ?? manually build the docs (into the _book/ dir)
@@ -73,13 +71,21 @@ APP
 ===
 app:devServe ... launch dev server, with continuous build (watching for code changes)
                  http://localhost:5000/
+
+                 INTERNAL SCRIPT:
+devServe ....... launch dev server, with continuous build (watching for code changes)
+                 http://localhost:5000/
                  NOTE: the internals of this script:
                        1. invokes the rollup bundler in a "watch" state (to: public/build)
                        2. implicitly invokes "npm start" to launch the server
 
+                 INTERNAL SCRIPT:
+devSyncDemoCode. auto-sync public/demoCode/ during development (i.e. **watch**)
+                 
+                 INTERNAL SCRIPT:
 start .......... start a static file server from the contents of public/
                  http://localhost:5000/
-                 NOTE: This is implicitly invoked from app:devServe script
+                 NOTE: This is implicitly invoked from devServe script
                        As a result, it CANNOT be renamed :-(
                  NOTE: You can invoke this explicitly to server the contents of
                        a production build (i.e. app:prodBuild)
@@ -152,7 +158,9 @@ Dependency                        | Type        | Usage                   | Refe
 `@rollup/plugin-commonjs`         | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `@rollup/plugin-node-resolve`     | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `autoprefixer`                    | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
+`cpx`                             | **TOOLING** | Display Source Code     | [Setup Code Samples]
 `gh-pages`                        | **TOOLING** | Deployment              | [Setup Svelte App Tooling]
+`npm-run-all`                     | **TOOLING** | Display Source Code     | [Setup Code Samples]
 `rollup`                          | **TOOLING** | Svelte Bundler          | [Setup Svelte App Tooling]
 `rollup-plugin-css-only`          | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `rollup-plugin-livereload`        | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
@@ -160,6 +168,7 @@ Dependency                        | Type        | Usage                   | Refe
 `rollup-plugin-terser`            | **TOOLING** | Svelte Bundler related  | [Setup Svelte App Tooling]
 `sirv-cli`                        | **TOOLING** | A static file server    | [Setup Svelte App Tooling]
 `svelte`                          | **TOOLING** | Svelte Compiler         | [Setup Svelte App Tooling]
+`svelte-highlight`                | **TOOLING**<br>**APP**   | Display Source Code<br>in application  | [Setup Code Samples]<br>and `src/util/ui/ShowCode.svelte`
 `svelte-preprocess`               | **TOOLING** | Tailwind CSS Build      | [Setup Tailwind CSS]
 `tailwindcss`                     | **TOOLING**<br>**APP**   | Tailwind CSS Build<br>and application code  | [Setup Tailwind CSS]<br>and app code: `src/...`
 `tw-themes`                       | **TOOLING**<br>**APP**   | Tailwind Themes   <br>and application code  | [Setup tw-themes]   <br>and app code: `src/...`
@@ -220,6 +229,7 @@ were carried out, however in some cases the order can be changed.
   - [Setup Tailwind CSS]
   - [Setup tw-themes]
   - [Setup Absolute Imports]
+  - [Setup Code Samples]
   - [Setup Docs Tooling]
   - [Setup js.org sub-domain]
 
@@ -984,6 +994,93 @@ At the end of this process you should have:
     };
     ```
 
+
+<!--- *** SUB-SECTION *************************************************************** --->
+# Setup Code Samples
+
+The **svelte-native-forms** demo app can display the source code for
+each demo.  This is accomplished by staging the demo source to a
+run-time resource (FROM: [`src/demo/`](src/demo/) TO:
+`public/demoCode/`) and retrieving it at run-time for display.  The
+display is accomplished through our internal
+[`<ShowCode>`](src/util/ui/ShowCode.svelte) component, which employs
+the [svelte-highlight] npm component library, which in turn is layered
+on top of the [highlight.js] package.
+
+**Requirements**:
+
+- auto-sync of `public/demoCode/` during development _(i.e. **watch**)_
+- syntax highlight of code
+- link to code in github -and/or- copy paste
+- AI: yellow-highlighter of selected code snippets _(punted on this
+  one for now)_
+
+**Syntax Highlighters Research**:
+
+- [svelte-highlight] _(what we are using - "path of least resistance")_
+- [highlight.js] _(used by [svelte-highlight])_
+- [Prism] _(very popular, but took the "path of least resistance")_
+
+At the end of this process you will have:
+
+- The ability to display the source code for each demo
+
+- Impacted Dependencies:
+  ```
+  svelte-highlight
+  npm-run-all
+  cpx
+  ```
+
+- Impacted Files:
+  ```
+  svelte-native-forms/
+    .gitignore
+    package.json
+  ```
+
+**Install Summary**:
+
+- Install Dependencies:
+
+  ```
+  $ npm install --save-dev svelte-highlight
+    + svelte-highlight@0.7.1
+      added 8 packages from 314 contributors and audited 214 packages in 4.923s
+  $ npm install --save-dev npm-run-all
+    + npm-run-all@4.1.5
+      added 53 packages from 33 contributors and audited 457 packages in 6.339s
+  $ npm install --save-dev cpx
+    + cpx@1.5.0
+      added 189 packages from 114 contributors and audited 404 packages in 9.751s
+  ```
+
+- Modify the NPM Scripts in `package.json` as follows:
+
+  ```
+  package.json
+  ============
+  {
+    ...
+    "scripts": {
+      "devServe": "rollup -c -w",
+      "devSyncDemoCode": "cpx src/demo/**/*.svelte public/demoCode/ --clean --verbose --watch",
+      "app:devServe": "npm-run-all --parallel devSyncDemoCode devServe",
+      "preapp:prodBuild": "cpx src/demo/**/*.svelte public/demoCode/ --clean --verbose",
+      ... snip snip
+    }  
+  }
+  ```
+
+- Add following to `.gitignore`:
+
+  ```
+  .gitignore
+  ==========
+  /public/demoCode/
+
+
+
 <!--- *** SUB-SECTION *************************************************************** --->
 # Setup Docs Tooling
 
@@ -1287,6 +1384,7 @@ This section documents the steps to setup a new **feature branch**
   [Setup Tailwind CSS]:           #setup-tailwind-css
   [Setup tw-themes]:              #setup-tw-themes
   [Setup Absolute Imports]:       #setup-absolute-imports
+  [Setup Code Samples]:           #setup-code-samples
   [Setup Docs Tooling]:           #setup-docs-tooling
   [Setup js.org sub-domain]:      #setup-jsorg-sub-domain
 [Deploy Project]:                 #deploy-project
@@ -1300,3 +1398,6 @@ This section documents the steps to setup a new **feature branch**
 [sveltejs/component-template]:    https://github.com/sveltejs/component-template
 [Tailwind CSS]:                   https://tailwindcss.com/
 [tw-themes]:                      https://tw-themes.js.org/
+[highlight.js]:                   https://www.npmjs.com/package/highlight.js
+[svelte-highlight]:               https://www.npmjs.com/package/svelte-highlight
+[Prism]:                          https://prismjs.com/

@@ -1,11 +1,15 @@
 <script>
  import DynamicsTableUnder from '../demo/DynamicsTableUnder.svelte'; // ?? pretend we are hooked into our selector
  let Demo = DynamicsTableUnder;
+ import ShowCode from '../util/ui/ShowCode.svelte'; // ?? temp test
 </script>
 
 <!-- AppMain (with independent scroll bars ... promoting our active <Demo/> -->
 <div id="DemoContainer" class="flex-1 overflow-x-auto overflow-y-auto p-3 bg-backdrop text-onLight">
+  <!-- ?? temp
   <svelte:component this={Demo}/>
+  -->
+  <ShowCode/>
 </div>
 
 <style>
