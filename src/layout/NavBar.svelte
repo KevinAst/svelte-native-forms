@@ -11,20 +11,9 @@
  import Menu                   from '../util/ui/Menu.svelte';
  import MenuItem               from '../util/ui/MenuItem.svelte';
  import Separator              from '../util/ui/Separator.svelte';
- import * as demo              from '../Demo.svelte';
-
- let isShowingCode = demo.isShowingCode();
- function showCode() {
-   isShowingCode = true;
-   demo.showCode();
- }
- function showDemo() {
-   isShowingCode = false;
-   demo.showDemo();
- }
+ import {demo}                 from '../Demo.svelte';
 
  let settingsMenu;
-
 </script>
 
 <!-- NavBar
@@ -63,18 +52,18 @@
       <div class="ml-4 flex-shrink-0 flex items-center">
 
         <!-- code/demo toggle -->
-        <span class="{isShowingCode ? 'bg-primary text-onDark' : 'text-onLight'}
+        <span class="{$demo.isShowingCode ? 'bg-primary text-onDark' : 'text-onLight'}
                      HOVER  hover:bg-primary hover:text-onDark
                      CURSOR select-none cursor-pointer
                      OTHER  px-3 py-2 rounded-md text-sm font-medium"
-              on:click={showCode}>
+              on:click={demo.showCode}>
           Code
         </span>
-        <span class="{!isShowingCode ? 'bg-primary text-onDark' : 'text-onLight'}
+        <span class="{$demo.isShowingDemo ? 'bg-primary text-onDark' : 'text-onLight'}
                      HOVER  hover:bg-primary hover:text-onDark
                      CURSOR select-none cursor-pointer
                      OTHER  px-3 py-2 rounded-md text-sm font-medium"
-              on:click={showDemo}>
+              on:click={demo.showDemo}>
           Demo
         </span>
 
