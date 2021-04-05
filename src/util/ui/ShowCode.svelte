@@ -17,8 +17,8 @@
    .replaceAll(/padding:.*;/g,     ''); // our app controls all padding
  // console.log(`XX codeTheme: ${codeTheme}`);
 
- // INPUT ?? accept this as component INPUT
- const moduleName = 'DynamicsTableUnder.svelte'; //? 'Basics.svelte'; //? 'DynamicsTableUnder.svelte'
+ // INPUT: the code module to display
+ export let moduleName; // ... EX: 'Basics.svelte', 'DynamicsTableUnder.svelte', etc.
 </script>
 
 <svelte:head>
