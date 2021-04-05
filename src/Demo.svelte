@@ -1,26 +1,63 @@
+<script context="module">
+ // our DEFAULT state/behavior, before <Demo> is mounted
+ // ... needed to avoid race condition (used before component is mounted)
+ let show_D = 'demo';
+ export const demoAPI_D = {
+   isShowingCode: () => show_D==='code',
+   isShowingDemo: () => show_D==='demo',
+   showCode:      () => show_D = 'code',
+   showDemo:      () => show_D = 'demo',
+ };
+ const resolveDemoAPI = () => _demoAPI || demoAPI_D;
+
+ // our singleton binding to our component instance
+ let _demoAPI;
+ export const isShowingCode = () => resolveDemoAPI().isShowingCode();
+ export const isShowingDemo = () => resolveDemoAPI().isShowingDemo();
+ export const showCode      = () => resolveDemoAPI().showCode();
+ export const showDemo      = () => resolveDemoAPI().showDemo();
+</script>
+
 <script>
- import DynamicsTableUnder from './demo/DynamicsTableUnder.svelte'; // ?? temp import simulating selector hook
+ import DynamicsTableUnder from './demo/DynamicsTableUnder.svelte'; // ?? temp: see "pretend" note (below)
  import ShowCode           from './util/ui/ShowCode.svelte';
+ import {fade}             from 'svelte/transition';
+ import {onMount}          from 'svelte';
 
  const demoComp = DynamicsTableUnder;          // ?? pretend we are hooked into our selector
  const demoCode = 'DynamicsTableUnder.svelte'; // ?? ditto
 
- let show = 'demo'; // reflexive state for what to display 'code'/'demo'
+ let show = show_D; // reflexive state for what to display 'code'/'demo'
  // our public API:
- export const demo = {
+ export const demoAPI = {
    isShowingCode: () => show==='code',
    isShowingDemo: () => show==='demo',
-   showCode: () => show = 'code',
-   showDemo: () => show = 'demo',
+   showCode:      () => show = 'code',
+   showDemo:      () => show = 'demo',
  };
+
+ // maintain our singleton binding to our public API (when <Demo> is mounted)
+ onMount(() => {
+   // retain our external binding
+   _demoAPI = demoAPI;
+
+   // return function to invoke when unmounted
+	 return () => _demoAPI = null;
+ });
 </script>
 
 <!-- our active Demo -->
 <div id="DemoContainer">
   {#if show === 'demo'}
-    <svelte:component this={demoComp}/>
+    <div in:fade={{delay: 400, duration: 200}}
+         out:fade={{duration: 400}}>
+      <svelte:component this={demoComp}/>
+    </div>
   {:else}
-    <ShowCode moduleName={demoCode}/>
+    <div in:fade={{delay: 400, duration: 200}}
+         out:fade={{duration: 400}}>
+      <ShowCode moduleName={demoCode}/>
+    </div>
   {/if}
 </div>
 
