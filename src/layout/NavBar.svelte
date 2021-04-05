@@ -23,7 +23,7 @@
    demo.showDemo();
  }
 
- let userMenu;
+ let settingsMenu;
 
 </script>
 
@@ -42,6 +42,7 @@
     <!-- Left Section of NavBar -->
     <div class="flex">
       <div class="ml-1 flex items-center space-x-2">
+        <!-- SideBar Toggle -->
         <Icon name="menu"
               title="Toggle SideBar"
               class="PRIMARY-COLOR text-primary
@@ -49,26 +50,11 @@
                      CURSOR        select-none cursor-pointer"
               on:click={sideBar.toggle}/>
 
-        <!-- Selected Sample -->
-        <span class="SELECTED-COLOR  bg-primary text-onDark
-                     CURSOR          select-none cursor-pointer
-                     OTHER           px-3 py-2 rounded-md text-sm font-medium">
-          Dashboard
+        <!-- App Title -->
+        <span class="ml-4 text-onLight font-bold italic select-none">
+          svelte-native-forms
         </span>
 
-        <!-- Non-Selected Samples -->
-        <span class="NON-SELECTED-COLOR text-onLight
-                     HOVER              hover:bg-primary hover:text-onDark
-                     CURSOR          select-none cursor-pointer
-                     OTHER              px-3 py-2 rounded-md text-sm font-medium">
-          Team
-        </span>
-        <span class="NON-SELECTED-COLOR text-onLight
-                     HOVER              hover:bg-primary hover:text-onDark
-                     CURSOR             select-none cursor-pointer
-                     OTHER              px-3 py-2 rounded-md text-sm font-medium">
-          Projects
-        </span>
       </div>
     </div>  <!-- end of ... Left Section of NavBar -->
 
@@ -92,19 +78,19 @@
           Demo
         </span>
 
-        <!-- User dropdown -->
+        <!-- Settings dropdown -->
         <div class="ml-3 relative">
           <button class="bg-secondary
                          flex text-sm rounded-full
                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-secondaryDark focus:ring-secondaryLight"
-                  on:click={userMenu.openMenu}>
-            <Icon name="person"
+                  on:click={settingsMenu.openMenu}>
+            <Icon name="settings"
                   class="PRIMARY-COLOR text-primary
                          HOVER-COLOR   hover:text-primaryDark
                          CURSOR        select-none cursor-pointer"/>
           </button>
-          <Menu bind:this={userMenu}>
-            <MenuItem on:click={() => alert('Coming Soon: User Info')}>User Info</MenuItem>
+          <Menu bind:this={settingsMenu}>
+            <MenuItem on:click={() => alert('Coming Soon: Documentation')}>Documentation</MenuItem>
             <Separator title="Themes"/>
             <MenuItem on:click={(e) => e.stopPropagation()}><ThemeSelector/></MenuItem>
             <MenuItem on:click={(e) => e.stopPropagation()}><ThemeInversionSelector/></MenuItem>
