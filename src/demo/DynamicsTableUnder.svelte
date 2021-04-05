@@ -100,4 +100,3 @@
    margin: 0px; /* "joins" error msg right below the cooresponding input */
  }
 </style>
-
