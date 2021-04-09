@@ -18,6 +18,7 @@
 import check           from './check';
 import {isString,
         isBoolean,
+        isFunction,
         isPlainObject} from './typeCheck';
 import noOp            from './noOp';
 import {encode,
@@ -156,8 +157,8 @@ const _handlers = {
 // monitor Device Storage changes (driving the firing of our registered handlers)
 window.addEventListener("storage", (e) => {
   const key    = e.key
-  const oldVal = e.oldValue;
-  const newVal = e.newValue;
+  const oldVal = decode(e.oldValue);
+  const newVal = decode(e.newValue);
 
   // interact with our registered handlers
   // console.log(`XX Device Storage Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
