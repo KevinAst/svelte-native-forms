@@ -48,16 +48,17 @@
 
    ------------------------------------------------------------------------------ */
 
-import check                from './check';
+import check           from './check';
 import {isString,
         isBoolean,
         isPlainObject,
-        isFunction}         from './typeCheck';
+        isFunction}    from './typeCheck';
 import {getSiteHashItem,
         updateSiteHashItem,
         registerSiteHashItemChangeHandler} from './siteHashStorage';
 import {fetchItem,
-        storeItem}          from './deviceStorage';
+        storeItem,
+        registerDeviceStorageItemChangeHandler} from './deviceStorage';
 
 /**
  * Return the entry retained in our App State (if any).
@@ -146,4 +147,15 @@ export function registerAppStateChangeHandler(key, handler) {
   // register the handler
   // ... simply pass through to the URL site hash registration
   registerSiteHashItemChangeHandler(key, handler);
+  // ... for fun sync Local Device Storage, to see changes cross-window
+  //     NOTE: We don't really want to do this:
+  //           IT IS PROBLEMATIC for the following reason:
+  //           - By doing this at the appStateRetention level,
+  //             it doesn't distinguish between changes of:
+  //               * "Site Hash Storage"
+  //               * "Local Device Storage"
+  //             IN OTHER WORDS: a change to Device Storage 
+  //             is globally propagated to ALL window instances
+  //           With that said: It's kinda fun to see the cross-communication between windows
+  // registerDeviceStorageItemChangeHandler(key, handler);
 }
