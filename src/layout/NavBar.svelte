@@ -52,14 +52,14 @@
       <div class="ml-4 flex-shrink-0 flex items-center">
 
         <!-- code/demo toggle -->
-        <span class="{$demo.isShowingCode ? 'bg-primary text-onDark' : 'text-onLight'}
+        <span class="{$demo.isShowingCode() ? 'bg-primary text-onDark' : 'text-onLight'}
                      HOVER  hover:bg-primary hover:text-onDark
                      CURSOR select-none cursor-pointer
                      OTHER  px-3 py-2 rounded-md text-sm font-medium"
               on:click={demo.showCode}>
           Code
         </span>
-        <span class="{$demo.isShowingDemo ? 'bg-primary text-onDark' : 'text-onLight'}
+        <span class="{$demo.isShowingDemo() ? 'bg-primary text-onDark' : 'text-onLight'}
                      HOVER  hover:bg-primary hover:text-onDark
                      CURSOR select-none cursor-pointer
                      OTHER  px-3 py-2 rounded-md text-sm font-medium"

@@ -1,24 +1,61 @@
 <script context="module">
  import {writable} from 'svelte/store';
+ import {getAppStateItem,
+         setAppStateItem, 
+         registerAppStateChangeHandler}  from './util/appStateRetention';
 
  // PUBLIC API is provided through a "module scoped" custom store
  // - this is possible because <Demo> is a "singleton" component ... only one instance is allowed
- // - demo Custom Store:
+ // - demo Custom Store (see "export" below):
  //   * Store API:
  //     + showCode(): void
  //     + showDemo(): void
  //   * Store Value:
  //     {
- //       isShowingCode: boolean, // true: code is visible, false: demo is visible
- //       isShowingDemo: boolean, // true: demo is visible, false: code is visible
+ //       show: 'demo'/'code'
+ //       isShowingCode(): boolean, // true: when code is visible
+ //       isShowingDemo(): boolean, // true: when demo is visible
  //     }
- const {subscribe, set, update} = writable({isShowingCode: false, isShowingDemo: true});
+
+ // INTERNAL constants
+ const CODE = 'code';
+ const DEMO = 'demo'; // our fallback default
+ const showKey  = 'show';
+
+ // our initial state comes from the persistent appStateRetention
+ // ... with a fallback of 'demo'
+ const initialState = getAppStateItem(showKey) || DEMO;
+
+ // methods held in our store value
+ // ... NOTE: BY reasoning over non-default (i.e. 'code'),
+ //           we DEFAULT all unknown values to the desired 'demo' fallback
+ function isShowingCode() { return this.show === CODE ? true : false; }
+ function isShowingDemo() { return this.show !== CODE ? true : false; }
+
+ // INTERNAL helper to set our store state
+ function setState(show) {
+   // retain local state in our store value
+   set({show, isShowingCode, isShowingDemo});
+   // sync state change in our appStateRetention
+   setAppStateItem(showKey, show);
+ }
+
+ // our reflexive store :-)
+ const {subscribe, set, update} = writable({show: initialState, isShowingCode, isShowingDemo});
  export const demo = { // our custom store (the <Demo> PUBLIC API)
    subscribe,
-   showCode: () => set({isShowingCode: true,  isShowingDemo: false}),
-   showDemo: () => set({isShowingCode: false, isShowingDemo: true}),
+   showCode: () => setState(CODE),
+   showDemo: () => setState(DEMO),
  };
+
+ // sync changes FROM: appStateRetention TO: our local state
+ // ... this can change "externally" by the user via the URL Site Hash
+ registerAppStateChangeHandler(showKey, ({newVal}) => {
+   // console.log(`XX AppStateChangeHandler for demo store (key: '${showKey}'): syncing to '${newVal}'`);
+   setState(newVal);
+ });
 </script>
+
 
 <script>
  import DynamicsTableUnder from './demo/DynamicsTableUnder.svelte'; // ?? temp: see "pretend" note (below)
@@ -31,7 +68,7 @@
 
 <!-- our active Demo -->
 <div id="DemoContainer">
-  {#if $demo.isShowingDemo}
+  {#if $demo.isShowingDemo()}
     <div in:fade={{delay: 400, duration: 200}}
          out:fade={{duration: 400}}>
       <svelte:component this={demoComp}/>
