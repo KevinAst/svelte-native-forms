@@ -77,13 +77,15 @@ export function encode(ref, safeguard=false) {
  */
 export function decode(ref) {
 
-  // validate our parameters
-  const checkParam = check.prefix('decode(ref) parameter violation: ');
-
-  // ... ref
-  checkParam(ref, 'ref is required');
+  // RECENT RELAXATION: allow `undefined` to simply pass-through
+  // // validate our parameters
+  // const checkParam = check.prefix('decode(ref) parameter violation: ');
+  // 
+  // // ... ref
+  // checkParam(ref, 'ref is required');
 
   // simply pass-through any non-string ref
+  // ... this includes things like `undefined`
   if (!isString(ref)) {
     return ref;
   }
