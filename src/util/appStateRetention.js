@@ -10,20 +10,20 @@
          hash value in the URL (for that state key)
        - Device storage is used in all other cases
    - REGARDING local app state:
-     * app startup should initialize it's local app state from the retained state
-       via `getAppStateItem(key)`, with it's own fallback default (when NOT retained)
-     * local app state is maintained in app logic as normal, 
-       however in addition to this:
-       - local app state changes should be retained via `setAppStateItem(key, val)`
-         * NOTE: this should be invoked UNCONDITIONALLY, 
-                 - regardless of whether the local-state changed or not
-                 - the reason for this is: when Local Device Storage is in-use
-                   the "master source" for this state is NOT the one app instance!
-                   it can come from multiple instances (in separate windows)
-       - in addition, handlers should be registered to react to changes to the retained state
-         * updating local app state appropriately
-         * this is accomplished via: `registerAppStateChangeHandler(key, handler)`
-         * this monitors Site Hash changes (because they can change by the user in the URL)
+     1. app startup should initialize it's local app state from the retained state
+        via `getAppStateItem(key)`, with it's own fallback default (when NOT retained)
+     2. local app state is maintained in app logic as normal,
+        HOWEVER in addition to this:
+        2a. local app state changes should be retained via `setAppStateItem(key, val)`
+            NOTE: this should be invoked UNCONDITIONALLY, 
+                  - regardless of whether the local-state changed or not
+                  - the reason for this is: when Local Device Storage is in-use
+                    the "master source" for this state is NOT the one app instance!
+                    it can come from multiple instances (in separate windows)
+        2b. in addition, handlers should be registered to react to changes to the retained state
+            - updating local app state appropriately
+            - this is accomplished via: `registerAppStateChangeHandler(key, handler)`
+            - this monitors Site Hash changes (they can change by the user in the URL)
 
  *** Site Hash Storage *** ... see: siteHashStorage.js
    - REPRESENTS a storage device that is retained in the URL (after the # hash)
@@ -38,7 +38,7 @@
        - user change hash in URL: event IS fired (INTERESTING: when JUST the URL hash changes it is NOT an app re-launch)
 
  *** Local Device Storage *** ... see: deviceStorage.js
-   - REPRESENTS a storage device that is global to the domain of the URL (a combination of protocol://host:port)
+   - REPRESENTS a storage device that is tied to the domain of the URL (a combination of protocol://host:port)
      ... in other words this storage is globally available to ALL windows of the same domain.
    - all access is programmatic, so the end-user cannot specify (as they can for the Site Hash URL)
    - REGARDING "storage" event:
@@ -47,9 +47,9 @@
        ... presumably the window that made the change is already aware of the change
        >>> by listening/reacting to this event, it has the effect of cross-communicating between windows
      * so the salient points of this event are:
-       - initial app launch:      NO event fired (so must programmatically pull value out)
+       - initial app launch:       NO event fired (so must programmatically pull value out)
        - programmatic hash change: event IS fired ONLY to external windows (for cross-communication between windows)
-       - iframe usage:            IDENTICAL (BASED ON THE iframe.src)
+       - iframe usage:             IDENTICAL (BASED ON THE iframe.src)
 
    ------------------------------------------------------------------------------ */
 
