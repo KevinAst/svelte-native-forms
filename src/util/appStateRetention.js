@@ -15,6 +15,11 @@
      * local app state is maintained in app logic as normal, 
        however in addition to this:
        - local app state changes should be retained via `setAppStateItem(key, val)`
+         * NOTE: this should be invoked UNCONDITIONALLY, 
+                 - regardless of whether the local-state changed or not
+                 - the reason for this is: when Local Device Storage is in-use
+                   the "master source" for this state is NOT the one app instance!
+                   it can come from multiple instances (in separate windows)
        - in addition, handlers should be registered to react to changes to the retained state
          * updating local app state appropriately
          * this is accomplished via: `registerAppStateChangeHandler(key, handler)`
@@ -149,13 +154,15 @@ export function registerAppStateChangeHandler(key, handler) {
   registerSiteHashItemChangeHandler(key, handler);
   // ... for fun sync Local Device Storage, to see changes cross-window
   //     NOTE: We don't really want to do this:
-  //           IT IS PROBLEMATIC for the following reason:
-  //           - By doing this at the appStateRetention level,
-  //             it doesn't distinguish between changes of:
-  //               * "Site Hash Storage"
-  //               * "Local Device Storage"
-  //             IN OTHER WORDS: a change to Device Storage 
-  //             is globally propagated to ALL window instances
-  //           With that said: It's kinda fun to see the cross-communication between windows
+  //           IT IS PROBLEMATIC for the following reasons:
+  //           1. By doing this at the appStateRetention level,
+  //              it doesn't distinguish between changes of:
+  //                * "Site Hash Storage"
+  //                * "Local Device Storage"
+  //              IN OTHER WORDS: a change to Device Storage 
+  //              is globally propagated to ALL window instances
+  //           2. it is possible to get in an infinite loop (thrashing between windows)
+  //              unsure about this, but I have seen it happen
+  //           With that said: it is really fun to see the cross-communication between windows
   // registerDeviceStorageItemChangeHandler(key, handler);
 }

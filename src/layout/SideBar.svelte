@@ -25,20 +25,64 @@
  //       OP3: combination of OP1/OP2
 
  import {writable} from 'svelte/store';
+ import {getAppStateItem,
+         setAppStateItem, 
+         registerAppStateChangeHandler}  from '../util/appStateRetention';
 
- // promote our sideBar PUBLIC API through this "module scoped" custom store
- const initialOpen  = true; // AI: adjust from app-specific retention (local storage, URL hash, etc.)
- const initialWidth = 250;  // AI: adjust from app-specific retention (local storage, URL hash, etc.)
- const {subscribe, set, update} = writable({
-   isOpen: initialOpen,
-   width:  initialWidth,
- });
+ // INTERNAL constants
+ const sideBarKey  = 'sidebar'; // ... syntax: open, closed, open-250, closed-250
+
+ // INTERNAL helper to emit an updated store state, either programmatically -OR- from changes in appStateRetention
+ function updateState({state={}, // the current store state (omit for initial setup)
+                       isOpen,   // a boolean that programmatically sets `isOpen` sub-state (omit when NOT impacting `isOpen` -OR- supplying stateStr)
+                       width,    // an int that programmatically sets `width` sub-state (omit when NOT impacting `width` -OR- supplying stateStr)
+                       stateStr}) { // a string that sets state from persistent appStateRetention handlers WITH highest precedence (omit when using the programatic params)
+
+   // maintain desired state setting, either from the current state -OR- programmatic params (when supplied)
+   isOpen = isOpen===undefined ? state.isOpen : isOpen;
+   width  = width===undefined  ? state.width  : width;
+
+   // apply the persistent stateStr (when supplied) ... TAKES PRECEDENCE
+   if (stateStr) {
+     const [part1, part2] = stateStr.split('-');
+     if (part1) {
+       // NOTE: BY reasoning over non-default (i.e. 'closed'),
+       //       we DEFAULT all unknown values to the desired 'open' fallback
+       isOpen = part1 === 'closed' ? false : true;
+     }
+     if (part2) {
+       width = parseInt(part2, 10);
+     }
+   }
+
+   // sync state change in our appStateRetention
+   setAppStateItem(sideBarKey, `${isOpen ? 'open' : 'closed'}-${width}`);
+
+   // return the state to be used by update (or the initial value)
+   return {isOpen, width};
+ }
+
+ //***
+ //*** promote our sideBar PUBLIC API through this "module scoped" custom store
+ //***
+
+ // our initial state comes from the persistent appStateRetention
+ // ... with a fallback of 'open-250'
+ const initialState = getAppStateItem(sideBarKey) || 'open-250';
+ const {subscribe, set, update} = writable( updateState({stateStr: initialState}) );
  export const sideBar = { // our custom store (which is the SideBar PUBLIC API)
    subscribe,
-   open:   () => update( (state) => ({...state, isOpen: true})  ),
-   close:  () => update( (state) => ({...state, isOpen: false}) ),
-   toggle: () => update( (state) => ({...state, isOpen: !state.isOpen}) ),
+   open:   () => update( (state) => updateState({state, isOpen: true}) ),
+   close:  () => update( (state) => updateState({state, isOpen: false}) ),
+   toggle: () => update( (state) => updateState({state, isOpen: !state.isOpen}) ),
  };
+
+ // sync changes FROM: appStateRetention TO: our local state
+ // ... this can optionally change "externally" by the user WHEN they employ the URL Site Hash
+ registerAppStateChangeHandler(sideBarKey, ({newVal}) => {
+   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarKey}'): syncing to '${newVal}'`);
+   update( (state) => updateState({state, stateStr: newVal}) );
+ });
 
  // AI: OVERKILL: insure SideBar has been instantiated (may be some timing issues here)
  // AI: OVERKILL: restrict multiple instances
@@ -85,7 +129,7 @@
      // console.log(`XX our SideBar width has changed!!!`, {newWidth_withScroll, newWidth_noScroll});
 
      // reflexively update our width change
-     update( (state) => ({...state, width: newWidth_withScroll}) );
+     update( (state) => updateState({state, width: newWidth_withScroll}) );
    });
    ro.observe(sideBarElm); // ... there is a second param that specifies which box model to adhear to (default: content-box)
 
