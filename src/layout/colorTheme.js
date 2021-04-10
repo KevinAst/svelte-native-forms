@@ -1,4 +1,7 @@
 import {initTwThemes} from 'tw-themes';
+import {getAppStateItem,
+        setAppStateItem, 
+        registerAppStateChangeHandler}  from '../util/appStateRetention';
 
 // our color schema ...
 const schema = [
@@ -71,8 +74,46 @@ const themes = {
 //*** Initialize tw-themes -and- promote the TwThemes object to our app
 //***
 
-const initialThemeName   = 'Warm'; // AI: ENHANCE TO pull from local storage
-const initialInvertShade = true;   //     ditto
+// INTERNAL constants
+const themeKey  = 'theme'; // appStateRetention key ... syntax: theme=Warm-dark
 
-const TwThemes = initTwThemes(schema, themes, initialThemeName, initialInvertShade);
+// INTERNAL helper to extract individual components of appStateRetention
+function parseAppState(appStateStr) {
+  const [themeName, darkMode] = appStateStr.split('-');
+  const shadeInversion = darkMode==='dark' ? true : false;
+  return {themeName, shadeInversion};
+}
+
+// our initial state comes from the persistent appStateRetention
+// ... with a fallback of 'Warm-light'
+const initialState = getAppStateItem(themeKey) || 'Warm-light';
+const {themeName, shadeInversion} = parseAppState(initialState);
+
+// initialize tw-themes -and- promote the TwThemes object to our app
+const TwThemes = initTwThemes(schema, themes, themeName, shadeInversion);
 export default TwThemes;
+
+// sync state change in our appStateRetention
+// ... by monkey patching all TwThemes methods THAT alter state
+['activateNextTheme',
+ 'activatePriorTheme',
+ 'activateTheme',
+ 'toggleInvertShade'].forEach( (methodName) => {
+   const original = TwThemes[methodName];
+   TwThemes[methodName] = function(...params) {
+     // invoke original method
+     const res = original(...params);
+     // sync state change in our appStateRetention
+     setAppStateItem(themeKey, `${TwThemes.getActiveThemeName()}-${TwThemes.getActiveInvertShade() ? 'dark' : 'light'}`);
+     // return original result
+     return res;
+   }
+ });
+
+// sync changes FROM: appStateRetention TO: our local state
+// ... this can optionally change "externally" by the user WHEN they employ the URL Site Hash
+registerAppStateChangeHandler(themeKey, ({newVal}) => {
+  // console.log(`XX AppStateChangeHandler for colorTheme (key: '${themeKey}'): syncing to '${newVal}'`);
+  const {themeName, shadeInversion} = parseAppState(newVal);
+  TwThemes.activateTheme({themeName, invertShade: shadeInversion});
+});
