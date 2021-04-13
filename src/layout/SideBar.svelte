@@ -30,33 +30,38 @@
          registerAppStateChangeHandler}  from '../util/appStateRetention';
 
  // INTERNAL constants
- const sideBarKey  = 'sidebar'; // ... syntax: open, closed, open-250, closed-250
+ // ... NOTE: we use two distinct persistent keys to allow them to be isolated in a URL hash
+ //           TYPICALLY we don't want to expose the SideBar width in a URL hash :-)
+ const sideBarOpenClosedKey = 'sidebar';  // ... syntax: sidebar=open, sidebar=closed
+ const sideBarWidthKey      = 'sidebarw'; // ... syntax: sidebarw=250
 
- // INTERNAL helper to emit an updated store state, either programmatically -OR- from changes in appStateRetention
+ // INTERNAL helper that emits an updated store state, either programmatically -OR- from changes in persistent retention
  function updateState({state={}, // the current store state (omit for initial setup)
-                       isOpen,   // a boolean that programmatically sets `isOpen` sub-state (omit when NOT impacting `isOpen` -OR- supplying stateStr)
-                       width,    // an int that programmatically sets `width` sub-state (omit when NOT impacting `width` -OR- supplying stateStr)
-                       stateStr}) { // a string that sets state from persistent appStateRetention handlers WITH highest precedence (omit when using the programatic params)
+                       isOpen,   // a boolean that programmatically sets `isOpen` sub-state (omit when NOT impacting `isOpen` -OR- supplying persistOpenClosed)
+                       width,    // an int that programmatically sets `width` sub-state (omit when NOT impacting `width` -OR- supplying persistWidth)
+                       persistOpenClosed, // a string of 'open'/'closed' (FROM our persistent retention)
+                       persistWidth}) {   // a string containing the desired width int (FROM our persistent retention)
 
    // maintain desired state setting, either from the current state -OR- programmatic params (when supplied)
    isOpen = isOpen===undefined ? state.isOpen : isOpen;
    width  = width===undefined  ? state.width  : width;
 
-   // apply the persistent stateStr (when supplied) ... TAKES PRECEDENCE
-   if (stateStr) {
-     const [part1, part2] = stateStr.split('-');
-     if (part1) {
-       // NOTE: BY reasoning over non-default (i.e. 'closed'),
-       //       we DEFAULT all unknown values to the desired 'open' fallback
-       isOpen = part1 === 'closed' ? false : true;
-     }
-     if (part2) {
-       width = parseInt(part2, 10);
+   // apply the persistent parameters (when supplied) ... TAKES PRECEDENCE
+   if (persistOpenClosed) {
+     // NOTE: BY reasoning over non-default (i.e. 'closed'),
+     //       we DEFAULT all unknown values to the desired 'open' fallback
+     isOpen = persistOpenClosed === 'closed' ? false : true;
+   }
+   if (persistWidth) {
+     width = parseInt(persistWidth, 10);
+     if (Number.isNaN(width)) {
+       width = 250; // DEFAULT invalid number
      }
    }
 
    // sync state change in our appStateRetention
-   setAppStateItem(sideBarKey, `${isOpen ? 'open' : 'closed'}-${width}`);
+   setAppStateItem(sideBarOpenClosedKey, `${isOpen ? 'open' : 'closed'}`);
+   setAppStateItem(sideBarWidthKey,      ''+width);
 
    // return the state to be used by update (or the initial value)
    return {isOpen, width};
@@ -67,9 +72,11 @@
  //***
 
  // our initial state comes from the persistent appStateRetention
- // ... with a fallback of 'open-250'
- const initialState = getAppStateItem(sideBarKey) || 'open-250';
- const {subscribe, set, update} = writable( updateState({stateStr: initialState}) );
+ // ... with a fallback of 'open'/'250'
+ const initialOpenClosed = getAppStateItem(sideBarOpenClosedKey) || 'open';
+ const initialWidth      = getAppStateItem(sideBarWidthKey)      || '250';
+ const {subscribe, set, update} = writable( updateState({persistOpenClosed: initialOpenClosed, 
+                                                         persistWidth:      initialWidth}) );
  export const sideBar = { // our custom store (which is the SideBar PUBLIC API)
    subscribe,
    open:   () => update( (state) => updateState({state, isOpen: true}) ),
@@ -79,9 +86,13 @@
 
  // sync changes FROM: appStateRetention TO: our local state
  // ... this can optionally change "externally" by the user WHEN they employ the URL Site Hash
- registerAppStateChangeHandler(sideBarKey, ({newVal}) => {
-   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarKey}'): syncing to '${newVal}'`);
-   update( (state) => updateState({state, stateStr: newVal}) );
+ registerAppStateChangeHandler(sideBarOpenClosedKey, ({newVal}) => {
+   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarOpenClosedKey}'): syncing to '${newVal}'`);
+   update( (state) => updateState({state, persistOpenClosed: newVal}) );
+ });
+ registerAppStateChangeHandler(sideBarWidthKey, ({newVal}) => {
+   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarWidthKey}'): syncing to '${newVal}'`);
+   update( (state) => updateState({state, persistWidth: newVal}) );
  });
 
  // AI: OVERKILL: insure SideBar has been instantiated (may be some timing issues here)
