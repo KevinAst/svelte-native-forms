@@ -20,6 +20,7 @@ import {isString,
         isFunction}    from './typeCheck';
 import {encode,
         decode}        from './encoder';
+import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.config.js build process)
 
 
 // INTERNAL functions to encode/decode hash bindings ('&' -and- '=')
@@ -41,6 +42,10 @@ const curSiteHash = getSiteHash();
 //             theme: 'Cool'
 //           }
 function getSiteHash() {
+  if (!isBrowser) {
+    return {};
+  }
+
   const hashStr = window.location.hash.substr(1); // the hash stripped of the starting '#'
   // console.log(`XX getSiteHash() hashStr: '${hashStr}'`);
   if (!hashStr) { // handle NO hashStr ... will be '' in this case
@@ -229,20 +234,22 @@ const _handlers = {
 };
 
 // monitor Site Hash changes (driving the firing of our registered handlers)
-window.addEventListener("hashchange", () => {
-  const hashMap = getSiteHash();
-  // console.log(`XX hashchange event fired: `, hashMap);
-  Object.entries(hashMap).forEach( ([key, newVal]) => {
-    const oldVal = curSiteHash[key];
-    if (newVal !== oldVal) {
-      // interact with our registered handlers
-      // console.log(`XX Site Hash Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
-      const handlers = _handlers[key];
-      if (handlers) {
-        handlers.forEach( (handler) => handler({oldVal, newVal}) );
+if (isBrowser) {
+  window.addEventListener("hashchange", () => {
+    const hashMap = getSiteHash();
+    // console.log(`XX hashchange event fired: `, hashMap);
+    Object.entries(hashMap).forEach( ([key, newVal]) => {
+      const oldVal = curSiteHash[key];
+      if (newVal !== oldVal) {
+        // interact with our registered handlers
+        // console.log(`XX Site Hash Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
+        const handlers = _handlers[key];
+        if (handlers) {
+          handlers.forEach( (handler) => handler({oldVal, newVal}) );
+        }
+        // retain latest newVal as current
+        curSiteHash[key] = newVal;
       }
-      // retain latest newVal as current
-      curSiteHash[key] = newVal;
-    }
+    });
   });
-});
+}

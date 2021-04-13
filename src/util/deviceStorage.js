@@ -23,6 +23,7 @@ import {isString,
 import noOp            from './noOp';
 import {encode,
         decode}        from './encoder';
+import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.config.js build process)
 
 
 /**
@@ -155,18 +156,20 @@ const _handlers = {
 };
 
 // monitor Device Storage changes (driving the firing of our registered handlers)
-window.addEventListener("storage", (e) => {
-  const key    = e.key
-  const oldVal = decode(e.oldValue);
-  const newVal = decode(e.newValue);
-
-  // interact with our registered handlers
-  // console.log(`XX Device Storage Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
-  const handlers = _handlers[key];
-  if (handlers) {
-    handlers.forEach( (handler) => handler({oldVal, newVal}) );
-  }
-});
+if (isBrowser) {
+  window.addEventListener("storage", (e) => {
+    const key    = e.key
+    const oldVal = decode(e.oldValue);
+    const newVal = decode(e.newValue);
+  
+    // interact with our registered handlers
+    // console.log(`XX Device Storage Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
+    const handlers = _handlers[key];
+    if (handlers) {
+      handlers.forEach( (handler) => handler({oldVal, newVal}) );
+    }
+  });
+}
 
 
 
@@ -183,6 +186,9 @@ window.addEventListener("storage", (e) => {
 //           see: https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Feature-detecting_localStorage
 const _localStorageAvailable = storageAvailable('localStorage');
 function storageAvailable(type) {
+  if (!isBrowser) {
+    return false;
+  }
   let storage;
   try {
     storage = window[type];
@@ -192,16 +198,18 @@ function storageAvailable(type) {
     return true;
   }
   catch(e) {
-    return e instanceof DOMException && (
-      // everything except Firefox
-      e.code === 22 ||
-      // Firefox
-      e.code === 1014 ||
-      // test name field too, because code might not be present
-      // everything except Firefox
-      e.name === 'QuotaExceededError' ||
-      // Firefox
-      e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+    return e instanceof DOMException && 
+           (
+             // everything except Firefox
+             e.code === 22 ||
+             // Firefox
+             e.code === 1014 ||
+             // test name field too, because code might not be present
+             // everything except Firefox
+             e.name === 'QuotaExceededError' ||
+             // Firefox
+             e.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+           ) &&
            // acknowledge QuotaExceededError only if there's something already stored
            (storage && storage.length !== 0);
   }
@@ -209,7 +217,9 @@ function storageAvailable(type) {
 
 // log warning when deviceStorage is NOT in affect
 if (!_localStorageAvailable) {
-  console.warn('***WARNING*** deviceStorage module ... localStorage (Web Storage API) is NOT available in this browser ... all deviceStorage usage will silently no-op!!');
+  console.warn('***WARNING*** deviceStorage module ... localStorage (Web Storage API) is NOT available in this container ... ' + 
+               'either unsupported by a browser -or- running in a node.js environment ... ' +
+               'all localStorage usage will silently no-op!!');
 }
 
 // our localStorage pass-through that gracefully no-ops for unsupported browsers
