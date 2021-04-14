@@ -82,6 +82,7 @@ export function getAppStateItem(key) {
   // ... key
   checkParam(key,           'key is required');
   checkParam(isString(key), 'key must be a string, NOT: ', key);
+  _keysInUse[key] = key;
 
   // return the requested value (if any)
   // ... site hash takes precedence
@@ -106,6 +107,7 @@ export function setAppStateItem(key, ref, safeguard=false) {
   // ... key
   checkParam(key,           'key is required');
   checkParam(isString(key), 'key must be a string, NOT: ', key);
+  _keysInUse[key] = key;
 
   // ... ref
   checkParam(ref,                                 'ref is required');
@@ -144,6 +146,7 @@ export function registerAppStateChangeHandler(key, handler) {
   // ... key
   checkParam(key,           'key is required');
   checkParam(isString(key), 'key must be a string, NOT: ', key);
+  _keysInUse[key] = key;
 
   // ... handler
   checkParam(handler,             'handler is required');
@@ -166,3 +169,40 @@ export function registerAppStateChangeHandler(key, handler) {
   //           With that said: it is really fun to see the cross-communication between windows
   // registerDeviceStorageItemChangeHandler(key, handler);
 }
+
+
+/**
+ * Return the active URL with full hash options, gleaned from ALL
+ * persistent keys that are currently in-use (both "Site Hash" and
+ * "Local Device" keys).
+ * 
+ * This is useful when devising a URL to be used in an embedded iframe.
+ * You can "prune" it to the desired key directives 
+ *
+ * EX: https://svelte-native-forms.js.org/app/#theme=Teal-dark&sidebar=open&sidebarw=229&show=code
+ * 
+ * TODO: Fully flesh out a usage pattern for getActiveUrlWithFullHash()
+ *       EX: - this API could return an array of active hash key/value pairs
+ *           - promote an "embed URL" dropdown options somewhere
+ *             * use a dialog to allow the user to select the options in-use
+ *             * provide ability to auto-generate a: URL, b: embedded iframe
+ * 
+ * @return {string} the active URL (with full hash options).
+ */
+export function getActiveUrlWithFullHash() {
+  let delim = '';
+  const urlStr = Object.keys(_keysInUse).reduce( (accum, key) => {
+    accum += `${delim}${key}=${getAppStateItem(key)}`;
+    delim = '&';
+    return accum;
+  }, `${location.href.replace(location.hash,'')}#`);
+  console.log(`getUrlWithFullHash(): ${urlStr}`);
+  return urlStr;
+}
+
+// keys in-use (needed by getUrlWithFullHash())
+const _keysInUse = {
+  // "key1": "key1",
+  // "key2": "key21",
+  // ...
+};
