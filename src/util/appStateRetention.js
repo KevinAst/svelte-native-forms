@@ -2,13 +2,13 @@
 
    - is the entry point for all app state retention
      ... it "fronts" all other storage APIs
-   - uses a combination of "Site Hash" and "Local Device" Storage
+   - uses a combination of "URL Hash Storage" and "Local Storage"
      ... see notes (below) for more information on both of these devises
    - these two devices are "mutually exclusive"
      * for a given state key
        - Site Hash storage is used WHEN the user specifies an initial 
          hash value in the URL (for that state key)
-       - Device storage is used in all other cases
+       - Local Storage is used in all other cases
    - REGARDING local app state:
      1. app startup should initialize it's local app state from the retained state
         via `getAppStateItem(key)`, with it's own fallback default (when NOT retained)
@@ -17,7 +17,7 @@
         2a. local app state changes should be retained via `setAppStateItem(key, val)`
             NOTE: this should be invoked UNCONDITIONALLY, 
                   - regardless of whether the local-state changed or not
-                  - the reason for this is: when Local Device Storage is in-use
+                  - the reason for this is: when Local Storage is in-use
                     the "master source" for this state is NOT the one app instance!
                     it can come from multiple instances (in separate windows)
         2b. in addition, handlers should be registered to react to changes to the retained state
@@ -37,19 +37,19 @@
        - programmatic hash change: event IS fired
        - user change hash in URL: event IS fired (INTERESTING: when JUST the URL hash changes it is NOT an app re-launch)
 
- *** Local Device Storage *** ... see: deviceStorage.js
-   - REPRESENTS a storage device that is tied to the domain of the URL (a combination of protocol://host:port)
+ *** Local Storage *** ... see: localStorage.js
+   - REPRESENTS a browser storage device that is global to the domain of the URL (a combination of protocol://host:port)
      ... in other words this storage is globally available to ALL windows of the same domain.
-   - all access is programmatic, so the end-user cannot specify (as they can for the Site Hash URL)
+   - all access is programmatic, so the end-user cannot specify (as they can for URL Hash Storage)
    - REGARDING "storage" event:
      * there is a "storage" event that is fired when the storage changes
        HOWEVER this event is fired only in windows other that the one that made the change
        ... presumably the window that made the change is already aware of the change
        >>> by listening/reacting to this event, it has the effect of cross-communicating between windows
      * so the salient points of this event are:
-       - initial app launch:       NO event fired (so must programmatically pull value out)
+       - initial app launch:      NO event fired (so must programmatically pull value out)
        - programmatic hash change: event IS fired ONLY to external windows (for cross-communication between windows)
-       - iframe usage:             IDENTICAL (BASED ON THE iframe.src)
+       - iframe usage:            IDENTICAL (BASED ON THE iframe.src)
 
    ------------------------------------------------------------------------------ */
 
@@ -61,9 +61,10 @@ import {isString,
 import {getSiteHashItem,
         updateSiteHashItem,
         registerSiteHashItemChangeHandler} from './siteHashStorage';
-import {fetchItem,
-        storeItem,
-        registerDeviceStorageItemChangeHandler} from './deviceStorage';
+// ?? check it out
+import {getLocalStorageItem,
+        setLocalStorageItem,
+        registerLocalStorageItemChangeHandler} from './localStorage';
 
 /**
  * Return the entry retained in our App State (if any).
@@ -85,8 +86,8 @@ export function getAppStateItem(key) {
   _keysInUse[key] = key;
 
   // return the requested value (if any)
-  // ... site hash takes precedence
-  const  value = getSiteHashItem(key) || fetchItem(key);
+  // ... url hash takes precedence
+  const  value = getSiteHashItem(key) || getLocalStorageItem(key);
   return value;
 }
 
@@ -118,8 +119,8 @@ export function setAppStateItem(key, ref, safeguard=false) {
 
   // retain this entry in our App State
   const inHash = updateSiteHashItem(key, ref, safeguard); // ... site hash takes precedence (updating ONLY if pre-exists in hash)
-  if (!inHash) { // ... fallback to Local Device Storage (when site hash is NOT in play)
-    storeItem(key, ref, safeguard);
+  if (!inHash) { // ... fallback to Local Storage (when site hash is NOT in play)
+    setLocalStorageItem(key, ref, safeguard);
   }
 }
 
@@ -155,26 +156,26 @@ export function registerAppStateChangeHandler(key, handler) {
   // register the handler
   // ... simply pass through to the URL site hash registration
   registerSiteHashItemChangeHandler(key, handler);
-  // ... for fun sync Local Device Storage, to see changes cross-window
+  // ... for fun sync Local Storage, to see changes cross-window
   //     NOTE: We don't really want to do this:
   //           IT IS PROBLEMATIC for the following reasons:
   //           1. By doing this at the appStateRetention level,
   //              it doesn't distinguish between changes of:
   //                * "Site Hash Storage"
-  //                * "Local Device Storage"
-  //              IN OTHER WORDS: a change to Device Storage 
+  //                * "Local Storage"
+  //              IN OTHER WORDS: a change to Local Storage 
   //              is globally propagated to ALL window instances
   //           2. it is possible to get in an infinite loop (thrashing between windows)
   //              unsure about this, but I have seen it happen
   //           With that said: it is really fun to see the cross-communication between windows
-  // registerDeviceStorageItemChangeHandler(key, handler);
+  // registerLocalStorageItemChangeHandler(key, handler);
 }
 
 
 /**
  * Return the active URL with full hash options, gleaned from ALL
- * persistent keys that are currently in-use (both "Site Hash" and
- * "Local Device" keys).
+ * persistent keys that are currently in-use (both "Hash Storage" and
+ * "Local Storage" keys).
  * 
  * This is useful when devising a URL to be used in an embedded iframe.
  * You can "prune" it to the desired key directives 

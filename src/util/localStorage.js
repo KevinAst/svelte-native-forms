@@ -1,8 +1,8 @@
-/**------------------------ Local Device Storage ----------------------------------------
+/**------------------------ Local Storage ----------------------------------------
 
-   - REPRESENTS a storage device that is global to the domain of the URL (a combination of protocol://host:port)
+   - REPRESENTS a browser storage device that is global to the domain of the URL (a combination of protocol://host:port)
      ... in other words this storage is globally available to ALL windows of the same domain.
-   - all access is programmatic, so the end-user cannot specify (as they can for the Site Hash URL)
+   - all access is programmatic, so the end-user cannot specify (as they can for URL Hash Storage)
    - REGARDING "storage" event:
      * there is a "storage" event that is fired when the storage changes
        HOWEVER this event is fired only in windows other that the one that made the change
@@ -27,25 +27,25 @@ import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.con
 
 
 /**
- * Fetch the stored entry from local device storage.
+ * Get the stored entry from Local Storage.
  *
  * @param {string} key the unique key that catalogs this entry.
  * 
- * @return {string|jsonObj} the entry stored from the supplied key (undefined for
- * none), implicitly unpacked to the original ref (supplied to
- * `storeItem()`).
+ * @return {string|jsonObj} the entry stored in the supplied key
+ * (undefined for none), implicitly unpacked to the original ref
+ * (supplied to `setLocalStorageItem()`).
  */
-export function fetchItem(key) {
+export function getLocalStorageItem(key) {
 
   // validate our parameters
-  const checkParam = check.prefix('fetchItem() parameter violation: ');
+  const checkParam = check.prefix('getLocalStorageItem() parameter violation: ');
 
   // ... key
   checkParam(key,           'key is required');
   checkParam(isString(key), 'key must be a string, NOT: ', key);
 
-  // retrieve the entry from our deviceStorage
-  const value = deviceStorage.getItem(key);
+  // retrieve the entry from our _localStorage
+  const value = _localStorage.getItem(key);
 
   // no-op for non-existent entries
   if (!value) {
@@ -61,17 +61,17 @@ export function fetchItem(key) {
 
 
 /**
- * Store the supplied entry in local device storage.
+ * Set the supplied entry in Local Storage.
  *
  * @param {string} key the unique key that catalogs this entry.
  * @param {string|jsonObj} ref the reference to store.
  * @param {boolean} [safeguard=false] an indicator as to whether the
  * entry should be obfuscated (true) or not (false - the DEFAULT).
  */
-export function storeItem(key, ref, safeguard=false) {
+export function setLocalStorageItem(key, ref, safeguard=false) {
 
   // validate our parameters
-  const checkParam = check.prefix('storeItem() parameter violation: ');
+  const checkParam = check.prefix('setLocalStorageItem() parameter violation: ');
 
   // ... key
   checkParam(key,           'key is required');
@@ -91,32 +91,32 @@ export function storeItem(key, ref, safeguard=false) {
   //   - safeguard (obfuscation)
   const value = encode(ref, safeguard);
 
-  // store the entry into our deviceStorage
-  deviceStorage.setItem(key, value);
+  // store the entry into our _localStorage
+  _localStorage.setItem(key, value);
 }
 
 
 /**
- * Remove the stored entry from local device storage.
+ * Remove the stored entry from Local Storage.
  *
  * @param {string} key the unique key of the entry to remove.
  */
-export function removeItem(key) {
+export function removeLocalStorageItem(key) {
 
   // validate our parameters
-  const checkParam = check.prefix('removeItem() parameter violation: ');
+  const checkParam = check.prefix('removeLocalStorageItem() parameter violation: ');
 
   // ... key
   checkParam(key,           'key is required');
   checkParam(isString(key), 'key must be a string, NOT: ', key);
 
-  // remove the entry from our local device storage
-  deviceStorage.removeItem(key);
+  // remove the entry from Local Storage
+  _localStorage.removeItem(key);
 }
 
 
 /**
- * Register handler when a specific key changes in the Device Storage.
+ * Register handler when a specific key changes in Local Storage.
  *
  * NOTE: This event is fired only in windows other that the one that
  *       made the change!  Presumably the window that made the change
@@ -130,9 +130,9 @@ export function removeItem(key) {
  *                   API: + handler({oldVal, newVal}): void
  *                          NOTE: uses named parameters!
  */
-export function registerDeviceStorageItemChangeHandler(key, handler) {
+export function registerLocalStorageItemChangeHandler(key, handler) {
   // validate our parameters
-  const checkParam = check.prefix('registerDeviceStorageItemChangeHandler() parameter violation: ');
+  const checkParam = check.prefix('registerLocalStorageItemChangeHandler() parameter violation: ');
 
   // ... key
   checkParam(key,           'key is required');
@@ -155,7 +155,7 @@ const _handlers = {
   // 'key2': [handler2a, handler2b],
 };
 
-// monitor Device Storage changes (driving the firing of our registered handlers)
+// monitor Local Storage changes (driving the firing of our registered handlers)
 if (isBrowser) {
   window.addEventListener("storage", (e) => {
     const key    = e.key
@@ -163,7 +163,7 @@ if (isBrowser) {
     const newVal = decode(e.newValue);
   
     // interact with our registered handlers
-    // console.log(`XX Device Storage Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
+    // console.log(`XX Local Storage Changed - event key: '${key}' changed WAS: '${oldVal}'  NOW: '${newVal}' ... interacting with handlers`);
     const handlers = _handlers[key];
     if (handlers) {
       handlers.forEach( (handler) => handler({oldVal, newVal}) );
@@ -215,15 +215,15 @@ function storageAvailable(type) {
   }
 }
 
-// log warning when deviceStorage is NOT in affect
+// log warning when Local SStorage is NOT in affect
 if (!_localStorageAvailable) {
-  console.warn('***WARNING*** deviceStorage module ... localStorage (Web Storage API) is NOT available in this container ... ' + 
+  console.warn('***WARNING*** localStorage.js ... Local Storage (Web Storage API) is NOT available in this container ... ' + 
                'either unsupported by a browser -or- running in a node.js environment ... ' +
                'all localStorage usage will silently no-op!!');
 }
 
 // our localStorage pass-through that gracefully no-ops for unsupported browsers
-const deviceStorage = _localStorageAvailable ? {
+const _localStorage = _localStorageAvailable ? {
   setItem:    (keyName, keyValue) => window.localStorage.setItem(keyName, keyValue),
   getItem:    (keyName)           => window.localStorage.getItem(keyName),
   removeItem: (keyName)           => window.localStorage.removeItem(keyName),
@@ -233,7 +233,7 @@ const deviceStorage = _localStorageAvailable ? {
   removeItem: noOp,
 };
 
-// TEMP crude test of deviceStorage ... invoke these separately!
-// deviceStorage.setItem('WowZeeKey', 'WowZeeValue');
-// console.log(`test deviceStorage ... '${deviceStorage.getItem('WowZeeKey')}'`);
+// TEMP crude test of _localStorage ... invoke these separately!
+// _localStorage.setItem('WowZeeKey', 'WowZeeValue');
+// console.log(`test _localStorage ... '${_localStorage.getItem('WowZeeKey')}'`);
 
