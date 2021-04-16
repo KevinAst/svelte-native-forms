@@ -6,7 +6,7 @@
      ... see notes (below) for more information on both of these devises
    - these two devices are "mutually exclusive"
      * for a given state key
-       - Site Hash storage is used WHEN the user specifies an initial 
+       - URL Hash storage is used WHEN the user specifies an initial 
          hash value in the URL (for that state key)
        - Local Storage is used in all other cases
    - REGARDING local app state:
@@ -23,19 +23,20 @@
         2b. in addition, handlers should be registered to react to changes to the retained state
             - updating local app state appropriately
             - this is accomplished via: `registerAppStateChangeHandler(key, handler)`
-            - this monitors Site Hash changes (they can change by the user in the URL)
+            - this monitors URL Hash changes (they can change by the user in the URL)
 
- *** Site Hash Storage *** ... see: siteHashStorage.js
+ *** URL Hash Storage *** ... see: urlHashStorage.js
    - REPRESENTS a storage device that is retained in the URL (after the # hash)
      ... ex: https://svelte-native-forms.js.org/app/#show=code
    - access can be either programmatic -or- by the end-user (specified in the URL itself)
    - REGARDING "hashchange" event:
      * this event is fired ONLY within the containing window
-       ... unlike the "storage" event that fires in external windows
+       ... unlike the Local Storage "storage" event that fires in external windows
      * so the salient points of this event are:
-       - initial app launch: NO event fired (so must programmatically pull value out of hash)
+       - initial app launch: NO event fired (so must programmatically pull value out of the URL Hash)
        - programmatic hash change: event IS fired
-       - user change hash in URL: event IS fired (INTERESTING: when JUST the URL hash changes it is NOT an app re-launch)
+       - user change hash in URL: event IS fired
+         INTERESTING: when JUST the URL Hash changes, it is NOT an app re-launch
 
  *** Local Storage *** ... see: localStorage.js
    - REPRESENTS a browser storage device that is global to the domain of the URL (a combination of protocol://host:port)
@@ -58,10 +59,9 @@ import {isString,
         isBoolean,
         isPlainObject,
         isFunction}    from './typeCheck';
-import {getSiteHashItem,
-        updateSiteHashItem,
-        registerSiteHashItemChangeHandler} from './siteHashStorage';
-// ?? check it out
+import {getUrlHashItem,
+        updateUrlHashItem,
+        registerUrlHashItemChangeHandler} from './urlHashStorage';
 import {getLocalStorageItem,
         setLocalStorageItem,
         registerLocalStorageItemChangeHandler} from './localStorage';
@@ -87,7 +87,7 @@ export function getAppStateItem(key) {
 
   // return the requested value (if any)
   // ... url hash takes precedence
-  const  value = getSiteHashItem(key) || getLocalStorageItem(key);
+  const  value = getUrlHashItem(key) || getLocalStorageItem(key);
   return value;
 }
 
@@ -118,8 +118,8 @@ export function setAppStateItem(key, ref, safeguard=false) {
   checkParam(isBoolean(safeguard), 'safeguard must be a boolean (true/false), NOT: ', safeguard);
 
   // retain this entry in our App State
-  const inHash = updateSiteHashItem(key, ref, safeguard); // ... site hash takes precedence (updating ONLY if pre-exists in hash)
-  if (!inHash) { // ... fallback to Local Storage (when site hash is NOT in play)
+  const inHash = updateUrlHashItem(key, ref, safeguard); // ... URL Hash takes precedence (updating ONLY if pre-exists in hash)
+  if (!inHash) { // ... fallback to Local Storage (when URL Hash is NOT in play)
     setLocalStorageItem(key, ref, safeguard);
   }
 }
@@ -128,7 +128,7 @@ export function setAppStateItem(key, ref, safeguard=false) {
 /**
  * Register handler when a specific key changes in our AppState.
  *
- * NOTE: We only monitor changes to the URL site hash (see notes at
+ * NOTE: We only monitor changes to the URL Hash (see notes at
  *       the top of this module).
  *       
  *       These handlers are fired both when changed by the user (in the URL),
@@ -154,14 +154,14 @@ export function registerAppStateChangeHandler(key, handler) {
   checkParam(isFunction(handler), 'handler must be a function, NOT: ', handler);
 
   // register the handler
-  // ... simply pass through to the URL site hash registration
-  registerSiteHashItemChangeHandler(key, handler);
+  // ... simply pass through to the URL Hash registration
+  registerUrlHashItemChangeHandler(key, handler);
   // ... for fun sync Local Storage, to see changes cross-window
   //     NOTE: We don't really want to do this:
   //           IT IS PROBLEMATIC for the following reasons:
   //           1. By doing this at the appStateRetention level,
   //              it doesn't distinguish between changes of:
-  //                * "Site Hash Storage"
+  //                * "URL Hash Storage"
   //                * "Local Storage"
   //              IN OTHER WORDS: a change to Local Storage 
   //              is globally propagated to ALL window instances
