@@ -71,6 +71,33 @@ function getUrlHash() {
 
 
 /**
+ * Return an indicator as to whether the specified entry is defined in
+ * the URL hash.
+ *
+ * @param {string} key the unique key to verify.
+ * 
+ * @return {boolean} true: the supplied key is defined the the URL
+ * hash, false: otherwise.
+ */
+export function isUrlHashItemDefined(key) {
+
+  // validate our parameters
+  const checkParam = check.prefix('isUrlHashItemDefined() parameter violation: ');
+
+  // ... key
+  checkParam(key,           'key is required');
+  checkParam(isString(key), 'key must be a string, NOT: ', key);
+
+  // fetch the specified entry out of our URL Hash (if any)
+  const hashMap = getUrlHash();
+  const value   = hashMap[key];
+
+  // return indicator based on whether an entry exists
+  return value ? true : false;
+}
+
+
+/**
  * Return the specified entry from the URL's hash (if any).
  *
  * @param {string} key the unique key that catalogs this entry.

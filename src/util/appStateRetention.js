@@ -62,6 +62,7 @@ import {isString,
         isFunction}    from './typeCheck';
 import {getUrlHashItem,
         updateUrlHashItem,
+        isUrlHashItemDefined,
         registerUrlHashItemChangeHandler} from './urlHashStorage';
 import {getLocalStorageItem,
         setLocalStorageItem,
@@ -132,18 +133,57 @@ export function setAppStateItem(key, ref, safeguard=false) {
 /**
  * Register handler when a specific key changes in our AppState.
  *
- * NOTE: We only monitor changes to the URL Hash (see notes at
- *       the top of this module).
- *       
- *       These handlers are fired both when changed by the user (in the URL),
- *       or programmatic changes (via our set/update API above).
+ * This registration is a convenient way to synchronize the local app
+ * state, when the underlying storage changes externally.
+ *
+ * This will register the supplied handler for either "URL Hash" or
+ * "Local Storage" changes, based on whether the specified key is part
+ * of the "URL HASH" or not.  In other words these two registrations
+ * are mutually exclusive.
+ * 
+ * NOTE 1: Remember, a "URL Hash" handler is fired not only on
+ *         programmatic changes, but also external changes (when the
+ *         user changes the hash value in their URL).
+ * 
+ *         As a result, this handler is a convenient way to
+ *         synchronize the local app state.
+ * 
+ * NOTE 2: Remember, a "Local Storage" handler is "in essence" a
+ *         technique to cross-communicate between windows
+ *         (i.e. processes), because it is fired only in windows other
+ *         than the one that made the change!
+ *         
+ *         For this reason it is rarely used.  As a result, to
+ *         register a "Local Storage" change handlers, you must
+ *         explicitly request this by setting the optional
+ *         `crossCommunicateLocalStorageChanges` parameter to `true`.
+ *
+ *         CAUTION: Be careful enabling "Local Storage" handlers that
+ *                  are triggered by rapid-fire events (such a mouse
+ *                  drag operations).  Because of the cross-process
+ *                  synchronization this can cause an osculating
+ *                  back-and-forth series of events that result in an
+ *                  infinite thrashing process.
+ *
+ *                  If you find yourself in this situation, consider:
+ *                   - Throttling or Debouncing
+ *                     ... see: https://codeburst.io/throttling-and-debouncing-in-javascript-646d076d0a44
+ *                     ... suspect may NOT help due to the back-and-forth process oscillation
+ *                     * Throttling: a reduction of the trigger rate
+ *                     * Debouncing: ZERO trigger rate until a period of calm
+ *                   - WAIT to issue the setAppStateItem() till the operation is
+ *                     complete (ex: drag operation is finished)
+ *                     ... suspect this is the ultimate solution (need more research)
  *
  * @param {string} key the unique key that is monitored for change.
  * @param {function} handler the function to invoke on change.
  *                   API: + handler({oldVal, newVal}): void
- *                          NOTE: uses named parameters!
+ *                          NOTE: The `handler` API uses named parameters!
+ * @param {boolean} [crossCommunicateLocalStorageChanges=false] a
+ * directive to register "Local Storage" handlers when appropriate.
+ * By DEFAULT, this is `false`.  Please refer to "NOTE 2" (above).
  */
-export function registerAppStateChangeHandler(key, handler) {
+export function registerAppStateChangeHandler(key, handler, crossCommunicateLocalStorageChanges=false) {
 
   // validate our parameters
   const checkParam = check.prefix('registerAppStateChangeHandler() parameter violation: ');
@@ -157,22 +197,19 @@ export function registerAppStateChangeHandler(key, handler) {
   checkParam(handler,             'handler is required');
   checkParam(isFunction(handler), 'handler must be a function, NOT: ', handler);
 
-  // register the handler
-  // ... simply pass through to the URL Hash registration
-  registerUrlHashItemChangeHandler(key, handler);
-  // ... for fun sync Local Storage, to see changes cross-window
-  //     NOTE: We don't really want to do this:
-  //           IT IS PROBLEMATIC for the following reasons:
-  //           1. By doing this at the appStateRetention level,
-  //              it doesn't distinguish between changes of:
-  //                * "URL Hash Storage"
-  //                * "Local Storage"
-  //              IN OTHER WORDS: a change to Local Storage 
-  //              is globally propagated to ALL window instances
-  //           2. it is possible to get in an infinite loop (thrashing between windows)
-  //              unsure about this, but I have seen it happen
-  //           With that said: it is really fun to see the cross-communication between windows
-  // registerLocalStorageItemChangeHandler(key, handler);
+  // ... crossCommunicateLocalStorageChanges
+  checkParam(isBoolean(crossCommunicateLocalStorageChanges),
+             'crossCommunicateLocalStorageChanges must be a boolean (true/false), NOT: ', crossCommunicateLocalStorageChanges);
+
+  // register the handler per specification (see docs)
+  if (isUrlHashItemDefined(key)) {
+    // console.log(`XX registerAppStateChangeHandler('${key}') ... registering "URL Hash Storage" handler (per prior existence in URL)`);
+    registerUrlHashItemChangeHandler(key, handler);
+  }
+  else if (crossCommunicateLocalStorageChanges) {
+    // console.log(`XX registerAppStateChangeHandler('${key}') ... registering "Local Storage" handler (per confirmation parameter)`);
+    registerLocalStorageItemChangeHandler(key, handler);
+  }
 }
 
 
