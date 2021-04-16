@@ -4,6 +4,7 @@
      ... it "fronts" all other storage APIs
    - uses a combination of "URL Hash Storage" and "Local Storage"
      ... see notes (below) for more information on both of these devises
+     ... "URL Hash Storage" takes precedence
    - these two devices are "mutually exclusive"
      * for a given state key
        - URL Hash storage is used WHEN the user specifies an initial 
@@ -11,10 +12,10 @@
        - Local Storage is used in all other cases
    - REGARDING local app state:
      1. app startup should initialize it's local app state from the retained state
-        via `getAppStateItem(key)`, with it's own fallback default (when NOT retained)
+        via `getAppStateItem(key)`, with an app's own fallback default (when NOT retained)
      2. local app state is maintained in app logic as normal,
         HOWEVER in addition to this:
-        2a. local app state changes should be retained via `setAppStateItem(key, val)`
+        2a. local app state changes should be synced via `setAppStateItem(key, val)`
             NOTE: this should be invoked UNCONDITIONALLY, 
                   - regardless of whether the local-state changed or not
                   - the reason for this is: when Local Storage is in-use
@@ -22,8 +23,8 @@
                     it can come from multiple instances (in separate windows)
         2b. in addition, handlers should be registered to react to changes to the retained state
             - updating local app state appropriately
-            - this is accomplished via: `registerAppStateChangeHandler(key, handler)`
-            - this monitors URL Hash changes (they can change by the user in the URL)
+            - this is accomplished via: `registerAppStateChangeHandler()`
+            - this monitors storage changes (they can change externally)
 
  *** URL Hash Storage *** ... see: urlHashStorage.js
    - REPRESENTS a storage device that is retained in the URL (after the # hash)
@@ -67,7 +68,7 @@ import {getLocalStorageItem,
         registerLocalStorageItemChangeHandler} from './localStorage';
 
 /**
- * Return the entry retained in our App State (if any).
+ * Return the specified entry retained in our App State (if any).
  *
  * @param {string} key the unique key that catalogs this entry.
  * 
@@ -93,7 +94,10 @@ export function getAppStateItem(key) {
 
 
 /**
- * Set the supplied entry in our App State.
+ * Set the supplied entry in our App State.  
+ * 
+ * Remember "URL Hash Storage" takes precedence over "Local Storage"
+ * (when it pre-exists in the URL)
  *
  * @param {string} key the unique key that catalogs this entry.
  * @param {string|jsonObj} ref the reference to store.
