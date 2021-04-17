@@ -167,13 +167,8 @@ export function setAppStateItem(key, ref, safeguard=false) {
  *
  *                  If you find yourself in this situation, consider:
  *                   - Throttling or Debouncing
- *                     ... see: https://codeburst.io/throttling-and-debouncing-in-javascript-646d076d0a44
- *                     ... suspect may NOT help due to the back-and-forth process oscillation
  *                     * Throttling: a reduction of the trigger rate
  *                     * Debouncing: ZERO trigger rate until a period of calm
- *                   - WAIT to issue the setAppStateItem() till the operation is
- *                     complete (ex: drag operation is finished)
- *                     ... suspect this is the ultimate solution (need more research)
  *
  * @param {string} key the unique key that is monitored for change.
  * @param {function} handler the function to invoke on change.

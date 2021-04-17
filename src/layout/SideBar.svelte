@@ -111,9 +111,10 @@
  //   - adjusts left position for visibility (open/close)
  //     * via inline style.left
  //   - SideBar width is adjustable (BY user via drag operation)
- import {onMount}  from 'svelte';
- import Icon       from '../util/ui/Icon.svelte';
- import {slide}    from 'svelte/transition';
+ import {onMount}   from 'svelte';
+ import Icon        from '../util/ui/Icon.svelte';
+ import {debounced} from '../util/dampen';
+ import {slide}     from 'svelte/transition';
 
  let sideBarElm;
 
@@ -132,7 +133,7 @@
  // monitor SideBar width changes
  // ... in onMount() to accommodate sideBarElm binding
  onMount( () => {
-   const ro = new ResizeObserver( (entries) => {
+   const ro = new ResizeObserver( debounced(100, (entries) => {
      // NOTE: Because we only monitor ONE element, we bypass `entries`
      //       and go straight to the horses mouth
      const newWidth_withScroll = sideBarElm.offsetWidth;
@@ -141,7 +142,7 @@
 
      // reflexively update our width change
      update( (state) => updateState({state, width: newWidth_withScroll}) );
-   });
+   }) );
    ro.observe(sideBarElm); // ... there is a second param that specifies which box model to adhear to (default: content-box)
 
    // cleanup - on component desctuction

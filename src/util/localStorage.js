@@ -123,7 +123,21 @@ export function removeLocalStorageItem(key) {
  *       is already aware of the change.
  *
  *       By listening/reacting to this event, it has the effect of
- *       cross-communicating between windows.
+ *       cross-communicating between windows (i.e. processes).
+ * 
+ *       For this reason it is rarely used.  
+ *
+ *       CAUTION: Be careful enabling "Local Storage" handlers that
+ *                are triggered by rapid-fire events (such a mouse
+ *                drag operations).  Because of the cross-process
+ *                synchronization this can cause an osculating
+ *                back-and-forth series of events that result in an
+ *                infinite thrashing process.
+ *
+ *                If you find yourself in this situation, consider:
+ *                 - Throttling or Debouncing
+ *                   * Throttling: a reduction of the trigger rate
+ *                   * Debouncing: ZERO trigger rate until a period of calm
  *
  * @param {string} key the unique key that is monitored for change.
  * @param {function} handler the function to invoke on change.
