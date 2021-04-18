@@ -14,7 +14,13 @@ export function isBoolean(ref) {
 
 // isPlainObject(ref): boolean
 export function isPlainObject(ref) {
-  return typeof ref === 'object' && ref.constructor === Object;
+  return !!ref && typeof ref === 'object' && ref.constructor === Object;
+}
+
+// isClassObject(ref): boolean
+export function isClassObject(ref) {
+  var type = typeof ref;
+  return !!ref && type === 'object' && !isPlainObject(ref) && !isArray(ref);
 }
 
 // isString(ref): boolean
@@ -28,3 +34,34 @@ export function isString(ref) {
 export function isFunction(ref) {
   return !!(ref && ref.constructor && ref.call && ref.apply);
 }
+
+// quick-and-dirty test of isClassObject(ref)
+// function test(testing, ref, expecting) {
+//   const isObj  = isClassObject(ref);
+//   const result = isObj === expecting ? 'PASS' : 'FAIL';
+//   console.log(`${result}: type ${testing} `, {ref, isObj});
+// }
+// 
+// class MyClass {
+//   constructor() {
+//     this.foo = 'bar';
+//   }
+// }
+// 
+// test('number',    123,            false);
+// test('string',    'foo',          false);
+// test('boolean',   true,           false);
+// test('array',     [1,2],          false);
+// test('JSON',      {foo: 'bar'},   false);
+// test('function',  test,           false);
+// test('null',      null,           false);
+// test('undefined', undefined,      false);
+// test('myObject',  new MyClass(),  true);
+// test('date',      new Date(),     true);
+
+// test if arrays are valid JSON structure
+// const myArr = [1,2,3];
+// console.log(`isPlainObj(myArr): ${isPlainObject(myArr)}`) // ... false
+// const myArrEncoded = JSON.stringify(myArr);    // ... "[1,2,3]"
+// const myArrDecoded = JSON.parse(myArrEncoded); // ... [1,2,3]
+// console.log(`encode/decode an array: `, {myArr, myArrEncoded, myArrDecoded});
