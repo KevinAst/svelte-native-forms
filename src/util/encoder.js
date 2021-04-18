@@ -1,5 +1,8 @@
 import check           from './check';
 import {isString,
+        isFunction,
+        isClassObject,
+        isArray,
         isPlainObject} from './typeCheck';
 
 /**
@@ -26,9 +29,13 @@ import {isString,
  * - embedded-recognition: the ability to recognize and reverse the
  *                         process of either encoding and/or
  *                         safeguarding, producing the original
- *                         ref (that was originally encoded)
+ *                         ref (that was encoded)
  *
- * @param {string|jsonObj} ref the reference to encode
+ * @param {any} ref the reference to encode.  All types are supported
+ * (including null/undefined) EXCEPT functions or class-based objects.
+ * NOTE: encode() **assumes** that supplied arrays and JSON objects do NOT
+ * contain these un-supported types.
+ *
  * @param {boolean} [safeguard=false] an indicator as to whether the
  * result should be obfuscated (true) or not (false - the DEFAULT).
  * 
@@ -37,28 +44,41 @@ import {isString,
 export function encode(ref, safeguard=false) {
 
   // validate our parameters
-  const checkParam = check.prefix('encode(ref) parameter violation: ');
+  const checkParam = check.prefix('encode() parameter violation: ');
 
-  // ... ref
-  checkParam(ref,                                 'ref is required');
-  checkParam(isString(ref) || isPlainObject(ref), 'ref must be a string -or- an object literal. NOT: ', ref);
+  // ... ref: we even encode anything (even null/undefined) - EXCEPT functions or class-based objects
+  checkParam( !(isFunction(ref) || isClassObject(ref)),  'ref can be ANY type BUT a function or a class-based object)');
 
   // ... safeguard
   checkParam(safeguard===true || safeguard===false, 'safeguard must be a boolean (true/false), NOT: ', safeguard);
 
   // encode the supplied ref into a string representation
-  let encoding = ref;            // ... by default, a string is left un-touched
-  if (isPlainObject(encoding)) { // ... encode objects
-    encoding = demarkObjEncoding + JSON.stringify(encoding);
+  let encoded;
+  // ... strings are processed as-is
+  if (isString(ref)) {
+    encoded = ref;
+  }
+  // ... handle `undefined` specifically (JSON does NOT handle `undefined` values)
+  else if (ref === undefined) {
+    encoded = demarkUndefined;
+  }
+  // ... plain JSON objects are: JSONIZED
+  else if (isPlainObject(ref)) {
+    encoded = demarkJsonEncoding + JSON.stringify(ref);
+  }
+  // ... all others (numbers, booleans, array, null)
+  //     are: wrapped in a JSON structure and JSONIZED
+  else {
+    encoded = demarkJsonEncoding + JSON.stringify({apwra: ref});
   }
 
   // safeguard, when requested
   if (safeguard) {
-    encoding = demarkSafeguard + obfuscate(encoding);
+    encoded = demarkSafeguard + obfuscate(encoded);
   }
 
   // thats all folks :-)
-  return encoding;
+  return encoded;
 }
 
 
@@ -69,7 +89,7 @@ export function encode(ref, safeguard=false) {
  *       it will simply pass-through the un-encoded ref.  This is a
  *       convenience, and is made possible by embedded-recognition.
  * 
- * @param {any} ref the reference object to decode ... either the
+ * @param {any} ref the reference item to decode ... either the
  * output of `encode()` (a recognized encoded string), or any other
  * reference (simply passed-through).
  * 
@@ -79,7 +99,7 @@ export function decode(ref) {
 
   // RECENT RELAXATION: allow `undefined` to simply pass-through
   // // validate our parameters
-  // const checkParam = check.prefix('decode(ref) parameter violation: ');
+  // const checkParam = check.prefix('decode() parameter violation: ');
   // 
   // // ... ref
   // checkParam(ref, 'ref is required');
@@ -99,36 +119,102 @@ export function decode(ref) {
     result = deobfuscate(result);
   }
 
-  // unwind any encodings
-  if (result.indexOf(demarkObjEncoding) === 0) {
-    result = result.substring(demarkObjEncoding.length);
+  // unwind any JSON encodings
+  if (result.indexOf(demarkJsonEncoding) === 0) {
+    result = result.substring(demarkJsonEncoding.length);
     result = JSON.parse(result);
+  }
+
+  // unwind any primitive type wrappings
+  if (result && result.hasOwnProperty('apwra')) {
+    result = result.apwra;
+  }
+
+  // unwind `undefined` value
+  if (result === demarkUndefined) {
+    result = undefined;
   }
 
   // thats all folks :-)
   return result;
 }
 
-// embedded-recognition keywords
-const demarkObjEncoding = 'obj2str:';
-const demarkSafeguard   = 'afesa'; // ... use a obscure phrase, so as to NOT "stand out"
-//     - pig Latin for "safe"
-//     - preventing it from being uniquely identified
-//       and harvested within a global deployment
-
+// embedded-recognition keywords - use Pig Latin phrases so as to NOT "stand out"
+const demarkJsonEncoding = 'asonja'; // ... "json"
+const demarkSafeguard    = 'afesa';  // ... "safe"
+const demarkUndefined    = '__undefined__';
 
 function obfuscate(str) {
   if (!window.btoa) {
-    throw new Error('*** ERROR *** encode(): ENCODING NOT supported by this browser (btoa).');
+    throw new Error('*** ERROR *** encode(): obfuscation NOT supported by this browser (btoa).');
   }
-  const encoding = window.btoa(str);
-  return encoding;
+  const obfuscated = window.btoa(str);
+  return obfuscated;
 }
 
 function deobfuscate(str) {
   if (!window.atob) {
-    throw new Error('*** ERROR *** encode(): DECODING NOT supported by this browser (atob).');
+    throw new Error('*** ERROR *** decode(): de-obfuscation NOT supported by this browser (atob).');
   }
   const clearTxt = window.atob(str);
   return clearTxt;
 }
+
+// quick-and-dirty test of encode()/decode()
+// function test(testing, ref, safeguard=false, expectingError=false) {
+//   let encoded;
+//   try {
+//     encoded = encode(ref, safeguard);
+//   }
+//   catch (err) {
+//     if (expectingError) {
+//       console.log(`PASS: Expected ERROR THROWN: testing ${testing} ERROR: ${err.message}`, {ref, safeguard, err});
+//     }
+//     else {
+//       console.log(`FAIL: Unexpected ERROR THROWN: testing ${testing} ERROR: ${err.message}`, {ref, safeguard, err});
+//     }
+//     return;
+//   }
+//   const decoded = decode(encoded);
+// 
+//   // test results
+//   if (isPlainObject(ref) || isArray(ref)) {
+//     // test objects by a re-encoding of the decoded TO ACCOMMODATE deep comparison of objects
+//     const result = encode(decoded, safeguard) === encoded ? 'PASS' : 'FAIL';
+//     console.log(`${result}: testing ${testing} `, {ref, safeguard, encoded, decoded});
+//   }
+//   else {
+//     // plain old test
+//     const result = ref === decoded ? 'PASS' : 'FAIL';
+//     console.log(`${result}: testing ${testing} `, {ref, safeguard, encoded, decoded});
+//   }
+// }
+// function testError(testing, ref, safeguard=false) {
+//   test(testing, ref, safeguard, true);
+// }
+// 
+// test('string', 'DillWeed');
+// test('string safeguarded', 'DillWeed', true);
+// test('JSON', {a:123, z:'This is a test'});
+// test('JSON safeguarded', {a:123, z:'This is a test'}, true);
+// test('number', 123);
+// test('number safeguarded', 123, true);
+// test('boolean true', true);
+// test('boolean true safeguarded', true, true);
+// test('boolean false', false);
+// test('boolean false safeguarded', false, true);
+// test('null', null);
+// test('null safeguarded', null, true);
+// test('undefined', undefined);
+// test('undefined safeguarded', undefined, true);
+// test('array', [1, 'two', {wow: 'zee'}]);
+// test('array safeguarded', [1, 'two', {wow: 'zee'}], true);
+// 
+// // test error conditions
+// testError('function', test);
+// class MyClass {
+//   constructor() {
+//     this.foo = 'bar';
+//   }
+// }
+// testError('class-based object', new MyClass());
