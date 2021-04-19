@@ -31,9 +31,9 @@ import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.con
  *
  * @param {string} key the unique key that catalogs this entry.
  * 
- * @return {string|jsonObj} the entry stored in the supplied key
- * (undefined for none), implicitly unpacked to the original ref
- * (supplied to `setLocalStorageItem()`).
+ * @return {any} the original entry retained in the set
+ * operation, if any (undefined for none), implicitly unpacked to it's
+ * original state.
  */
 export function getLocalStorageItem(key) {
 
@@ -64,7 +64,8 @@ export function getLocalStorageItem(key) {
  * Set the supplied entry in Local Storage.
  *
  * @param {string} key the unique key that catalogs this entry.
- * @param {string|jsonObj} ref the reference to store.
+ * @param {any} ref the reference to store.  All types are supported
+ * (including null/undefined) EXCEPT functions or class-based objects.
  * @param {boolean} [safeguard=false] an indicator as to whether the
  * entry should be obfuscated (true) or not (false - the DEFAULT).
  */

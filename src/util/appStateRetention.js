@@ -73,9 +73,9 @@ import {getLocalStorageItem,
  *
  * @param {string} key the unique key that catalogs this entry.
  * 
- * @return {string|jsonObj} the entry retained in our app (undefined
- * for none), implicitly unpacked to the original ref (supplied to
- * `setAppStateItem()`).
+ * @return {any} the original entry retained in the set
+ * operation, if any (undefined for none), implicitly unpacked to it's
+ * original state.
  */
 export function getAppStateItem(key) {
 
@@ -101,7 +101,8 @@ export function getAppStateItem(key) {
  * (when it pre-exists in the URL)
  *
  * @param {string} key the unique key that catalogs this entry.
- * @param {string|jsonObj} ref the reference to store.
+ * @param {any} ref the reference to store.  All types are supported
+ * (including null/undefined) EXCEPT functions or class-based objects.
  * @param {boolean} [safeguard=false] an indicator as to whether the
  * entry should be obfuscated (true) or not (false - the DEFAULT).
  */
