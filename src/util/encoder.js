@@ -197,6 +197,7 @@ function deobfuscate(str) {
 // test('string safeguarded', 'DillWeed', true);
 // test('JSON', {a:123, z:'This is a test'});
 // test('JSON safeguarded', {a:123, z:'This is a test'}, true);
+// test('JSON auto-prunes functions', {a:123, z:'a string', fooFn: ()=>'a function'});
 // test('number', 123);
 // test('number safeguarded', 123, true);
 // test('boolean true', true);
