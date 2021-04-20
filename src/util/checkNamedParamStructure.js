@@ -1,3 +1,5 @@
+import {isPlainObject}  from './typeCheck';
+
 /**
  * A convenience assertion validation utility that performs checks
  * related to any named parameter structural problems.
