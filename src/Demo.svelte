@@ -1,8 +1,6 @@
 <script context="module">
- import {writable} from 'svelte/store';
- import {getAppStateItem,
-         setAppStateItem, 
-         registerAppStateChangeHandler}  from './util/appStateRetention';
+ import persistentWritable      from './util/persistentWritable';
+ import applyStoreValueMethods  from './util/applyStoreValueMethods';
 
  // PUBLIC API is provided through a "module scoped" custom store
  // - this is possible because <Demo> is a "singleton" component ... only one instance is allowed
@@ -20,40 +18,31 @@
  // INTERNAL constants
  const CODE = 'code';
  const DEMO = 'demo'; // our fallback default
- const showKey  = 'show';
 
- // our initial state comes from the persistent appStateRetention
- // ... with a fallback of 'demo'
- const initialState = getAppStateItem(showKey) || DEMO;
-
- // methods held in our store value
- // ... NOTE: BY reasoning over non-default (i.e. 'code'),
- //           we DEFAULT all unknown values to the desired 'demo' fallback
- function isShowingCode() { return this.show === CODE ? true : false; }
- function isShowingDemo() { return this.show !== CODE ? true : false; }
-
- // INTERNAL helper to set our store state
- function setState(show) {
-   // retain local state in our store value
-   set({show, isShowingCode, isShowingDemo});
-   // sync state change in our appStateRetention
-   setAppStateItem(showKey, show);
- }
-
- // our reflexive store :-)
- const {subscribe, set, update} = writable({show: initialState, isShowingCode, isShowingDemo});
- export const demo = { // our custom store (the <Demo> PUBLIC API)
-   subscribe,
-   showCode: () => setState(CODE),
-   showDemo: () => setState(DEMO),
- };
-
- // sync changes FROM: appStateRetention TO: our local state
- // ... this can change "externally" by the user via the URL Site Hash
- registerAppStateChangeHandler(showKey, ({newVal}) => {
-   // console.log(`XX AppStateChangeHandler for demo store (key: '${showKey}'): syncing to '${newVal}'`);
-   setState(newVal);
+ // our base store ... a persistentWritable
+ const store = persistentWritable({
+   key: 'show',
+   initialFallback: {show: DEMO},
+   safeguard: false,                           // ??$$ vary this (for fun)
+   crossCommunicateLocalStorageChanges: false, // ??$$ vary this (for fun)
  });
+
+ // apply value-added store value methods
+ // ... somewhat unconventional, but I LIKE!
+ applyStoreValueMethods(store, {
+   // NOTE 1: cannot be arrow functions (with the `this` usage)
+   // NOTE 2: by reasoning over non-default (i.e. CODE),
+   //         we DEFAULT all unknown values to the desired DEMO fallback
+   isShowingCode() { return this.show === CODE ? true : false; }, 
+   isShowingDemo() { return this.show !== CODE ? true : false; },
+ });
+
+ // our custom store (the <Demo> PUBLIC API)
+ export const demo = {
+   subscribe: store.subscribe,
+   showCode: () => store.set({show: CODE}),
+   showDemo: () => store.set({show: DEMO}),
+ };
 </script>
 
 
