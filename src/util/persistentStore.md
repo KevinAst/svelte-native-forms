@@ -21,7 +21,7 @@ for more complex structures _(JSON usage can be overridden as needed)_.
 
 - [Usage]
 - [API:]
-  - [`persistentStore({key, initialFallback, \[startSubscriptionNotifier\]}): writable`]
+  - [`persistentStore()`]
 - [Examples]
   - [Doo Dee Doo]
 
@@ -143,7 +143,7 @@ complete description_.
 **API:**
 
 ```js
-+ persistentStore({key, initialFallback, [startSubscriptionNotifier]}): writable
++ persistentStore({key, store, [safeguard], [crossCommunicateLocalStorageChanges]}): writable
 ```
 
 **Parameters:**
@@ -205,9 +205,7 @@ samples in this section progressively build on additional options of
 [Introduction]:              #persistentstore-svelte-store
 [Usage]:                     #usage
 [API:]:                      #api
-  <!--- NOTE: each function supports different link labels (with and without API)  ---> 
   [`persistentStore()`]:     #persistentstore
-  [`persistentStore({key, initialFallback, \[startSubscriptionNotifier\]}): writable`]: #persistentstore
 [Examples]:                  #examples
   [Doo Dee Doo]:             #doo-dee-doo
 
