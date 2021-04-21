@@ -28,11 +28,22 @@ export function isString(ref) {
   return typeof ref === 'string' || ref instanceof String;
 }
 
-
 // isFunction(ref): boolean
 // ... from http://underscorejs.org/
 export function isFunction(ref) {
   return !!(ref && ref.constructor && ref.call && ref.apply);
+}
+
+// isSvelteStore(ref): boolean
+export function isSvelteStore(ref) {
+  // duck type check :-)
+  return !!ref && ref.subscribe;
+}
+
+// isSvelteWritable(ref): boolean
+export function isSvelteWritable(ref) {
+  // duck type check :-)
+  return isSvelteStore(ref) && ref.set && ref.update;
 }
 
 // quick-and-dirty test of isClassObject(ref)

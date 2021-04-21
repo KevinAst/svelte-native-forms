@@ -1,6 +1,6 @@
 <script context="module">
- import persistentWritable      from './util/persistentWritable';
- import applyStoreValueMethods  from './util/applyStoreValueMethods';
+ import persistentWritable     from './util/persistentWritable';
+ import bindStoreValueMethods  from './util/bindStoreValueMethods';
 
  // PUBLIC API is provided through a "module scoped" custom store
  // - this is possible because <Demo> is a "singleton" component ... only one instance is allowed
@@ -8,9 +8,9 @@
  //   * Store API:
  //     + showCode(): void
  //     + showDemo(): void
- //   * Store Value:
+ //   * Store-Value:
  //     {
- //       show: 'demo'/'code'
+ //       show: 'demo'/'code',
  //       isShowingCode(): boolean, // true: when code is visible
  //       isShowingDemo(): boolean, // true: when demo is visible
  //     }
@@ -27,14 +27,12 @@
    crossCommunicateLocalStorageChanges: false, // ??$$ vary this (for fun)
  });
 
- // apply value-added store value methods
- // ... somewhat unconventional, but I LIKE!
- applyStoreValueMethods(store, {
-   // NOTE 1: cannot be arrow functions (with the `this` usage)
-   // NOTE 2: by reasoning over non-default (i.e. CODE),
-   //         we DEFAULT all unknown values to the desired DEMO fallback
+ // bind store-value methods (encapsulating business logic)
+ bindStoreValueMethods(store, {
+   // NOTE: by reasoning over non-default (i.e. CODE),
+   //       we DEFAULT all unknown values to the desired DEMO fallback
    isShowingCode() { return this.show === CODE ? true : false; }, 
-   isShowingDemo() { return this.show !== CODE ? true : false; },
+   isShowingDemo() { return !this.isShowingCode(); },
  });
 
  // our custom store (the <Demo> PUBLIC API)
