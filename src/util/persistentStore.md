@@ -339,8 +339,8 @@ https://my-app.org/app/
    sidebar:  'asonja{"isOpen":false,"width":350}'
    ```
  
-3. If you re-launch the web page, it will pick up where you last left
-   off, because your store is persistent!!
+3. As always, if you re-launch the web page, it will pick up where you
+   last left off, because your store is persistent!!
 
 4. As before, if you are dealing with sensitive data, activate the `safeguard`
    parameter _(above)_, and you will see that the data is is now
@@ -390,26 +390,125 @@ https://my-app.org/app/
 <!--- *** Section ************************************************************************* ---> 
 ## Overriding JSONization (back to strings)
 
-As we have seen _from the prior example ([Complex Store Values])_,
-the default [JSONization] process is fine for [Local Storage] but is
-**NOT** all that great [URL Hash Storage].
+As we have seen _from the prior example ([Complex Store Values])_, the
+default [JSONization] process is fine for [Local Storage] but **NOT**
+all that great [URL Hash Storage].
 
 As previously mentioned, it doesn't make a lot of sense to use this
 obscure JSON syntax in the URL. _**Typically our URL directives
 should be "more user friendly" and "human interpretable"**_.
 
 What we need is a way to override the default [JSONization] process,
-and get back to a more palatable string.
+and get back to a more palatable string.  This is exactly what the
+[`persistentStore()`] `encode` and `decodeAndSync` parameters are for!
 
-?? RETRO POINT: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The following sample is identical to the previous _([Complex Store
+Values])_, except it has added the two new `encode` and
+`decodeAndSync` parameters.
 
-Enter the ?? option.
+
+```js
+// our base store (a persistent writable)
+const {subscribe, update} = persistentStore({
+  key:   'sidebar',
+  store: writable({ 
+    isOpen: true,  // the sideBar open/closed state
+    width:  300    // the sideBar width
+  }),
+  // safeguard: true, // see BULLET 4. (below)
+  encode: (key, storeValue) => `${storeValue.isOpen ? 'open' : 'closed'}-${storeValue.width}`,
+  decodeAndSync: (key, persistentValue, store) => {
+    const [openClosed, widthStr] = persistentValue.split('-');
+    const isOpen = openClosed === 'closed' ? false : true;
+    let   width  = parseInt(widthStr, 10);
+    store.set({isOpen, width});
+  },
+});
+
+// our "public" custom store (with "controlled" setter methods)
+export const sideBar = {
+  subscribe,
+  open:     ()      => update( (state) => ({...state, isOpen: true}) ),
+  close:    ()      => update( (state) => ({...state, isOpen: false}) ),
+  toggle:   ()      => update( (state) => ({...state, isOpen: !state.isOpen}) ),
+  setWidth: (width) => update( (state) => ({...state, width}) ),
+};
+```
+
+You can see where these two application hooks are encoding/decoding
+the persistent values into a simple string representation.
+
+**Please Note** that these callbacks are NOT yet reasoning over the
+`key` parameter.  Because we are using a single key, it can be
+implied.  Our next example will showcase when this is necessary _(to
+partition the store-value with multiple keys)_.
+
+As always, by running our app with no URL hash keys, our persistent
+state is retained in [Local Storage].
+
+```
+https://my-app.org/app/
+```
+
+1. Because our store is persistent, your **DevTools** "Application"
+   tab will show the new [Local Storage] "sidebar" entry _(as defined
+   by the `key` parameter - above)_:
+ 
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   ==========
+   sidebar:  'open-400'
+   ```
+
+   Notice how our app-specific encode/decode process has formatted the
+   persistent entry into a "more user friendly" and "human readable"
+   format.
+ 
+2. As always, changing the store-value auto syncs the [Local Storage].
+ 
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   ============
+   sidebar:  'closed-350'
+   ```
+ 
+3. As always, if you re-launch the web page, it will pick up where you
+   last left off, because your store is persistent!!
+
+4. As before, if you are dealing with sensitive data, activate the `safeguard`
+   parameter _(above)_, and you will see that the data is is now
+   obfuscated.
+
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   =======================
+   sidebar:  'afesaY2xvc2VkLTM1MA=='
+   ```
+
+5. Now that our persistent storage is based on simple strings, we can
+   once again drive the state from our URL _(rather than [Local
+   Storage])_ ... simply add the following hash to your URL:
+
+   ```
+   https://my-app.org/app/#sidebar=closed-350
+   ```
+
+   - Now the state is persisted in the URL, when we change the store
+     the URL will reflect this change.
+
+   - As always, this allows you to specify the initial value from the
+     URL itself.  This is especially useful in things like `iframe`
+     usage.
+
+   - You can also change the hash value in the URL, and it will
+     automatically sync to your local svelte store **(very kool)**.
 
 
 <!--- *** Section ************************************************************************* ---> 
 ## Breaking a Store into Multiple Persistent Keys
-
-?? TOC
 
 ?? RETRO POINT: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
