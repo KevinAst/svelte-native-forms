@@ -15,37 +15,46 @@ Because your stores are now persistent, when you re-launch your web
 page, it will pick up where you last left off ... **Very Kool
 Indeed**!!
 
-> From a usage perspective, I would caution against using this as an
-> application database.  Neither [Local Storage] or svelte stores were
-> intended for that _(for a variety of reasons)_.
+> From a usage perspective, **a caution must be given to avoid using
+> this mechanism as an application database**!  Neither [Local
+> Storage] or svelte stores were intended for this _(for a variety of
+> reasons)_.
 >
-> With that said, a great use of `persistentStore` is application
-> control state.  For example: a selected theme _(with dark mode)_, or a
-> SideBar open/close indicator, etc.  Using a `persistentStore`, your
-> state is retained across browser sessions, and the developer doesn't
-> even have to think about it ... it just works!
+> With that said, **a great use of `persistentStore` is application
+> control state**!  For example: a selected theme _(with dark mode)_,
+> or a SideBar open/close indicator, etc.  Using a `persistentStore`,
+> your state is retained across browser sessions, and the developer
+> doesn't even have to think about it ... it just works!
 
-The `key` parameter serves as the persistent storage key.  The
-persisted value is always a string.  By default `persistentStore()`
-will automatically handle complex store-values by using a [JSONized]
-string.  As we will see, this [JSONization] process can be overridden
-as needed.
+A `key` parameter is configured that serves as the persistent storage
+key.  The persisted value is always a string.  Complex store-values
+are automatically encoded using a [JSONized] string _(this can be
+overridden as needed)_.  In addition the persisted value can be
+obfuscated _(for sensitive data)_.
+
+`persistentStore()` encapsulates all the "detailed wiring" needed
+to use [App State Retention] in your svelte store, **making it
+extremely easy to enable persistent stores**.  This encapsulation
+covers the three-fold aspects of 1. svelte store initialization from
+persistent storage, 2. auto-syncing svelte store changes to persistent
+storage, and 3. auto-syncing changes from the persistent storage to
+the svelte store.
 
 
 <!--- *** Section ************************************************************************* ---> 
 ## At a Glance
 
-- [Usage]
+- [Getting Started]
 - [API:]
   - [`persistentStore()`]
-- [Examples]
+- [Concepts]
   - [Complex Store Values]
   - [Overriding JSONization (back to strings)]
   - [Breaking a Store into Multiple Persistent Keys]
 
 
 <!--- *** Section ************************************************************************* ---> 
-## Usage
+## Getting Started
 
 Here is a very basic example of using `persistentStore`:
 
@@ -130,7 +139,7 @@ https://my-app.org/app/
      automatically sync to your local svelte store **(very kool)**.
 
 This example just "touches the surface".  There are more options to
-consider.  The [Examples] section covers this in more detail.
+consider.  The [Concepts] section covers this in more detail.
 
 
 <!--- *** Section ************************************************************************* ---> 
@@ -149,44 +158,116 @@ complete description_.
 **API:**
 
 ```js
-+ persistentStore({key, store, [safeguard], [crossCommunicateLocalStorageChanges]}): writable
++ persistentStore({key,
+                   store,
+                   [safeguard],
+                   [encode],
+                   [decodeAndSync],
+                   [crossCommunicateLocalStorageChanges]}): writable
 ```
 
 **Parameters:**
 _please note that named parameters are used to more easily accommodate
-parameter omission (employing default semantics)_:
+parameter omission (employing the default semantics)_:
 
-- **`key`**: {string} - the persistent storage key.
+- **`key`**: {string | string[]} - the persistent storage key.  
+
+  Normally this will be a single key, but multiple keys can be
+  supplied _(i.e. an array of keys)_ when multiple storage units are
+  needed for a given svelte store.  When multiple keys are supplied,
+  both the `encode` and `decodeAndSync` parameters must also be
+  defined, so as to determine the partitioning of the store-value to
+  it's keys.  For an example of this, please refer to the [Breaking a
+  Store into Multiple Persistent Keys] discussion.
 
 - **`store`**: {[`Writable`]} - the svelte [`Writable`] store
   to be be persisted.  This `store` will be enabled to automatically
   persist it's store-value whenever it changes.
 
-- **`[safeguard]`**: {boolean} - an indicator as to whether the
-  storage value should be obfuscated (true) or not (false - the
-  DEFAULT).
+- **`[safeguard]`**: {boolean} - an optional indicator as to whether
+  the storage value should be obfuscated (true) or not (false - the
+  DEFAULT).  _This is useful when dealing with sensitive data._
 
   **DEFAULT**: `false`
+
+- **`[encode]`**: {function} - an optional handler that encodes a
+  store-value to a string per app-specific requirements.  _This is
+  useful when you wish to override the default [JSONization] process
+  _(which can be a bit cryptic)_ into a "more user friendly" and
+  "human interpretable" string.  This is especially true when [URL
+  Hash Storage] is in effect, because it is visible in the URL
+  itself._
+
+  **NOTE**: When supplied, **both** `encode` and `decodeAndSync` must
+  be provided together.  They are bookends _so to speak_.
+
+  ```js
+  + encode(key, storeValue): string
+  ```
+
+  Encode the supplied `storeValue` _(in the context of `key`)_ in the
+  returned string.  This may be a full or partial representation of
+  the `storeValue`, depending on whether the `persistentStore` has one
+  or multiple `key`s.
+
+  For examples of this, please refer to the discussions in [Overriding
+  JSONization (back to strings)] and [Breaking a Store into Multiple
+  Persistent Keys].
+
+  **INTERNALLY**: `setAppStateItem()` will simply pass through this
+  "persistent" encoded string _(conditionally performing a safeguard
+  as directed)_.
+
+  **DEFAULT**: pass through simple string-based `storeValue`, and
+  [JSONize] complex `storeValue`s.
+
+- **`[decodeAndSync]`**: {function} - an optional handler that decodes
+  a persistent-value and syncs it to a store, per app-specific
+  requirements.  _This is useful for the same reasons given in the
+  `encode` parameter._
+
+  **NOTE**: When supplied, **both** `encode` and `decodeAndSync`
+  must be provided together.  They are bookends _so to speak_.
+
+  ```js
+  + decodeAndSync(key, persistentValue, store): void
+  ```
+
+  Decode the supplied `persistentValue` _(in the context of `key`)_
+  and sync this to the supplied `store`.  This `persistentValue` may
+  be a full or partial representation of the `store`, depending on
+  whether the `persistentStore` has one or multiple `key`s.  **HINT**:
+  A full representation can sync with a `store.set()`, while a partial
+  representation should sync with a `store.update()`.
+
+  For examples of this, please refer to the discussions in [Overriding
+  JSONization (back to strings)] and [Breaking a Store into Multiple
+  Persistent Keys].
+
+  **DEFAULT**: directly use the `persistentValue` _(reversing any [JSONization])_
+  in a store set operation - `store.set(persistentValue)`.
 
 - **`[crossCommunicateLocalStorageChanges]`**: {boolean} - a directive
   to register change handlers for "Local Storage" changes (see: [App
   State Retention])
 
+  For an example of this, please refer to the ?? discussion.
+
   **DEFAULT**: `false`
 
 **Return:** {[`Writable`]} - as a convenience, the supplied
- `store` is returned, supporting chaining.  The "persistent" bindings
- have been applied to this `store`.
+`store` is returned, supporting chaining.  The "persistent" bindings
+have been applied to this `store`.
 
 </ul>
 
 
 <!--- *** Section ************************************************************************* ---> 
-## Examples
+## Concepts
 
-We have covered a very basic example in the [Usage] section.  The
-samples in this section progressively build on additional options of
-`persistentStore()`.
+The [Getting Started] section covered a very basic example of
+`persistentStore()`.  This section progressively builds additional
+concepts and options used in this utility.
 
 - [Complex Store Values]
 - [Overriding JSONization (back to strings)]
@@ -343,10 +424,10 @@ Hash, while the remainder comes from Local Storage.
 
 <!--- **tw-themes** ---> 
 [Introduction]:              #persistentstore-svelte-store
-[Usage]:                     #usage
+[Getting Started]:           #getting-started
 [API:]:                      #api
   [`persistentStore()`]:     #persistentstore
-[Examples]:                  #examples
+[Concepts]:                  #concepts
   [Complex Store Values]:    #complex-store-values
   [Overriding JSONization (back to strings)]:       #overriding-jsonization-back-to-strings
   [Breaking a Store into Multiple Persistent Keys]: #breaking-a-store-into-multiple-persistent-keys
@@ -357,5 +438,6 @@ Hash, while the remainder comes from Local Storage.
 [App State Retention]:       appStateRetention.js
 [URL Hash Storage]:          urlHashStorage.js
 [Local Storage]:             localStorage.js
+[JSONize]:                   https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
 [JSONized]:                  https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
 [JSONization]:               https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
