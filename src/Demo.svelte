@@ -20,40 +20,14 @@
  const CODE = 'code';
  const DEMO = 'demo'; // our fallback default
 
-
- // ?? OP 1: break out in seperate steps
- //? // our base store ... a persistentStore
- //? const store = persistentStore({
- //?   key: 'show',
- //?   store: writable({show: DEMO}),
- //?   safeguard: false,                           // ??$$ vary this (for fun)
- //?   crossCommunicateLocalStorageChanges: false, // ??$$ vary this (for fun)
- //? });
- //? 
- //? // bind store-value methods (encapsulating business logic)
- //? bindStoreValueMethods(store, {
- //?   // NOTE: by reasoning over non-default (i.e. CODE),
- //?   //       we DEFAULT all unknown values to the desired DEMO fallback
- //?   isShowingCode() { return this.show === CODE ? true : false; }, 
- //?   isShowingDemo() { return !this.isShowingCode(); },
- //? });
- //? 
- //? // our custom store (the <Demo> PUBLIC API)
- //? export const demo = {
- //?   subscribe: store.subscribe,
- //?   showCode: () => store.set({show: CODE}),
- //?   showDemo: () => store.set({show: DEMO}),
- //? };
-
- // ?? OP 2: everything ALL ALL-IN-ONE
  // our base store (a persistent writable store with store-value methods)
  const {subscribe, set} = 
    bindStoreValueMethods(
      persistentStore({
        key: 'show',
        store: writable({show: DEMO}),
-       safeguard: false,                           // ??$$ vary this (for fun)
-       crossCommunicateLocalStorageChanges: false, // ??$$ vary this (for fun)
+       encode: (key, storeValue) => storeValue.show,
+       decodeAndSync: (key, persistentValue, store) => store.set({show: persistentValue}),
      }),
      { // ... our store-value methods
        //     NOTE: by reasoning over non-default (i.e. CODE),
@@ -69,7 +43,6 @@
    showCode: () => set({show: CODE}),
    showDemo: () => set({show: DEMO}),
  };
-
 </script>
 
 
