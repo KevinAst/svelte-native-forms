@@ -51,14 +51,21 @@ the svelte store.
   - [Complex Store Values]
   - [Overriding JSONization (back to strings)]
   - [Breaking a Store into Multiple Persistent Keys]
+- [Tidbits]
+  - [Full URL Hash Syntax]
+  - [Cross Communication (between windows)]
+
 
 
 <!--- *** Section ************************************************************************* ---> 
 ## Getting Started
 
-Here is a very basic example of using `persistentStore`:
+Here is a very basic example using `persistentStore`:
 
 ```js
+ import {writable}      from 'svelte/store';
+ import persistentStore from './util/persistence/persistentStore';
+
  // our base store (a persistent writable)
  const {subscribe, set} = persistentStore({
    key:   'show',
@@ -248,10 +255,8 @@ parameter omission (employing the default semantics)_:
   in a store set operation - `store.set(persistentValue)`.
 
 - **`[crossCommunicateLocalStorageChanges]`**: {boolean} - a directive
-  to register change handlers for "Local Storage" changes (see: [App
-  State Retention])
-
-  For an example of this, please refer to the ?? discussion.
+  to register change handlers for [Local Storage] changes _(for more
+  information on this, see [Cross Communication (between windows)])_.
 
   **DEFAULT**: `false`
 
@@ -641,6 +646,75 @@ https://my-app.org/app/
 
 
 
+<!--- *** Section ************************************************************************* ---> 
+## Tidbits
+
+This section further explores a number of additional topics.
+
+- [Full URL Hash Syntax]
+- [Cross Communication (between windows)]
+
+
+<!--- *** Section ************************************************************************* ---> 
+## Full URL Hash Syntax
+
+We have discussed the URL Hash in all our samples, but all the
+examples have been single entries.
+
+Here is a URL that defines multiple persistent state items:
+
+```
+https://my-app.org/app/#show=code&sidebar=closed
+```
+
+1. start out with a hash tag (#) at the end of the URL
+2. each entry is a `key=value` pair
+3. multiple entries are delineated with the ampersand (&)
+
+
+<!--- *** Section ************************************************************************* ---> 
+## Cross Communication (between windows)
+
+Just as changes in [URL Hash Storage] can be synced to your local
+svelte store, changes in [Local Storage] can be synced as well ... by
+enabling the `crossCommunicateLocalStorageChanges` ... _see the
+[`persistentStore()`] parameters_.
+
+The difference is that with [Local Storage] changes, the
+synchronization occurs in external browser windows _(i.e. windows
+other that the one that made the change)_.  All Local Storage changes
+are done programmatically.  Presumably, the window that initiated the
+change is already aware of the change, so there is no need to notify
+this window.  For more information, please refer to the [Window:
+storage event].
+
+**This has the effect of cross-communication between windows.** _For
+this reason, this option is rarely used, **but it is crazy to play
+with**!_ When enabled, changes in one browser window are immediately
+reflected in other browser windows, _thanks to svelte's reflective
+store_!.
+
+The underlying aspect to understand here is that [Local Storage] is
+shared between any browser window with the same domain _(a combination
+of `protocol://host:port`)_.  This could be a second rendition of the
+same app _(in a different window)_ or a different app altogether
+... _as long it shares the same domain_.  In essence, **[Local
+Storage] is "global" in that sense**.
+
+> **CAUTION**: 
+> Be careful enabling the `crossCommunicateLocalStorageChanges` option
+> when triggered by rapid-fire events _(such a mouse drag operations)_.
+> Because of the cross-process synchronization, this can cause an
+> osculating back-and-forth series of events that result in an infinite
+> thrashing process.
+> 
+> If you find yourself in this situation, consider:
+> - Throttling: a reduction of the trigger rate
+> - Debouncing: ZERO trigger rate until a period of calm
+
+
+
+
 <!--- *** REFERENCE LINKS ************************************************************************* ---> 
 <!---     NOTE: some links are duplicated with alias link label text                                --->
 
@@ -653,7 +727,9 @@ https://my-app.org/app/
   [Complex Store Values]:    #complex-store-values
   [Overriding JSONization (back to strings)]:       #overriding-jsonization-back-to-strings
   [Breaking a Store into Multiple Persistent Keys]: #breaking-a-store-into-multiple-persistent-keys
-
+[Tidbits]:                   #tidbits
+  [Full URL Hash Syntax]:    #full-url-hash-syntax
+  [Cross Communication (between windows)]:  #cross-communication-between-windows
 
 <!--- external links ---> 
 [`Writable`]:                https://svelte.dev/docs#writable
@@ -663,3 +739,4 @@ https://my-app.org/app/
 [JSONize]:                   https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
 [JSONized]:                  https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
 [JSONization]:               https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
+[Window: storage event]:     https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event
