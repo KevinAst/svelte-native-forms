@@ -24,101 +24,41 @@
  //       OP2: registration API (useful for dynamic run-time resources - as in visualize-it)
  //       OP3: combination of OP1/OP2
 
- // ?? OLD: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- //? import {writable} from 'svelte/store';
- //? import {getAppStateItem,
- //?         setAppStateItem, 
- //?         registerAppStateChangeHandler}  from '../util/appStateRetention';
- //? 
- //? // INTERNAL constants
- //? // ... NOTE: we use two distinct persistent keys to allow them to be isolated in a URL hash
- //? //           TYPICALLY we don't want to expose the SideBar width in a URL hash :-)
- //? const sideBarOpenClosedKey = 'sidebar';  // ... syntax: sidebar=open, sidebar=closed
- //? const sideBarWidthKey      = 'sidebarw'; // ... syntax: sidebarw=250
- //? 
- //? // INTERNAL helper that emits an updated store state, either programmatically -OR- from changes in persistent retention
- //? function updateState({state={}, // the current store state (omit for initial setup)
- //?                       isOpen,   // a boolean that programmatically sets `isOpen` sub-state (omit when NOT impacting `isOpen` -OR- supplying persistOpenClosed)
- //?                       width,    // an int that programmatically sets `width` sub-state (omit when NOT impacting `width` -OR- supplying persistWidth)
- //?                       persistOpenClosed, // a string of 'open'/'closed' (FROM our persistent retention)
- //?                       persistWidth}) {   // a string containing the desired width int (FROM our persistent retention)
- //? 
- //?   // maintain desired state setting, either from the current state -OR- programmatic params (when supplied)
- //?   isOpen = isOpen===undefined ? state.isOpen : isOpen;
- //?   width  = width===undefined  ? state.width  : width;
- //? 
- //?   // apply the persistent parameters (when supplied) ... TAKES PRECEDENCE
- //?   if (persistOpenClosed) {
- //?     // NOTE: BY reasoning over non-default (i.e. 'closed'),
- //?     //       we DEFAULT all unknown values to the desired 'open' fallback
- //?     isOpen = persistOpenClosed === 'closed' ? false : true;
- //?   }
- //?   if (persistWidth) {
- //?     width = parseInt(persistWidth, 10);
- //?     if (Number.isNaN(width)) {
- //?       width = 250; // DEFAULT invalid number
- //?     }
- //?   }
- //? 
- //?   // sync state change in our appStateRetention
- //?   setAppStateItem(sideBarOpenClosedKey, `${isOpen ? 'open' : 'closed'}`);
- //?   setAppStateItem(sideBarWidthKey,      ''+width);
- //? 
- //?   // return the state to be used by update (or the initial value)
- //?   return {isOpen, width};
- //? }
- //? 
- //? //***
- //? //*** promote our sideBar PUBLIC API through this "module scoped" custom store
- //? //***
- //? 
- //? // our initial state comes from the persistent appStateRetention
- //? // ... with a fallback of 'open'/'250'
- //? const initialOpenClosed = getAppStateItem(sideBarOpenClosedKey) || 'open';
- //? const initialWidth      = getAppStateItem(sideBarWidthKey)      || '250';
- //? const {subscribe, set, update} = writable( updateState({persistOpenClosed: initialOpenClosed, 
- //?                                                         persistWidth:      initialWidth}) );
- //? export const sideBar = { // our custom store (which is the SideBar PUBLIC API)
- //?   subscribe,
- //?   open:   () => update( (state) => updateState({state, isOpen: true}) ),
- //?   close:  () => update( (state) => updateState({state, isOpen: false}) ),
- //?   toggle: () => update( (state) => updateState({state, isOpen: !state.isOpen}) ),
- //? };
- //? 
- //? // sync changes FROM: appStateRetention TO: our local state
- //? // ... this can optionally change "externally" by the user WHEN they employ the URL Site Hash
- //? registerAppStateChangeHandler(sideBarOpenClosedKey, ({newVal}) => {
- //?   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarOpenClosedKey}'): syncing to '${newVal}'`);
- //?   update( (state) => updateState({state, persistOpenClosed: newVal}) );
- //? });
- //? registerAppStateChangeHandler(sideBarWidthKey, ({newVal}) => {
- //?   // console.log(`XX AppStateChangeHandler for SideBar store (key: '${sideBarWidthKey}'): syncing to '${newVal}'`);
- //?   update( (state) => updateState({state, persistWidth: newVal}) );
- //? });
-
- // ?? NEW: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  import {writable}      from 'svelte/store';
  import persistentStore from '../util/persistentStore';
 
  // our base store (a persistent writable)
  const {subscribe, update} = persistentStore({
-   key:   'sideBar',
+          // we use two distinct persistent keys to allow 
+          // partitioning storage between URL hash and Local Storage
+   key:   ['sidebar',   // ... syntax: sidebar=open, sidebar=closed
+           'sidebarw'], // ... syntax: sidebarw=250
    store: writable({ 
      isOpen: true,  // the sidebar open/closed state
      width:  300    // the sidebar width
    }),
-   // safeguard: true, // see BULLET ?? 4. (below)
-   encode: (key, storeValue) => `${storeValue.isOpen ? 'open' : 'closed'}-${storeValue.width}`,
-   decodeAndSync: (key, persistentValue, store) => {
-     const [openClosed, widthStr] = persistentValue.split('-');
-     // NOTE: BY reasoning over non-default (i.e. 'closed'),
-     //       we DEFAULT all unknown values to the desired 'open' fallback
-     const isOpen = openClosed === 'closed' ? false : true;
-     let   width  = parseInt(widthStr, 10);
-     if (Number.isNaN(width)) {
-       width = 250; // DEFAULT invalid number
+   encode: (key, storeValue) => {
+     if (key === 'sidebar') {
+       return storeValue.isOpen ? 'open' : 'closed';
      }
-     store.set({isOpen, width});
+     else {
+       return '' + storeValue.width;
+     }
+   },
+   decodeAndSync: (key, persistentValue, store) => {
+     if (key === 'sidebar') {
+       // NOTE: BY reasoning over non-default (i.e. 'closed'),
+       //       we DEFAULT all unknown values to the desired 'open' fallback
+       const isOpen = persistentValue === 'closed' ? false : true;
+       store.update( (storeValue) => ({...storeValue, isOpen}) );
+     }
+     else {
+       let width = parseInt(persistentValue, 10);
+       if (Number.isNaN(width)) {
+         width = 250; // DEFAULT invalid number
+       }
+       store.update( (storeValue) => ({...storeValue, width}) );
+     }
    },
  });
 

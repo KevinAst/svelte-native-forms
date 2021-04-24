@@ -2,6 +2,7 @@ import check                    from './check';
 import checkNamedParamStructure from './checkNamedParamStructure';
 import {isString,
         isBoolean,
+        isArray,
         isPlainObject,
         isFunction,
         isSvelteWritable}       from './typeCheck';
@@ -27,12 +28,11 @@ export default function persistentStore(namedParams={}) {
   // ... check overall named parameter structure
   checkNamedParamStructure(checkParam, namedParams, arguments, unknownNamedArgs);
 
-  // ??$$ TEST
   // ... key
   checkParam(keyParam,                                 'key is required');
   checkParam(isString(keyParam) || isArray(keyParam),  'key must be a string or a string[]');
   const keys = isString(keyParam) ? [keyParam] : keyParam; // ... for consistency, we use keys (plural) from this point on
-  keys.forEach( (key) => checkParam(isString(key)),    'key array must contain ALL strings');
+  keys.forEach( (key) => checkParam(isString(key),     'key array must contain ALL strings') );
   const multiKey = keys.length===1 ? false : true;     // ... convenience used in encode/decodeAndSync checks
 
   // ... store
@@ -42,13 +42,13 @@ export default function persistentStore(namedParams={}) {
   // ... safeguard
   checkParam(isBoolean(safeguard), 'safeguard must be a boolean (when supplied), NOT: ', safeguard);
 
-  // ... encode ??$$ TEST
+  // ... encode
   checkParam(isFunction(encode), 'encode must be a function (when supplied)');
 
-  // ... decodeAndSync ??$$ TEST
+  // ... decodeAndSync
   checkParam(isFunction(decodeAndSync), 'decodeAndSync must be a function (when supplied)');
 
-  // ... encode/decodeAndSync COMBINATIONS ??$$ TEST
+  // ... encode/decodeAndSync COMBINATIONS
   const isEncodeSupplied = encode        !== DEFAULT_encode;
   const isDecodeSupplied = decodeAndSync !== DEFAULT_decodeAndSync;
   checkParam(isEncodeSupplied===isDecodeSupplied, 'one of either encode or decodeAndSync were supplied without the other ... they BOTH must be provided together (they are bookends)');
@@ -102,7 +102,7 @@ export default function persistentStore(namedParams={}) {
   //     - crossCommunicateLocalStorageChanges
   keys.forEach( (key) => {
     registerAppStateChangeHandler(key, ({newVal: persistentStoreValue}) => {
-      console.log(`?? AppStateChangeHandler for persistentStore (key: '${key}'): syncing to:`, {persistentStoreValue});
+      // console.log(`XX AppStateChangeHandler for persistentStore (key: '${key}'): syncing to:`, {persistentStoreValue});
       decodeAndSync(key, persistentStoreValue, store);
     }, crossCommunicateLocalStorageChanges);
   });

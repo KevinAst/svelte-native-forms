@@ -404,8 +404,7 @@ and get back to a more palatable string.  This is exactly what the
 
 The following sample is identical to the previous _([Complex Store
 Values])_, except it has added the two new `encode` and
-`decodeAndSync` parameters.
-
+`decodeAndSync` parameters _(demarked as **NEW**)_.
 
 ```js
 // our base store (a persistent writable)
@@ -416,6 +415,7 @@ const {subscribe, update} = persistentStore({
     width:  300    // the sideBar width
   }),
   // safeguard: true, // see BULLET 4. (below)
+  // ---------- NEW START -------- NEW START -------- NEW START -------- NEW START -----------
   encode: (key, storeValue) => `${storeValue.isOpen ? 'open' : 'closed'}-${storeValue.width}`,
   decodeAndSync: (key, persistentValue, store) => {
     const [openClosed, widthStr] = persistentValue.split('-');
@@ -423,6 +423,7 @@ const {subscribe, update} = persistentStore({
     let   width  = parseInt(widthStr, 10);
     store.set({isOpen, width});
   },
+  // ---------- NEW END ---------- NEW END ---------- NEW END ---------- NEW END -------------
 });
 
 // our "public" custom store (with "controlled" setter methods)
@@ -436,7 +437,7 @@ export const sideBar = {
 ```
 
 You can see where these two application hooks are encoding/decoding
-the persistent values into a simple string representation.
+the persistent values into simple strings.
 
 **Please Note** that these callbacks are NOT yet reasoning over the
 `key` parameter.  Because we are using a single key, it can be
@@ -510,11 +511,133 @@ https://my-app.org/app/
 <!--- *** Section ************************************************************************* ---> 
 ## Breaking a Store into Multiple Persistent Keys
 
-?? RETRO POINT: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+There are cases where you may wish to partition a single store-value
+into multiple persistent keys.  This supports things like allowing one
+aspect of a store to be driven from [URL Hash Storage], while the
+remainder comes from [Local Storage].
 
-?? You may need to break a single store-value into multiple persistent
-keys.  This supports things like one store aspect to come from a URL
-Hash, while the remainder comes from Local Storage.
+The following sample is identical to the previous _([Overriding
+JSONization (back to strings)])_, except where demarked as **NEW**:
+
+```js
+// our base store (a persistent writable)
+const {subscribe, update} = persistentStore({
+  key:   ['sidebar', 'sidebarw'], // ----- NEW ---- NEW ---- NEW -------
+  store: writable({ 
+    isOpen: true,  // the sideBar open/closed state
+    width:  300    // the sideBar width
+  }),
+  // safeguard: true, // see BULLET 4. (below)
+  // ---------- NEW START -------- NEW START -------- NEW START --------
+  encode: (key, storeValue) => {
+    if (key === 'sidebar') {
+      return storeValue.isOpen ? 'open' : 'closed';
+    }
+    else {
+      return '' + storeValue.width;
+    }
+  },
+  decodeAndSync: (key, persistentValue, store) => {
+    if (key === 'sidebar') {
+      const isOpen = persistentValue === 'closed' ? false : true;
+      store.update( (storeValue) => ({...storeValue, isOpen}) );
+    }
+    else {
+      let width = parseInt(persistentValue, 10);
+      if (Number.isNaN(width)) {
+        width = 250; // DEFAULT invalid number
+      }
+      store.update( (storeValue) => ({...storeValue, width}) );
+    }
+  },
+  // ---------- NEW END ---------- NEW END ---------- NEW END ----------
+});
+
+// our "public" custom store (with "controlled" setter methods)
+export const sideBar = {
+  subscribe,
+  open:     ()      => update( (state) => ({...state, isOpen: true}) ),
+  close:    ()      => update( (state) => ({...state, isOpen: false}) ),
+  toggle:   ()      => update( (state) => ({...state, isOpen: !state.isOpen}) ),
+  setWidth: (width) => update( (state) => ({...state, width}) ),
+};
+```
+
+Notice that the sample is:
+
+  1. Defining multiple keys: `['sidebar', 'sidebarw']`
+
+  2. The `encode` and `decodeAndSync` callbacks **now reason about the
+     `key` parameter**.  This, in effect, is multiple encodings in one
+     callback.  It has the effect of partitioning the persistent store
+     into multiple keys.  **Notice also that we are using
+     `store.update()`** instead of `store.set()` _(in the prior
+     example)_, because each key represents a portion of the
+     store-value.
+
+As always, by running our app with no URL hash keys, our persistent
+state is retained in [Local Storage].
+
+```
+https://my-app.org/app/
+```
+
+1. Now by looking at the **DevTools** "Application" tab, you will see
+   we have **two** [Local Storage] entries:
+ 
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   ======
+   sidebar:  'open'
+   sidebarw: '400'
+   ```
+ 
+2. As always, changing the store-value auto syncs the [Local Storage].
+ 
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   ========
+   sidebar:  'closed'
+   sidebarw: '350'
+   ```
+ 
+3. As always, if you re-launch the web page, it will pick up where you
+   last left off, because your store is persistent!!
+
+4. As before, if you are dealing with sensitive data, activate the `safeguard`
+   parameter _(above)_, and you will see that the data is is now
+   obfuscated.
+
+   **DevTools** "Application" Tab:
+   ```
+   Key       Value
+   =======   ===============
+   sidebar:  'afesaY2xvc2Vk'
+   sidebarw: 'afesaMzAw'
+   ```
+
+5. The interesting thing about partitioning our store's persistent
+   state is it allows one aspect of the store to come from [URL Hash
+   Storage], while the remainder comes from [Local Storage].
+
+   Consider this URL:
+
+   ```
+   https://my-app.org/app/#sidebar=closed
+   ```
+
+   - Now the 'open/closed' state is being driven by the URL, but the sidebar width is
+     coming from Local Storage.
+
+   - As always, this allows you to specify the initial value from the
+     URL itself.  This is especially useful in things like `iframe`
+     usage.
+
+   - As always, you can also change the hash value in the URL, and it
+     will automatically sync to your local svelte store **(very
+     kool)**.
 
 
 
