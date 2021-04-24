@@ -1,7 +1,7 @@
 import {initTwThemes} from 'tw-themes';
 import {getAppStateItem,
         setAppStateItem, 
-        registerAppStateChangeHandler}  from '../util/appStateRetention';
+        registerAppStateChangeHandler}  from '../util/persistence/appStateRetention';
 
 // our color schema ...
 const schema = [

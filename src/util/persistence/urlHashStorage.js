@@ -14,22 +14,32 @@
 
    ------------------------------------------------------------------------------ */
 
-import check           from './check';
+import check           from '../check';
 import {isString,
         isBoolean,
         isPlainObject,
-        isFunction}    from './typeCheck';
+        isFunction}    from '../typeCheck';
 import {encode,
-        decode}        from './encoder';
-import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.config.js build process)
+        decode}        from '../encoder';
+import {isBrowser}     from '../env'; // can run in node.js env (ex: tailwind.config.js build process)
 
 
-// INTERNAL functions to encode/decode hash bindings ('&' -and- '=')
+// INTERNAL functions that performs ADDITIONAL encode/decode for hash bindings ('&' -and- '=' ?? and others)
 // ... allowing these characters to exist in app state
-// ... most critical when using safeguard feature
+// ... CRITICAL on a: safeguard and b: JSON string <<< which BOTH are WEIRD and problematic IN URL (we really want this to be human readable)
 // ... NOTE: ternary operator (below) handles `undefined` str
-const encodeHashBindings = (str) => str ? str.replaceAll('&', '@A@').replaceAll('=', '@E@') : str;
-const decodeHashBindings = (str) => str ? str.replaceAll('@A@', '&').replaceAll('@E@', '=') : str;
+// ?? OLD
+const encodeHashBindings = (str) => {
+  console.log(`?? encodeHashBindings() on str: `, {str}); // ?? someone is calling this with an object: {str: "closed"}
+  const x = str ? str.replaceAll('&', '@A@').replaceAll('=', '@E@').replaceAll('{', '@LS@').replaceAll('}', '@RS@').replaceAll('"', '@Q@').replaceAll(':', '@C@') : str;
+  return x;
+};
+
+//const encodeHashBindings = (str) => str ? str.replaceAll('&', '@A@').replaceAll('=', '@E@').replaceAll('{', '@LS@').replaceAll('}', '@RS@').replaceAll('"', '@Q@').replaceAll(':', '@C@') : str;
+const decodeHashBindings = (str) => str ? str.replaceAll('@A@', '&').replaceAll('@E@', '=').replaceAll('@LS@', '{').replaceAll('@RS@', '}').replaceAll('@Q@', '"').replaceAll('@C@', ':') : str;
+// ?? TEST
+//? const encodeHashBindings = (str) => str ? escape(str)   : str;
+//? const decodeHashBindings = (str) => str ? unescape(str) : str;
 
 
 // INTERNAL state - a module-scoped copy of the URL Hash
@@ -65,7 +75,7 @@ function getUrlHash() {
     }
     return accum;
   }, {});
-  // console.log(`XX getUrlHash() hashMap: `, hashMap);
+  console.log(`?? getUrlHash() hashMap: `, hashMap);
   return hashMap;
 }
 
@@ -135,7 +145,7 @@ function retainUrlHash(hashMap) {
     delim = '&';
     return accum;
   }, '');
-  // console.log(`XX retainUrlHash() hashStr: '${hashStr}'`);
+  console.log(`?? retainUrlHash() hashStr: '${hashStr}'`);
   window.location.hash = hashStr;
 }
 

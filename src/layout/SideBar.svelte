@@ -25,7 +25,7 @@
  //       OP3: combination of OP1/OP2
 
  import {writable}      from 'svelte/store';
- import persistentStore from '../util/persistentStore';
+ import persistentStore from '../util/persistence/persistentStore';
 
  // our base store (a persistent writable)
  const {subscribe, update} = persistentStore({

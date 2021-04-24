@@ -55,11 +55,11 @@
 
    ------------------------------------------------------------------------------ */
 
-import check           from './check';
+import check           from '../check';
 import {isString,
         isBoolean,
         isPlainObject,
-        isFunction}    from './typeCheck';
+        isFunction}    from '../typeCheck';
 import {getUrlHashItem,
         updateUrlHashItem,
         isUrlHashItemDefined,

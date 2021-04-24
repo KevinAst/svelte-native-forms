@@ -1,6 +1,6 @@
 <script context="module">
  import {writable}             from 'svelte/store';
- import persistentStore        from './util/persistentStore';
+ import persistentStore        from './util/persistence/persistentStore';
  import bindStoreValueMethods  from './util/bindStoreValueMethods';
 
  // PUBLIC API is provided through a "module scoped" custom store

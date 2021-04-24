@@ -15,15 +15,15 @@
 
    ------------------------------------------------------------------------------ */
 
-import check           from './check';
+import check           from '../check';
 import {isString,
         isBoolean,
         isFunction,
-        isPlainObject} from './typeCheck';
-import noOp            from './noOp';
+        isPlainObject} from '../typeCheck';
+import noOp            from '../noOp';
 import {encode,
-        decode}        from './encoder';
-import {isBrowser}     from './env'; // can run in node.js env (ex: tailwind.config.js build process)
+        decode}        from '../encoder';
+import {isBrowser}     from '../env'; // can run in node.js env (ex: tailwind.config.js build process)
 
 
 /**

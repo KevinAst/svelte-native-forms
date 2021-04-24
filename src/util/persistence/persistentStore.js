@@ -1,11 +1,11 @@
-import check                    from './check';
-import checkNamedParamStructure from './checkNamedParamStructure';
+import check                    from '../check';
+import checkNamedParamStructure from '../checkNamedParamStructure';
 import {isString,
         isBoolean,
         isArray,
         isPlainObject,
         isFunction,
-        isSvelteWritable}       from './typeCheck';
+        isSvelteWritable}       from '../typeCheck';
 import {getAppStateItem,
         setAppStateItem,
         registerAppStateChangeHandler} from './appStateRetention';
