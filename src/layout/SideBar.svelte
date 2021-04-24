@@ -24,20 +24,51 @@
  //       OP2: registration API (useful for dynamic run-time resources - as in visualize-it)
  //       OP3: combination of OP1/OP2
 
- import {writable} from 'svelte/store';
+ import {writable}      from 'svelte/store';
+ import persistentStore from '../util/persistence/persistentStore';
 
- // promote our sideBar PUBLIC API through this "module scoped" custom store
- const initialOpen  = true; // AI: adjust from app-specific retention (local storage, URL hash, etc.)
- const initialWidth = 250;  // AI: adjust from app-specific retention (local storage, URL hash, etc.)
- const {subscribe, set, update} = writable({
-   isOpen: initialOpen,
-   width:  initialWidth,
+ // our base store (a persistent writable)
+ const {subscribe, update} = persistentStore({
+          // we use two distinct persistent keys to allow 
+          // partitioning storage between URL hash and Local Storage
+   key:   ['sidebar',   // ... syntax: sidebar=open, sidebar=closed
+           'sidebarw'], // ... syntax: sidebarw=250
+   store: writable({ 
+     isOpen: true,  // the sidebar open/closed state
+     width:  300    // the sidebar width
+   }),
+   encode: (key, storeValue) => {
+     if (key === 'sidebar') {
+       return storeValue.isOpen ? 'open' : 'closed';
+     }
+     else {
+       return '' + storeValue.width;
+     }
+   },
+   decodeAndSync: (key, persistentValue, store) => {
+     if (key === 'sidebar') {
+       // NOTE: BY reasoning over non-default (i.e. 'closed'),
+       //       we DEFAULT all unknown values to the desired 'open' fallback
+       const isOpen = persistentValue === 'closed' ? false : true;
+       store.update( (storeValue) => ({...storeValue, isOpen}) );
+     }
+     else {
+       let width = parseInt(persistentValue, 10);
+       if (Number.isNaN(width)) {
+         width = 250; // DEFAULT invalid number
+       }
+       store.update( (storeValue) => ({...storeValue, width}) );
+     }
+   },
  });
- export const sideBar = { // our custom store (which is the SideBar PUBLIC API)
+
+ // our "public" custom store (with "controlled" setter methods)
+ export const sideBar = {
    subscribe,
-   open:   () => update( (state) => ({...state, isOpen: true})  ),
-   close:  () => update( (state) => ({...state, isOpen: false}) ),
-   toggle: () => update( (state) => ({...state, isOpen: !state.isOpen}) ),
+   open:     ()      => update( (state) => ({...state, isOpen: true}) ),
+   close:    ()      => update( (state) => ({...state, isOpen: false}) ),
+   toggle:   ()      => update( (state) => ({...state, isOpen: !state.isOpen}) ),
+   setWidth: (width) => update( (state) => ({...state, width}) ),
  };
 
  // AI: OVERKILL: insure SideBar has been instantiated (may be some timing issues here)
@@ -56,9 +87,10 @@
  //   - adjusts left position for visibility (open/close)
  //     * via inline style.left
  //   - SideBar width is adjustable (BY user via drag operation)
- import {onMount}  from 'svelte';
- import Icon       from '../util/ui/Icon.svelte';
- import {slide}    from 'svelte/transition';
+ import {onMount}   from 'svelte';
+ import Icon        from '../util/ui/Icon.svelte';
+ import {debounced} from '../util/dampen';
+ import {slide}     from 'svelte/transition';
 
  let sideBarElm;
 
@@ -77,7 +109,7 @@
  // monitor SideBar width changes
  // ... in onMount() to accommodate sideBarElm binding
  onMount( () => {
-   const ro = new ResizeObserver( (entries) => {
+   const ro = new ResizeObserver( debounced(100, (entries) => {
      // NOTE: Because we only monitor ONE element, we bypass `entries`
      //       and go straight to the horses mouth
      const newWidth_withScroll = sideBarElm.offsetWidth;
@@ -85,8 +117,9 @@
      // console.log(`XX our SideBar width has changed!!!`, {newWidth_withScroll, newWidth_noScroll});
 
      // reflexively update our width change
-     update( (state) => ({...state, width: newWidth_withScroll}) );
-   });
+     sideBar.setWidth(newWidth_withScroll);
+
+   }) );
    ro.observe(sideBarElm); // ... there is a second param that specifies which box model to adhear to (default: content-box)
 
    // cleanup - on component desctuction

@@ -1,0 +1,44 @@
+{
+  "name": "svelte-native-forms",
+  "version": "0.1.0",
+  "description": "minimalist form validation with powerful results",
+  "homepage": "https://svelte-native-forms.js.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KevinAst/svelte-native-forms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KevinAst/svelte-native-forms/issues"
+  },
+  "keywords": [
+    "svelte-native-forms",
+    "svelte",
+    "form",
+    "validation",
+    "utility",
+    "geeku",
+    "astx"
+  ],
+  "author": "Kevin J. Bridges <kevin@wiiBridges.com> (https://github.com/KevinAst)",
+  "license": "MIT",
+  "svelte": "src/index.js",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "files": [
+    "package.json",
+    "LICENSE.md",
+    "README.md",
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "rollup": "^2.0.0",
+    "rollup-plugin-svelte": "^6.0.0",
+    "svelte": "^3.0.0"
+  }
+}

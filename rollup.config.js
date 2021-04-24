@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
+import alias from '@rollup/plugin-alias';  // KJB: in support of: Absolute Imports
 
 // KJB: supporting TailwindCSS
 import sveltePreprocess from 'svelte-preprocess';
@@ -89,7 +90,16 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
+
+    // KJB: Absolute Imports
+    alias({
+      entries: [
+        // allow:      import {formChecker}  from "svelte-native-forms";
+        // instead of: import {formChecker}  from "../../snf/src";
+        { find: 'svelte-native-forms', replacement: 'snf/src/index.js' },
+      ]
+    })
 	],
 	watch: {
 		clearScreen: false
