@@ -25,7 +25,7 @@
   {@html codeTheme}
 </svelte:head>
 
-{#await fetchTextResource(`/demoCode/${moduleName}`)}
+{#await fetchTextResource(`demoCode/${moduleName}`)}
   <p>...waiting</p>
 {:then code}
   <HighlightSvelte {code} style="font-size: 0.7rem" />
