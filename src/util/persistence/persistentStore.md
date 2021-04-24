@@ -718,7 +718,7 @@ Storage] is "global" in that sense**.
 <!--- *** REFERENCE LINKS ************************************************************************* ---> 
 <!---     NOTE: some links are duplicated with alias link label text                                --->
 
-<!--- **tw-themes** ---> 
+<!--- internal links ---> 
 [Introduction]:              #persistentstore-svelte-store
 [Getting Started]:           #getting-started
 [API:]:                      #api
