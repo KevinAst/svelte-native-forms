@@ -733,7 +733,7 @@ Storage] is "global" in that sense**.
 
 <!--- external links ---> 
 [`Writable`]:                https://svelte.dev/docs#writable
-[App State Retention]:       appStateRetention.js
+[App State Retention]:       appStateRetention.md
 [URL Hash Storage]:          urlHashStorage.js
 [Local Storage]:             localStorage.js
 [JSONize]:                   https://www.digitalocean.com/community/tutorials/js-json-parse-stringify
